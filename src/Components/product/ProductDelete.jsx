@@ -4,15 +4,15 @@ import { CircleX } from "lucide-react";
 import { useContext, useState } from "react";
 
 import "../../Styles/dialogStyle.scss";
-import { DELETE_USER } from "../../../graphql/mutation";
+import { DELETE_PRODUCT } from "../../../graphql/mutation";
 import { useAuth } from "../../context/AuthContext";
 import { translateLauguage } from "../../function/translate";
 
-export default function DeleteUser({
+export default function ProductDelete({
   open,
   onClose,
-  userId,
-  userName,
+  productId,
+  productName,
   setRefetch,
 }) {
 
@@ -22,16 +22,16 @@ export default function DeleteUser({
   const { language } = useAuth();
   const { t } = translateLauguage(language);
 
-  const [deleteUser] = useMutation(DELETE_USER, {
-    onCompleted: ({ deleteUser }) => {
+  const [deleteProduct] = useMutation(DELETE_PRODUCT, {
+    onCompleted: ({ deleteProduct }) => {
       setLoading(false);
-      if (deleteUser?.isSuccess) {
+      if (deleteProduct?.isSuccess) {
         onClose?.();
-        setAlert(true, "success", deleteUser?.message);
+        setAlert(true, "success", deleteProduct?.message);
         setRefetch();
         setConfirmationText("");
       } else {
-        setAlert(true, "error", deleteUser?.message);
+        setAlert(true, "error", deleteProduct?.message);
       }
     },
     onError: (error) => {
@@ -42,18 +42,18 @@ export default function DeleteUser({
   });
 
   const handleDelete = () => {
-    if (confirmationText !== (userName ?? "")) {
+    if (confirmationText !== (productName ?? "")) {
       setAlert(true, "error", t("confirmation_text_not_match"));
       return;
     }
-    if (!userId) {
+    if (!productId) {
       setAlert(true, "error", t("user_id_missing"));
       return;
     }
 
     setLoading(true);
-    deleteUser({
-      variables: { id: userId },
+    deleteProduct({
+      variables: { id: productId },
     });
   };
 
@@ -70,8 +70,8 @@ export default function DeleteUser({
       }}
     >
       <DialogTitle>
-        <Stack direction="row" justifyContent="space-between" alignItems={"center"}>
-          <Typography >
+        <Stack direction="row" justifyContent="space-between">
+          <Typography className="dialog-title">
             {t("delete")}
           </Typography>
           <IconButton onClick={onClose}>
@@ -87,13 +87,13 @@ export default function DeleteUser({
               <Grid size={{ xs: 12 }}>
                 <Stack spacing={1} pb="15px">
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <Typography>
+                    <Typography className="txt-delete">
                       {t("delete_input")}
                     </Typography>
                     <Typography className="txt-delete-confirm">
-                      {userName}
+                      {productName}
                     </Typography>
-                    <Typography>
+                    <Typography className="txt-delete">
                       {t("delete_to_confirm")}
                     </Typography>
                   </Stack>
@@ -114,10 +114,10 @@ export default function DeleteUser({
                   className="btn-delete"
                   fullWidth
                   onClick={handleDelete}
-                  disabled={loading || confirmationText !== (userName ?? "")}
+                  disabled={loading || confirmationText !== (productName ?? "")}
                 >
                   {loading ? (
-                    <CircularProgress size={20} />
+                    <Typography>{t(`processing...`)}</Typography>
                   ) : (
                     <Typography className="txt-btn">{t("delete")}</Typography>
                   )}

@@ -1,37 +1,35 @@
 import { useMutation } from "@apollo/client/react";
 import { Button, CircularProgress, Dialog, DialogContent, DialogContentText, DialogTitle, Divider, Grid, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { CircleX } from "lucide-react";
-import { useContext, useState } from "react";
+import { useState } from "react";
 
 import "../../Styles/dialogStyle.scss";
-import { DELETE_USER } from "../../../graphql/mutation";
+import { DELETE_SHOP } from "../../../graphql/mutation";
 import { useAuth } from "../../context/AuthContext";
-import { translateLauguage } from "../../function/translate";
 
-export default function DeleteUser({
+export default function ShopDelete({
   open,
   onClose,
-  userId,
-  userName,
+  shopId,
+  shopName,
   setRefetch,
+  t, 
 }) {
-
+  console.log("shopName",shopName)
   const [confirmationText, setConfirmationText] = useState("");
   const { setAlert } = useAuth();
   const [loading, setLoading] = useState(false);
-  const { language } = useAuth();
-  const { t } = translateLauguage(language);
 
-  const [deleteUser] = useMutation(DELETE_USER, {
-    onCompleted: ({ deleteUser }) => {
+  const [deleteShop] = useMutation(DELETE_SHOP, {
+    onCompleted: ({ deleteShop }) => {
       setLoading(false);
-      if (deleteUser?.isSuccess) {
+      if (deleteShop?.isSuccess) {
         onClose?.();
-        setAlert(true, "success", deleteUser?.message);
+        setAlert(true, "success", deleteShop?.message);
         setRefetch();
         setConfirmationText("");
       } else {
-        setAlert(true, "error", deleteUser?.message);
+        setAlert(true, "error", deleteShop?.message);
       }
     },
     onError: (error) => {
@@ -42,18 +40,18 @@ export default function DeleteUser({
   });
 
   const handleDelete = () => {
-    if (confirmationText !== (userName ?? "")) {
+    if (confirmationText !== (shopName ?? "")) {
       setAlert(true, "error", t("confirmation_text_not_match"));
       return;
     }
-    if (!userId) {
+    if (!shopId) {
       setAlert(true, "error", t("user_id_missing"));
       return;
     }
 
     setLoading(true);
-    deleteUser({
-      variables: { id: userId },
+    deleteShop({
+      variables: { id: shopId },
     });
   };
 
@@ -71,9 +69,7 @@ export default function DeleteUser({
     >
       <DialogTitle>
         <Stack direction="row" justifyContent="space-between" alignItems={"center"}>
-          <Typography >
-            {t("delete")}
-          </Typography>
+          <Typography >{t("delete")}</Typography>
           <IconButton onClick={onClose}>
             <CircleX className="dialog-close-icon" />
           </IconButton>
@@ -84,18 +80,12 @@ export default function DeleteUser({
         <DialogContentText>
           <Stack margin="0px 0px 20px 0px">
             <Grid container spacing={3}>
-              <Grid size={{ xs: 12 }}>
+              <Grid size={{xs:12}}>
                 <Stack spacing={1} pb="15px">
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <Typography>
-                      {t("delete_input")}
-                    </Typography>
-                    <Typography className="txt-delete-confirm">
-                      {userName}
-                    </Typography>
-                    <Typography>
-                      {t("delete_to_confirm")}
-                    </Typography>
+                    <Typography >{t("delete_input")}</Typography>
+                    <Typography className="txt-delete-confirm">{shopName}</Typography>
+                    <Typography >{t("delete_to_confirm")}</Typography>
                   </Stack>
                 </Stack>
                 <TextField
@@ -109,12 +99,12 @@ export default function DeleteUser({
                   autoComplete="off"
                 />
               </Grid>
-              <Grid size={{ xs: 12 }}>
+              <Grid size={{xs:12}}>
                 <Button
                   className="btn-delete"
                   fullWidth
                   onClick={handleDelete}
-                  disabled={loading || confirmationText !== (userName ?? "")}
+                  disabled={loading || confirmationText !== (shopName ?? "")}
                 >
                   {loading ? (
                     <CircularProgress size={20} />

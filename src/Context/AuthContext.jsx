@@ -42,11 +42,12 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem("token") || null);
+ 
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("user");
     return saved ? JSON.parse(saved) : null;
   });
-
+  const userRole = user?.role || ""
 
   // ==================language=====================
   const handleGetLanguage = () => {
@@ -76,7 +77,7 @@ export const AuthProvider = ({ children }) => {
       return { open: open, status: alertStatus, message: messageAlert };
     };
 
-
+  
 
   useEffect(() => {
     if (token) {
@@ -117,7 +118,8 @@ export const AuthProvider = ({ children }) => {
         language,
         changeLanguage,
         alert,
-        setAlert
+        setAlert,
+        userRole
       }}
     >
       {children}

@@ -2,16 +2,15 @@ import { IconButton, Stack } from "@mui/material";
 import { SquarePen, Trash } from "lucide-react";
 import React, { useState } from "react";
 
-import DeleteUser from "./DeleteUser";
-import UserForm from "./UserForm";
+import DeleteCategory from "./DeleteCategory";
+import CategoryForm from "./CategoryForm";
 
-export default function UserAction({
-  userData,
+export default function CategoryAction({
+  categoryData,
   setRefetch,
-  userId,
+  categoryId,
   t,
-  userName,
-
+  categoryName,
 }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -32,22 +31,21 @@ export default function UserAction({
         </IconButton>
       </Stack>
 
-      <UserForm
+      <CategoryForm
         open={open}
         onClose={handleClose}
         dialogTitle="Update"
-        userData={userData}
+        categoryData={categoryData}
         setRefetch={setRefetch}
         t={t}
       />
 
-      <DeleteUser
+      <DeleteCategory
         setRefetch={setRefetch}
- 
         open={openDelete}
         onClose={handleCloseDelete}
-        userId={userId}
-        userName={userName}
+        categoryId={categoryId}
+        categoryName={categoryName}
       />
     </div>
   );

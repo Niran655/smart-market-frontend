@@ -2,16 +2,14 @@ import { IconButton, Stack } from "@mui/material";
 import { SquarePen, Trash } from "lucide-react";
 import React, { useState } from "react";
 
-import DeleteUser from "./DeleteUser";
-import UserForm from "./UserForm";
-
-export default function UserAction({
-  userData,
+import DeleteUnit from "./DeleteUnit";
+import UnitForm from "./UnitForm";
+export default function UnitAction({
+  unitData,
   setRefetch,
-  userId,
+  unitId,
   t,
-  userName,
-
+  unitName,
 }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -32,22 +30,21 @@ export default function UserAction({
         </IconButton>
       </Stack>
 
-      <UserForm
+      <UnitForm
         open={open}
         onClose={handleClose}
         dialogTitle="Update"
-        userData={userData}
+        unitData={unitData}
         setRefetch={setRefetch}
         t={t}
       />
 
-      <DeleteUser
+      <DeleteUnit
         setRefetch={setRefetch}
- 
         open={openDelete}
         onClose={handleCloseDelete}
-        userId={userId}
-        userName={userName}
+        unitId={unitId}
+        unitName={unitName}
       />
     </div>
   );

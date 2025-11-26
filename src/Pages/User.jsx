@@ -1,7 +1,7 @@
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import { useQuery } from "@apollo/client/react";
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Breadcrumbs, Button, Grid, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Box, Breadcrumbs, Button, Grid, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Search } from "lucide-react";
 import { useState } from "react";
 
@@ -24,12 +24,14 @@ const User = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
   const [keyword, setKeyword] = useState("");
+  const [role, setRole] = useState("All");
   const { data, refetch, loading, error } = useQuery(GET_USER_WITH_PAGINATION, {
     variables: {
       page,
       limit,
       pagination: true,
       keyword,
+      role: role === "All" ? "" : role,
     },
   });
 
@@ -44,6 +46,11 @@ const User = () => {
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
+  };
+
+  const handleRoleChange = (e) => {
+    setRole(e.target.value);
+    setPage(1);
   };
 
   return (
@@ -68,7 +75,6 @@ const User = () => {
             <Typography
               sx={{
                 textDecoration: "none",
-
                 fontWeight: 600,
               }}
               variant="h6"
@@ -79,9 +85,15 @@ const User = () => {
           </Breadcrumbs>
         </Box>
       </Stack>
-      <Box className="filter-box" mt={5}>
-        <Grid container spacing={2} alignItems="center" textAlign={"start"}>
-          <Grid size={{ xs: 12 }}>
+      <Stack direction={"row"} justifyContent={"space-between"} mt={5}>
+        <Grid
+          container
+          spacing={5}
+          fullWidth
+          alignItems="center"
+          textAlign="start"
+        >
+          <Grid size={{ xs: 12, md: 6 }}>
             <Typography variant="body2" fontWeight={500} mb={0.5}>
               {t("search")}
             </Typography>
@@ -94,8 +106,10 @@ const User = () => {
               fullWidth
               variant="outlined"
               sx={{
+                width: "250px",
+
                 "& .MuiOutlinedInput-root": {
-                  "& fieldset": { border: "none" },
+                  // "& fieldset": { border: "none" },
                 },
               }}
               InputProps={{
@@ -106,6 +120,32 @@ const User = () => {
                 ),
               }}
             />
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Typography className="search-head-title">{t("status")}</Typography>
+            <TextField
+              className="select-text-field"
+              select
+              fullWidth
+              size="small"
+              value={role}
+              sx={{
+                width: "200px",
+                "& .MuiOutlinedInput-root": {
+                  // "& fieldset": { border: "none" },
+                },
+              }}
+              onChange={handleRoleChange}
+            >
+              <MenuItem value="All">{t("all")}</MenuItem>
+              <MenuItem value="superAdmin">{t("super_admin")}</MenuItem>
+              <MenuItem value="cashier">{t("cashier")}</MenuItem>
+              <MenuItem value="admin">{t("admin")}</MenuItem>
+              <MenuItem value="stockController">
+                {t("stock_controller")}
+              </MenuItem>
+            </TextField>
           </Grid>
         </Grid>
 
@@ -127,7 +167,7 @@ const User = () => {
             />
           )}
         </Stack>
-      </Box>
+      </Stack>
       <TableContainer className="table-container">
         <Table className="table">
           <TableHead className="table-header">
@@ -153,7 +193,20 @@ const User = () => {
               {userRow.map((row, index) => (
                 <TableRow key={row._id} className="table-row">
                   <TableCell>{paginator.slNo + index}</TableCell>
-                  <TableCell>{row.nameKh}</TableCell>
+                  <TableCell>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <img
+                        src={row?.image}
+                        alt={row?.nameEn}
+                        width={40}
+                        height={40}
+                        style={{ borderRadius: "100%", objectFit: "cover" }}
+                      />
+                      <span>
+                        {language === "en" ? row?.nameEn : row?.nameKh}
+                      </span>
+                    </Box>
+                  </TableCell>
                   <TableCell>
                     {row.gender === "male" ? t("male") : t("female")}
                   </TableCell>

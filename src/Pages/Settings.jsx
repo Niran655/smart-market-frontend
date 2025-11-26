@@ -6,9 +6,9 @@ import Product from "../assets/Image/best-product.png";
 import Category from "../assets/Image/category.png";
 import Unit from "../assets/Image/unit.png";
 import User from "../assets/Image/man.png";
-import { useAuth } from "../Context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import "../Styles/setting.scss";
-import { translateLauguage } from "../Function/translate";
+import { translateLauguage } from "../function/translate";
 
 export default function Settings() {
   const { language } = useAuth();
@@ -80,7 +80,7 @@ export default function Settings() {
           <Paper
             className="setting-box"
             component={RouterLink}
-            to="/settings/category"
+            to="/setting/category"
             sx={{ cursor: "pointer", textDecoration: "none" }}
           >
             <Box>
@@ -101,7 +101,7 @@ export default function Settings() {
           <Paper
             className="setting-box"
             component={RouterLink}
-            to="/settings/product"
+            to="/setting/product"
             sx={{ cursor: "pointer", textDecoration: "none" }}
           >
             <Box>

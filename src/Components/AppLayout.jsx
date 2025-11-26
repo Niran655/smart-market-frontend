@@ -1,15 +1,15 @@
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
-import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { AppBar, Avatar, Box, Drawer, IconButton, ListItemIcon, MenuItem, Menu as MuiMenu, Toolbar, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { AppBar, Avatar, Box, ButtonBase, Drawer, IconButton, ListItemIcon, MenuItem, Menu as MuiMenu, Stack, Toolbar, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Store } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import CambodiaFlag from "../assets/Image/cambodiaflag.png";
 import EnglishFlag from "../assets/Image/englishflag.png";
@@ -25,9 +25,19 @@ export default function AppLayout() {
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const {t} = translateLauguage(language)
+  const { t } = translateLauguage(language);
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+ const [userObject, setUserObject] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUserObject(JSON.parse(storedUser));
+    }
+  }, []); 
+
+
 
   const [selectedFlag, setSelectedFlag] = useState(
     language === "kh" ? CambodiaFlag : EnglishFlag
@@ -55,7 +65,11 @@ export default function AppLayout() {
     setSelectedLanguage(newLang === "kh" ? "ភាសាខ្មែរ" : "English");
   };
   const menuItems = [
-    { icon: GridViewOutlinedIcon, label: `${t(`dashboard`)}`, path: "/dashboard" },
+    {
+      icon: GridViewOutlinedIcon,
+      label: `${t(`dashboard`)}`,
+      path: "/dashboard",
+    },
     { icon: Store, label: `${t(`store`)}`, path: "/store" },
     { icon: ReceiptLongOutlinedIcon, label: `${t(`report`)}`, path: "/report" },
     { icon: SettingsOutlinedIcon, label: `${t(`setting`)}`, path: "/setting" },
@@ -171,24 +185,25 @@ export default function AppLayout() {
                 <IconButton onClick={toggleLanguage}>
                   <Avatar
                     src={selectedFlag}
-                    sx={{ width: 30, height: 30, border: "1px solid #ddd" }}
-                  />
+                      sx={{ width: 30, height: 30 }}
+                    />
                 </IconButton>
               </Tooltip>
-
-              <Tooltip title="Account settings">
-                <IconButton
-                  onClick={handleMenuOpen}
-                  size="small"
-                  sx={{ ml: 2 }}
-                >
-                  <Avatar
-                    sx={{ width: 32, height: 32, bgcolor: "secondary.main" }}
-                  >
-                    <AccountCircleIcon />
-                  </Avatar>
-                </IconButton>
-              </Tooltip>
+            <ButtonBase onClick={handleMenuOpen} sx={{ borderRadius: 1 }}>
+              <Stack
+                direction="row"
+                spacing={1}
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Avatar
+                  sx={{ width: 32, height: 32 }}
+                  src={userObject?.image}
+                  alt={userObject?.nameKh}
+                />
+                <Typography color="white">{userObject?.nameKh}</Typography>
+              </Stack>
+            </ButtonBase>
 
               <MuiMenu
                 anchorEl={anchorEl}

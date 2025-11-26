@@ -4,7 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation } from "@apollo/client/react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import { styled } from "@mui/material/styles";
@@ -12,12 +12,10 @@ import { Divider, Grid, TextField } from "@mui/material";
 import { Form, FormikProvider, useFormik } from "formik";
 import * as React from "react";
 import { useEffect } from "react";
-import { useState } from "react";
 import * as Yup from "yup";
 
-import { CREATE_UNIT, UPDATE_UNIT } from "../../../graphql/mutation";
+import { CREATE_CATEGORY, UPDATE_CATEGORY } from "../../../graphql/mutation";
 import { useAuth } from "../../context/AuthContext";
-
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
@@ -27,75 +25,63 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-export default function UnitForm({
+export default function CategoryForm({
   open,
   onClose,
   t,
   dialogTitle,
-  unitData,
+  categoryData,
   setRefetch,
 }) {
   console.log("Dialogtitle", dialogTitle);
   const [loading, setLoading] = React.useState(false);
   const { setAlert } = useAuth();
-  const [userObject, setUserObject] = useState(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUserObject(JSON.parse(storedUser));
-    }
-  }, []);
-
-  
-
-  const [createUnit] = useMutation(CREATE_UNIT, {
-    onCompleted: ({ createUnit }) => {
-      if (createUnit?.isSuccess) {
+  const [createCategory] = useMutation(CREATE_CATEGORY, {
+    onCompleted: ({ createCategory }) => {
+      if (createCategory?.isSuccess) {
         setLoading(false);
         setRefetch();
-        setAlert(true, "success", createUnit?.message);
+        setAlert(true, "success", createCategory?.message);
         onClose();
       } else {
         setLoading(false);
-        setAlert(true, "error", createUnit?.message);
+        setAlert(true, "error", createCategory?.message);
       }
     },
     onError: (error) => {
       setLoading(false);
-      quickAlert("error", error.message || "Error");
       console.error("Error", error);
-
     },
   });
 
-  const [updateUnit] = useMutation(UPDATE_UNIT, {
-    onCompleted: ({ updateUnit }) => {
-      if (updateUnit?.isSuccess) {
+  const [updateCategory] = useMutation(UPDATE_CATEGORY, {
+    onCompleted: ({ updateCategory }) => {
+      if (updateCategory?.isSuccess) {
         setLoading(false);
         setRefetch();
-        setAlert(true, "success", updateUnit?.message);
+        setAlert(true, "success", updateCategory?.message);
         onClose?.();
       } else {
         setLoading(false);
-        setAlert(true, "error", updateUnit?.message);
+        setAlert(true, "error", updateCategory?.message);
       }
     },
     onError: (error) => {
       setLoading(false);
-      console.log("Error", error);
-      setAlert(true, "error", "something went wrong!");
+      console.error("Error", error);
     },
   });
 
   const formik = useFormik({
     initialValues: {
+      image:"",
       nameKh: "",
       nameEn: "",
       active: true,
       remark: "",
     },
     validationSchema: Yup.object({
+      image:Yup.string(),
       nameKh: Yup.string().required(t("require")),
       nameEn: Yup.string().required(t("require")),
       remark: Yup.string(),
@@ -104,15 +90,15 @@ export default function UnitForm({
     onSubmit: (values, { resetForm }) => {
       setLoading(true);
       if(dialogTitle==="Create"){
-      createUnit({
+      createCategory({
         variables: {
           input: values,
         },
       });
     }else{
-      updateUnit({
+      updateCategory({
         variables: {
-          id: unitData?._id,
+          id: categoryData?._id,
           input: values,
         },
       });
@@ -132,15 +118,15 @@ export default function UnitForm({
   } = formik;
 
   useEffect(() => {
-    if (unitData) {
+    if (categoryData) {
       setValues({
-        nameKh: unitData.nameKh,
-        nameEn: unitData.nameEn,
-        remark: unitData.remark,
-        active: unitData.active,
+        nameKh: categoryData.nameKh,
+        nameEn: categoryData.nameEn,
+        remark: categoryData.remark,
+        active: categoryData.active,
       });
     }
-  }, [unitData, setValues]);
+  }, [categoryData, setValues]);
 
   return (
     <BootstrapDialog
@@ -151,9 +137,8 @@ export default function UnitForm({
     >
       <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
         {dialogTitle === "Create"
-          ? t(`add_unit`)
-          :t(`edit_unit`)}
-      
+          ? t(`add_category`)
+          :t(`edit_category`)}
       </DialogTitle>
 
       <IconButton

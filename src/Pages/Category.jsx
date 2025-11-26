@@ -5,17 +5,19 @@ import { Box, Breadcrumbs, Button, Grid, InputAdornment, Stack, Switch, Table, T
 import { Search } from "lucide-react";
 import { useState } from "react";
 
+import UpdateCategoryStatus from "../Components/category/UpdateCategoryStatus";
+import CategoryAction from "../Components/category/CategoryAction";
+import CategoryForm from "../Components/category/CategoryForm";
 import UpdateUnitStatus from "../Components/units/UpdateStatus";
 import UnitAction from "../Components/units/UnitAction";
-import UnitForm from "../Components/units/UnitForm";
 import FooterPagination from "../include/FooterPagination";
 import "../Styles/TableStyle.scss";
 import { useAuth } from "../context/AuthContext";
-import { GET_UNIT_WHITH_PAGINATION } from "../../graphql/queries";
+import { GET_CATEGORY_WHITH_PAGINATION } from "../../graphql/queries";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
-const Unit = () => {
+const Category = () => {
   const { language } = useAuth();
   const { t } = translateLauguage(language);
   const [open, setOpen] = useState(false);
@@ -24,7 +26,7 @@ const Unit = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
   const [keyword, setKeyword] = useState("");
-  const { data, refetch, loading } = useQuery(GET_UNIT_WHITH_PAGINATION, {
+  const { data, refetch, loading } = useQuery(GET_CATEGORY_WHITH_PAGINATION, {
     variables: {
       page,
       limit,
@@ -32,8 +34,8 @@ const Unit = () => {
       keyword,
     },
   });
-  const unitDatas = data?.getUnitWithPagination?.data || [];
-  const paginator = data?.getUnitWithPagination?.paginator;
+  const categoryData = data?.getCategoryWithPagination?.data || [];
+  const paginator = data?.getCategoryWithPagination?.paginator;
 
   const handleLimit = (e) => {
     const newLimit = parseInt(e.target.value, 10);
@@ -68,12 +70,12 @@ const Unit = () => {
                 textDecoration: "none",
                 fontWeight: 600,
               }} color="text.primary">
-              {t("unit")}
+              {t("category")}
             </Typography>
           </Breadcrumbs>
         </Box>
       </Stack>
-      <Box sx={{display:"flex",justifyContent:"space-between",alignItems:"center"}} mt={5}>
+      <Box sx={{display:"flex",justifyContent:"space-between",alignItems:"center"}}  mt={5}>
         <Grid container spacing={2} alignItems="center" textAlign={"start"}>
           <Grid size={{ xs: 12 }}>
             <Typography variant="body2" fontWeight={500} mb={0.5}>
@@ -83,9 +85,9 @@ const Unit = () => {
               type="search"
               size="small"
               placeholder={t("search") + "..."}
+              fullWidth
               value={keyword}
               onChange={(e)=>setKeyword(e.target.value)}
-              fullWidth
               variant="outlined"
               sx={{
                 "& .MuiOutlinedInput-root": {
@@ -113,7 +115,7 @@ const Unit = () => {
           </Button>
         </Stack>
         {open && (
-          <UnitForm
+          <CategoryForm
             setRefetch={refetch}
             dialogTitle="Create"
             open={handleOpen}
@@ -137,26 +139,26 @@ const Unit = () => {
 
           {loading ? (
             <CircularIndeterminate />
-          ) : unitDatas?.length == 0 ? (
+          ) : categoryData?.length == 0 ? (
             <EmptyData />
           ) : (
             <TableBody>
-              {unitDatas?.map((unit, index) => (
+              {categoryData?.map((category, index) => (
                 <TableRow className="table-row">
                   <TableCell>{paginator.slNo + index}</TableCell>
-                  <TableCell>{unit?.nameKh}</TableCell>
-                  <TableCell>{unit?.nameEn}</TableCell>
-                  <TableCell>{unit?.remark}</TableCell>
+                  <TableCell>{category?.nameKh}</TableCell>
+                  <TableCell>{category?.nameEn}</TableCell>
+                  <TableCell>{category?.remark}</TableCell>
                   <TableCell>
-                    <UpdateUnitStatus editData={unit} refetch={refetch} />
+                    <UpdateCategoryStatus editData={category} refetch={refetch} />
                   </TableCell>
                   <TableCell className="flex-end">
-                    <UnitAction
+                    <CategoryAction
                       t={t}
-                      unitId={unit?._id}
-                      unitName={unit?.nameEn}
+                      categoryId={category?._id}
+                      categoryName={category?.nameEn}
                       setRefetch={refetch}
-                      unitData={unit}
+                      categoryData={category}
                     />
                   </TableCell>
                 </TableRow>
@@ -184,4 +186,4 @@ const Unit = () => {
   );
 };
 
-export default Unit;
+export default Category;

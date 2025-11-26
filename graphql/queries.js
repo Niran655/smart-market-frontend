@@ -27,10 +27,23 @@ query GetUnitWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyw
   }
 }
 `
+export const GET_UNIT = gql`
+query GetUnit {
+  getUnit {
+    _id
+    nameKh
+    nameEn
+    remark
+    active
+    createdAt
+    updatedAt
+  }
+}
+`
 
 export const GET_USER_WITH_PAGINATION = gql`
-query GetUsersWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
-  getUsersWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+query GetUsersWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $role: String) {
+  getUsersWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, role: $role) {
     data {
       _id
       image
@@ -57,6 +70,174 @@ query GetUsersWithPagination($page: Int, $limit: Int, $pagination: Boolean, $key
       hasNextPage
       totalDocs
     }
+  }
+}
+`
+export const GET_CATEGORY_WHITH_PAGINATION = gql`
+query GetCategoryWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
+  getCategoryWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+    data {
+      _id
+      nameKh
+      nameEn
+      remark
+      active
+      createdAt
+      updatedAt
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
+  }
+}
+`
+export const GET_CATEGORY = gql`
+query GetCategory {
+  getCategory {
+    _id
+    image
+    nameKh
+    nameEn
+    remark
+    active
+    createdAt
+    updatedAt
+  }
+}
+`
+export const GET_ALL_SHOP = gql`
+query GetAllShops($id: ID!) {
+  getAllShops(_id: $id) {
+    _id
+    code
+    image
+    nameEn
+    nameKh
+    type
+    remark
+    address
+    active
+    createdAt
+    updatedAt
+    platform {
+      id
+      platform
+      name
+      url
+    }
+    user {
+      nameEn
+      nameKh
+    }
+  }
+}
+`
+export const GET_SHOP_BY_SHOP_ID =gql`
+query GetShopByShopId($shopId: ID!, $id: ID) {
+  getShopByShopId(shopId: $shopId, _id: $id) {
+    id
+    code
+    image
+    nameEn
+    nameKh
+    type
+    remark
+    address
+    active
+    createdAt
+    updatedAt
+    platform {
+      id
+      platform
+      name
+      url
+    }
+    user {
+      _id
+      role
+      nameEn
+      nameKh
+    }
+  }
+}
+`
+
+export const GET_PRODUCT_WITH_PAGINATION = gql`
+query GetProductsWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
+  getProductsWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+    data {
+      nameKh
+      nameEn
+      image
+      unitId {
+        nameKh
+        nameEn
+        _id
+      }
+      categoryId {
+        nameEn
+        nameKh
+        _id
+      }
+      remark
+      _id
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
+  }
+}
+`
+
+export const GET_SUP_PRODUCT = gql`
+query GetSubProducts($parentProductId: ID!) {
+  getSubProducts(parentProductId: $parentProductId) {
+    _id
+    priceDes
+    priceImg
+    productDes
+    productImg
+    qty
+    salePrice
+    saleType
+    sell
+    servicePrice
+    taxRate
+    totalPrice
+    updatedAt
+    using
+    shopId {
+      _id
+      nameEn
+      nameKh
+    }
+    unitId {
+      _id
+      nameEn
+      nameKh
+    }
+    check
+    barCode
+    costPrice
+    createdAt
   }
 }
 `

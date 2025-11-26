@@ -21,21 +21,21 @@ export default function MenuNavbar() {
       routeTo: "/dashboard",
       pageIcon: <Category className="icon" />,
     },
-    {
-      pageTitle: "Student",
-      pageIcon: <User className="icon" />,
-      matchPaths: ["/student-grid", "/student/details"],
-      children: [
-        {
-          pageTitle: "All Student",
-          routeTo: "/student-grid",
-        },
-        {
-          pageTitle: "Student List",
-          routeTo: "/student-list",
-        },
-      ],
-    },
+    // {
+    //   pageTitle: "Student",
+    //   pageIcon: <User className="icon" />,
+    //   matchPaths: ["/student-grid", "/student/details"],
+    //   children: [
+    //     {
+    //       pageTitle: "All Student",
+    //       routeTo: "/student-grid",
+    //     },
+    //     {
+    //       pageTitle: "Student List",
+    //       routeTo: "/student-list",
+    //     },
+    //   ],
+    // },
     {
       pageTitle: "Order",
       routeTo: "/order",

@@ -1,11 +1,12 @@
+import { useEffect } from "react";
 import { useMutation } from "@apollo/client/react";
-import { Avatar, Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Button, Paper, Stack, TextField, Typography } from "@mui/material";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
 
 import logo from "../assets/Image/logo.png";
 import { LOGIN } from "../../graphql/mutation";
-import { useAuth } from "../Context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import "../Styles/login.scss";
 
 const validationSchema = Yup.object({
@@ -14,8 +15,8 @@ const validationSchema = Yup.object({
 });
 
 export default function Login() {
-  const { login } = useAuth();
-  const [loginMutation, { loading }] = useMutation(LOGIN);
+  const { login, user } = useAuth();
+  const [loginMutation, { loading, client }] = useMutation(LOGIN);
 
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
@@ -28,18 +29,21 @@ export default function Login() {
     } catch (error) {
       setErrors({ password: "Email ឬ ពាក្យសម្ងាត់ មិនត្រឹមត្រូវ" });
     }
-
     setSubmitting(false);
   };
+
+  useEffect(() => {
+    if (user) {
+
+      client.resetStore();
+
+    }
+  }, [user, client]);
+
   return (
     <Box className="login-wrapper">
-      <Box elevation={4} className="login-card">
-        <Stack
-          alignItems="center"
-          spacing={2}
-          direction="column"
-          sx={{ width: "100%" }}
-        >
+      <Paper elevation={4} className="login-card">
+        <Stack alignItems="center" spacing={2} direction="column" sx={{ width: "100%" }}>
           <Avatar src={logo} sx={{ width: 90, height: 90 }} />
           <Typography variant="body2" color="text.secondary">
             Login to your account
@@ -77,9 +81,7 @@ export default function Login() {
                   className="input-field"
                 />
 
-                <Typography className="forgot-text">
-                  ភ្លេចពាក្យសម្ងាត់?
-                </Typography>
+                <Typography className="forgot-text">ភ្លេចពាក្យសម្ងាត់?</Typography>
 
                 <Button
                   type="submit"
@@ -94,7 +96,7 @@ export default function Login() {
             )}
           </Formik>
         </Stack>
-      </Box>
+      </Paper>
     </Box>
   );
 }
