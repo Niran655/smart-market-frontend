@@ -25,7 +25,7 @@ export default function SubProductAction({
   return (
     <div>
       <Stack direction="row" justifyContent={"flex-end"} spacing={1}>
-        <IconButton sx={{ backgroundColor: "#E0F7FA", color: "blue" }}>
+        <IconButton sx={{ backgroundColor: "#E0F7FA", color: "#21BCFF" }}>
           <QrCode size="18px" />
         </IconButton>
         <IconButton sx={{ backgroundColor: "#FFF3E0", color: "orange" }}>

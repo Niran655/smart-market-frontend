@@ -144,7 +144,7 @@ query GetAllShops($id: ID!) {
 export const GET_SHOP_BY_SHOP_ID =gql`
 query GetShopByShopId($shopId: ID!, $id: ID) {
   getShopByShopId(shopId: $shopId, _id: $id) {
-    id
+    _id
     code
     image
     nameEn
@@ -223,7 +223,7 @@ query GetSubProducts($parentProductId: ID!) {
     taxRate
     totalPrice
     updatedAt
-    using
+    using 
     shopId {
       _id
       nameEn
@@ -238,6 +238,46 @@ query GetSubProducts($parentProductId: ID!) {
     barCode
     costPrice
     createdAt
+  }
+}
+`
+export const GET_PRODUCT_FOR_SALE_WITH_PAGINATION = gql`
+query GetProductForSaleWithPagination($shopId: ID, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $categoryId: String) {
+  getProductForSaleWithPagination(shopId: $shopId, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, categoryId: $categoryId) {
+    data {
+      _id
+      qty
+      parentProductId {
+        _id
+        nameKh
+        nameEn
+        categoryId {
+          nameEn
+          nameKh
+          _id
+        }
+      }
+      unitId {
+        _id
+        nameKh
+        nameEn
+      }
+      productImg
+      taxRate
+      salePrice
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
   }
 }
 `

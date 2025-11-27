@@ -2,7 +2,7 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoSettingsOutline } from "react-icons/io5";
 import { Avatar, Box, Collapse, List, ListItem, ListItemButton, ListItemIcon, Stack, Typography } from "@mui/material";
-import { Bag2, Category, DocumentText1, Messages2, Tag, User, UserOctagon } from "iconsax-react";
+import { Bag2, Category, DocumentText1, House2, Messages2, Tag, User, UserOctagon } from "iconsax-react";
 import { useState } from "react";
 
 import logo from "../assets/Image/logo.png";
@@ -34,8 +34,13 @@ export default function MenuNavbar() {
     //       pageTitle: "Student List",
     //       routeTo: "/student-list",
     //     },
-    //   ],
+    //   ], 
     // },
+    {
+      pageTitle: "Warehouse",
+      routeTo: "/warehouse",
+      pageIcon: <House2 className="icon" />,
+    },
     {
       pageTitle: "Order",
       routeTo: "/order",

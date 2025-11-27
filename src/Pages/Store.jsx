@@ -1,5 +1,6 @@
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import { useQuery } from "@apollo/client/react";
+import { useNavigate } from "react-router-dom";
 import { Box, Breadcrumbs, Button, Card, Grid, InputAdornment, Stack, TextField, Typography } from "@mui/material";
 import { BookmarkX, ChartBarStacked, LogIn, Search } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -16,7 +17,7 @@ const Store = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [userObject, setUserObject] = useState(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -29,6 +30,12 @@ const Store = () => {
       id: userObject?._id,
     },
   });
+
+const handleJoinShop = (shopId) => {
+  localStorage.setItem("activeShopId", shopId);
+  navigate(`/store/pos/${shopId}`);
+};
+
 
   return (
     <Box>
@@ -119,9 +126,14 @@ const Store = () => {
                       {language === "en" ? shop.nameEn : shop.nameKh}
                     </Typography>
                     <Stack direction={"column"} spacing={1} mt={2}>
-                      <Button startIcon={<LogIn size={16}/>} size="small" variant="contained">
-                        {t(`join_in_shop`)}
-                      </Button>
+                 <Button
+  startIcon={<LogIn size={16} />}
+  size="small"
+  variant="contained"
+  onClick={() => handleJoinShop(shop._id)}
+>
+  {t("join_in_shop")}
+</Button>
                       <Button
                         size="small"
                         variant="contained"

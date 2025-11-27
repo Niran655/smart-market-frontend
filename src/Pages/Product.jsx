@@ -5,7 +5,7 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import Accordion from "@mui/material/Accordion";
 import { useQuery } from "@apollo/client/react";
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Breadcrumbs, Button, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Box, Breadcrumbs, Button, CircularProgress, Grid, IconButton, InputAdornment, Skeleton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { CopyPlus, Search } from "lucide-react";
 import { useState } from "react";
 
@@ -67,7 +67,7 @@ const Product = () => {
     }
   };
 
-    const handleLimit = (e) => {
+  const handleLimit = (e) => {
     const newLimit = parseInt(e.target.value, 10);
     setLimit(newLimit);
     setPage(1);
@@ -76,7 +76,6 @@ const Product = () => {
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
-
 
   return (
     <Box>
@@ -251,7 +250,10 @@ const Product = () => {
                         <Accordion
                           expanded
                           disableGutters
-                          sx={{ boxShadow: "none", transition: "all 0.5s ease-in-out", }}
+                          sx={{
+                            boxShadow: "none",
+                            transition: "all 0.5s ease-in-out",
+                          }}
                         >
                           <AccordionDetails>
                             <Table size="small">
@@ -265,7 +267,7 @@ const Product = () => {
                                   <TableCell>{t("tax_rate")}</TableCell>
                                   <TableCell>{t("service")}</TableCell>
                                   <TableCell>{t("total_price")}</TableCell>
-                                  <TableCell className="flex-end" >
+                                  <TableCell className="flex-end">
                                     <IconButton onClick={handleOpenSub}>
                                       <CopyPlus color="#36BBA7" size={20} />
                                     </IconButton>
@@ -289,7 +291,57 @@ const Product = () => {
                               </TableHead>
 
                               {subLoading ? (
-                                <Typography>Loading...</Typography>
+                                <TableBody>
+                                  {Array.from({
+                                    length:
+                                      subProductData?.length > 0
+                                        ? subProductData.length
+                                        : 1,
+                                  }).map((_, idx) => (
+                                    <TableRow key={idx}>
+                                      <TableCell>
+                                        <Skeleton
+                                          variant="circular"
+                                          width={40}
+                                          height={40}
+                                        />
+                                      </TableCell>
+                                      <TableCell>
+                                        <Skeleton variant="text" width={80} />
+                                      </TableCell>
+                                      <TableCell>
+                                        <Skeleton variant="text" width={60} />
+                                      </TableCell>
+                                      <TableCell>
+                                        <Skeleton variant="text" width={70} />
+                                      </TableCell>
+                                      <TableCell>
+                                        <Skeleton variant="text" width={70} />
+                                      </TableCell>
+                                      <TableCell>
+                                        <Skeleton variant="text" width={60} />
+                                      </TableCell>
+                                      <TableCell>
+                                        <Skeleton variant="text" width={70} />
+                                      </TableCell>
+                                      <TableCell>
+                                        <Skeleton variant="text" width={80} />
+                                      </TableCell>
+                                      <TableCell>
+                                        <Stack direction={"row"} spacing={1}>
+                                          {[...Array(4)].map((_, idx) => (
+                                            <Skeleton
+                                              key={idx}
+                                              variant="circular"
+                                              width={30}
+                                              height={30}
+                                            />
+                                          ))}
+                                        </Stack>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
                               ) : subProductData.length === 0 ? (
                                 <TableRow>
                                   <TableCell colSpan={10}>
@@ -327,15 +379,40 @@ const Product = () => {
                                           />
                                         </Box>
                                       </TableCell>
-                                      <TableCell>{p.saleType == "retail"?t(`retail`):t(`wholesale`)}</TableCell>
-                                      <TableCell>{ language == 'en' ? p.unitId?.nameEn:p.unitId?.nameKh}</TableCell>
-                                      <TableCell>$ {p.costPrice}</TableCell>
-                                      <TableCell>$ {p.salePrice}</TableCell>
-                                      <TableCell>$ {p.taxRate}</TableCell>
-                                      <TableCell>$ {p.servicePrice}</TableCell>
-                                      <TableCell>$ {p.totalPrice}</TableCell>
                                       <TableCell>
-                                        <SubProductAction setRefetch={refetchSub} parentProductId={row._id} subProductData={p}  t={t} />
+                                        {p.saleType == "retail"
+                                          ? t(`retail`)
+                                          : t(`wholesale`)}
+                                      </TableCell>
+                                      <TableCell>
+                                        {language == "en"
+                                          ? p.unitId?.nameEn
+                                          : p.unitId?.nameKh}
+                                      </TableCell>
+                                      <TableCell>
+                                        $ {p.costPrice.toFixed(2)}
+                                      </TableCell>
+                                      <TableCell>
+                                        $ {p.salePrice.toFixed(2)}
+                                      </TableCell>
+                                      <TableCell>
+                                        $ {p.taxRate.toFixed(2)}
+                                      </TableCell>
+                                      <TableCell>
+                                        $ {p.servicePrice.toFixed(2)}
+                                      </TableCell>
+                                      <TableCell>
+                                        $ {p.totalPrice.toFixed(2)}
+                                      </TableCell>
+                                      <TableCell>
+                                        <SubProductAction
+                                          setRefetch={refetchSub}
+                                          supProductName={t(`delete`)}
+                                          parentProductId={row._id}
+                                          subProductId={p?._id}
+                                          subProductData={p}
+                                          t={t}
+                                        />
                                       </TableCell>
                                     </TableRow>
                                   ))}
@@ -352,21 +429,21 @@ const Product = () => {
             </TableBody>
           )}
         </Table>
-         <Stack
-                  direction="row"
-                  justifyContent="flex-end"
-                  alignItems="center"
-                  sx={{ padding: 2 }}
-                >
-                  <FooterPagination
-                    page={page}
-                    limit={limit}
-                    setPage={handlePageChange}
-                    handleLimit={handleLimit}
-                    totalDocs={paginator?.totalDocs}
-                    totalPages={paginator?.totalPages}
-                  />
-                </Stack>
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          alignItems="center"
+          sx={{ padding: 2 }}
+        >
+          <FooterPagination
+            page={page}
+            limit={limit}
+            setPage={handlePageChange}
+            handleLimit={handleLimit}
+            totalDocs={paginator?.totalDocs}
+            totalPages={paginator?.totalPages}
+          />
+        </Stack>
       </TableContainer>
     </Box>
   );

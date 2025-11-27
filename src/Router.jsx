@@ -12,6 +12,7 @@ import Login from './Pages/Login';
 import Store from './Pages/Store';
 import Unit from './Pages/Unit';
 import User from './Pages/User';
+import Pos from './Pages/Pos';
 export default function Router() {
   const { isAuthenticated } = useAuth();
 
@@ -34,7 +35,8 @@ export default function Router() {
         { path: 'report', element: <Report/> },
         { path: '/setting/user', element: <User/> },
         { path: '/setting/category', element: <Category/> },
-        { path: '/setting/product', element: <Product/>}
+        { path: '/setting/product', element: <Product/>},
+        { path: '/store/pos/:shopId', element: <Pos/>}
       ],
     },
   ]);

@@ -4,7 +4,7 @@ import { CircleX } from "lucide-react";
 import { useContext, useState } from "react";
 
 import "../../Styles/dialogStyle.scss";
-import { DELETE_PRODUCT } from "../../../graphql/mutation";
+import { DELETE_SUP_PRODUCT } from "../../../graphql/mutation";
 import { useAuth } from "../../context/AuthContext";
 import { translateLauguage } from "../../function/translate";
 
@@ -12,26 +12,26 @@ export default function SubProductDelete({
   open,
   onClose,
   subProductId,
-  subProductName,
+  supProductName,
   setRefetch,
 }) {
-
+  console.log("subProductId",subProductId)
   const [confirmationText, setConfirmationText] = useState("");
   const { setAlert } = useAuth();
   const [loading, setLoading] = useState(false);
   const { language } = useAuth();
   const { t } = translateLauguage(language);
 
-  const [deleteProduct] = useMutation(DELETE_PRODUCT, {
-    onCompleted: ({ deleteProduct }) => {
+  const [deleteSubProduct] = useMutation(DELETE_SUP_PRODUCT, {
+    onCompleted: ({ deleteSubProduct }) => {
       setLoading(false);
-      if (deleteProduct?.isSuccess) {
+      if (deleteSubProduct?.isSuccess) {
         onClose?.();
-        setAlert(true, "success", deleteProduct?.message);
+        setAlert(true, "success", deleteSubProduct?.message);
         setRefetch();
         setConfirmationText("");
       } else {
-        setAlert(true, "error", deleteProduct?.message);
+        setAlert(true, "error", deleteSubProduct?.message);
       }
     },
     onError: (error) => {
@@ -42,7 +42,7 @@ export default function SubProductDelete({
   });
 
   const handleDelete = () => {
-    if (confirmationText !== (subProductName ?? "")) {
+    if (confirmationText !== (supProductName ?? "")) {
       setAlert(true, "error", t("confirmation_text_not_match"));
       return;
     }
@@ -52,7 +52,7 @@ export default function SubProductDelete({
     }
 
     setLoading(true);
-    deleteProduct({
+    deleteSubProduct({
       variables: { id: subProductId },
     });
   };
@@ -91,7 +91,7 @@ export default function SubProductDelete({
                       {t("delete_input")}
                     </Typography>
                     <Typography className="txt-delete-confirm">
-                      {subProductName}
+                      {supProductName}
                     </Typography>
                     <Typography className="txt-delete">
                       {t("delete_to_confirm")}
@@ -114,7 +114,7 @@ export default function SubProductDelete({
                   className="btn-delete"
                   fullWidth
                   onClick={handleDelete}
-                  disabled={loading || confirmationText !== (subProductName ?? "")}
+                  disabled={loading || confirmationText !== (supProductName ?? "")}
                 >
                   {loading ? (
                     <Typography>{t(`processing...`)}</Typography>

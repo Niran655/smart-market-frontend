@@ -64,7 +64,7 @@ export default function AddUser({
     refetch: refetchShop,
   } = useQuery(GET_SHOP_BY_SHOP_ID, {
     variables: { shopId: shopId, id: userId },
-    skip: !shopId,
+    // skip: !shopId,
   });
 
   const [addUserControllShop] = useMutation(ADD_USER_CONTROLL_SHOP, {
@@ -89,6 +89,7 @@ export default function AddUser({
   });
 
   const existingUsers = shopData?.getShopByShopId?.user || [];
+  console.log("exitting user",existingUsers)
   const existingUserIds = existingUsers.map((user) => user._id || user.id);
 
   const handleChange = (event) => {

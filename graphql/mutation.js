@@ -282,3 +282,14 @@ mutation DeleteSubProduct($id: ID!) {
   }
 }
 `
+export const CREATE_SALE = gql`
+mutation CreateSale($input: SaleInput) {
+  createSale(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`;
