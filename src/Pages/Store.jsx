@@ -1,7 +1,17 @@
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import { useQuery } from "@apollo/client/react";
 import { useNavigate } from "react-router-dom";
-import { Box, Breadcrumbs, Button, Card, Grid, InputAdornment, Stack, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Breadcrumbs,
+  Button,
+  Card,
+  Grid,
+  InputAdornment,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { BookmarkX, ChartBarStacked, LogIn, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -31,11 +41,10 @@ const Store = () => {
     },
   });
 
-const handleJoinShop = (shopId) => {
-  localStorage.setItem("activeShopId", shopId);
-  navigate(`/store/pos/${shopId}`);
-};
-
+  const handleJoinShop = (shopId) => {
+    localStorage.setItem("activeShopId", shopId);
+    navigate(`/store/pos/${shopId}`);
+  };
 
   return (
     <Box>
@@ -57,7 +66,14 @@ const handleJoinShop = (shopId) => {
         </Box>
       </Stack>
 
-      <Box sx={{display:"flex",justifyContent:"space-between",alignItems:"center"}} mt={5}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+        mt={5}
+      >
         <Grid container spacing={2} alignItems="center" textAlign="start">
           <Grid size={{ xs: 12 }}>
             <Typography variant="body2" fontWeight={500} mb={0.5}>
@@ -118,7 +134,7 @@ const handleJoinShop = (shopId) => {
                     alt={shop.nameKh}
                     width={80}
                     height={80}
-                    style={{borderRadius:'5px'}}
+                    style={{ borderRadius: "5px" }}
                   />
 
                   <Box>
@@ -126,14 +142,14 @@ const handleJoinShop = (shopId) => {
                       {language === "en" ? shop.nameEn : shop.nameKh}
                     </Typography>
                     <Stack direction={"column"} spacing={1} mt={2}>
-                 <Button
-  startIcon={<LogIn size={16} />}
-  size="small"
-  variant="contained"
-  onClick={() => handleJoinShop(shop._id)}
->
-  {t("join_in_shop")}
-</Button>
+                      <Button
+                        startIcon={<LogIn size={16} />}
+                        size="small"
+                        variant="contained"
+                        onClick={() => handleJoinShop(shop._id)}
+                      >
+                        {t("join_in_shop")}
+                      </Button>
                       <Button
                         size="small"
                         variant="contained"
@@ -148,7 +164,11 @@ const handleJoinShop = (shopId) => {
 
                 <Stack direction={"row"} spacing={2}>
                   <Stack direction={"row"} spacing={2}>
-                    <Button size="small" variant="contained" startIcon={<ChartBarStacked/>}>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      startIcon={<ChartBarStacked />}
+                    >
                       {t(`report`)}
                     </Button>
                     <ShopAction

@@ -224,6 +224,8 @@ query GetSubProducts($parentProductId: ID!) {
     totalPrice
     updatedAt
     using 
+    stock
+    minStock
     shopId {
       _id
       nameEn
@@ -247,6 +249,7 @@ query GetProductForSaleWithPagination($shopId: ID, $page: Int, $limit: Int, $pag
     data {
       _id
       qty
+      stock
       parentProductId {
         _id
         nameKh
@@ -278,6 +281,42 @@ query GetProductForSaleWithPagination($shopId: ID, $page: Int, $limit: Int, $pag
       hasNextPage
       totalDocs
     }
+  }
+}
+`
+
+export const GET_PRDUCT_WAREHOUSE_WITH_PAGINATION = gql`
+query GetProductWareHouseWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
+  getProductWareHouseWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+   data {
+      stock
+      subProduct {
+        qty
+        unitId {
+          nameEn
+          nameKh
+        }
+        parentProductId {
+          nameKh
+          nameEn
+        }
+        productImg
+        minStock
+        _id
+      }
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }  
   }
 }
 `

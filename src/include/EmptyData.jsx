@@ -5,10 +5,10 @@ import emptybox from "../assets/Image/empty-box.png";
 const EmptyData = () => {
   return (
 
-      <TableBody bgcolor="white" sx={{ height: "300px", borderRadius: "20px"}}>
+      <TableBody  sx={{ height: "300px", borderRadius: "20px"}}>
         <TableRow>
           <TableCell colSpan={10} align="center">
-            <Box  bgcolor="white" >
+            <Box>
               <Stack
                 direction="row"
                 justifyContent="center"

@@ -1,11 +1,12 @@
 import CloseIcon from "@mui/icons-material/Close";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { styled } from "@mui/material/styles";
-import { Autocomplete, Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControlLabel, Grid, IconButton, MenuItem, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControlLabel, Grid, IconButton, InputAdornment, MenuItem, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { FormikProvider, useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 
+import UseAutocomplete from "../include/useAutoComplete";
 import { CREATE_SUB_PRODUCT, UPDATE_SUB_PRODUCT } from "../../../graphql/mutation";
 import { useAuth } from "../../context/AuthContext";
 import { GET_ALL_SHOP, GET_UNIT } from "../../../graphql/queries";
@@ -28,12 +29,13 @@ export default function SubProductForm({
   subProductData,
   parentProductId,
   setRefetch,
+  unit,
 }) {
   const { setAlert } = useAuth();
   const [tabIndex, setTabIndex] = useState(0);
   const [loadingLocal, setLoadingLocal] = useState(false);
   const [userObject, setUserObject] = useState(null);
-  const {language} = useAuth()
+  const { language } = useAuth();
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -105,6 +107,8 @@ export default function SubProductForm({
       saleType: subProductData?.saleType || "retail",
       unitId: subProductData?.unitId?._id || subProductData?.unitId || "",
       qty: subProductData?.qty ?? 0,
+      stock: subProductData?.stock || 0,
+      minStock: subProductData?.minStock || 0,
       barCode: subProductData?.barCode || "",
       productDes: subProductData?.productDes || "",
       productImg: subProductData?.productImg || "",
@@ -144,6 +148,8 @@ export default function SubProductForm({
         check: Boolean(values.check),
         sell: Boolean(values.sell),
         shopId: values.shopId || [],
+        stock: values.stock || 0,
+        minStock: values.minStock || 0,
 
         servicePrice: Number(values.servicePrice || 0),
         salePrice: Number(values.salePrice || 0),
@@ -197,6 +203,8 @@ export default function SubProductForm({
           productDes: subProductData?.productDes || "",
           productImg: subProductData?.productImg || "",
           using: subProductData?.using ?? false,
+          stock: subProductData?.stock,
+          minStock: subProductData?.minStock,
           check: subProductData?.check ?? false,
           sell: subProductData?.sell ?? false,
           shopId:
@@ -232,6 +240,16 @@ export default function SubProductForm({
   };
 
   const getDisplayName = (i) => i?.name || i?.nameEn || i?.nameKh || "";
+
+  useEffect(() => {
+    const service = Number(values.servicePrice || 0);
+    const sale = Number(values.salePrice || 0);
+    const tax = Number(values.taxRate || 0);
+
+    const total = (service + sale) * (1 + tax / 100);
+
+    setFieldValue("totalPrice", total.toFixed(2));
+  }, [values.servicePrice, values.salePrice, values.taxRate, setFieldValue]);
 
   const selectedUnit = units.find((u) => u._id === values.unitId) || null;
   const selectedShops = shops.filter((s) => values.shopId?.includes(s._id));
@@ -284,30 +302,18 @@ export default function SubProductForm({
                     </TextField>
                   </Grid>
 
-                <Grid size={{ xs: 12, md: 6 }}>
-                        <Typography variant="body2">{t("unit")}</Typography>
-                        <Autocomplete
-                          options={units}
-                          getOptionLabel={(option) =>
-                            language === "en" ? option.nameEn : option.nameKh
-                          }
-                          loading={unitLoading}
-                          value={selectedUnit}
-                          onChange={(e, newValue) =>
-                            setFieldValue("unitId", newValue ? newValue._id : "")
-                          }
-                          isOptionEqualToValue={(option, value) => option._id === value._id}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder={t("select_unit")}
-                              size="small"
-                              error={Boolean(touched.unitId && errors.unitId)}
-                              helperText={touched.unitId && errors.unitId}
-                            />
-                          )}
-                        />
-                      </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <UseAutocomplete
+                      name="unitId"
+                      label={`${t("unit")} *`}
+                      placeholder={t("select_unit")}
+                      query={GET_UNIT}
+                      dataKey="getUnit"
+                      getOptionLabel={(item) =>
+                        item?.name || item?.nameEn || item?.nameKh || ""
+                      }
+                    />
+                  </Grid>
 
                   <Grid size={{ xs: 12, md: 6 }}>
                     <Typography variant="body2">{t("qty_in_unit")}</Typography>
@@ -315,6 +321,13 @@ export default function SubProductForm({
                       fullWidth
                       size="small"
                       type="number"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            {language == "kh" ? unit?.nameKh : unit?.nameEn}
+                          </InputAdornment>
+                        ),
+                      }}
                       {...getFieldProps("qty")}
                       error={Boolean(touched.qty && errors.qty)}
                       helperText={touched.qty && errors.qty}
@@ -353,6 +366,36 @@ export default function SubProductForm({
                     />
                   </Grid>
 
+                  {values.check && (
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <Typography variant="body2">
+                        {t("current_stock")}
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        type="number"
+                        disabled
+                        {...getFieldProps("stock")}
+                        error={Boolean(touched.stock && errors.stock)}
+                        helperText={touched.stock && errors.stock}
+                      />
+                    </Grid>
+                  )}
+
+                  {values.check && (
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <Typography variant="body2">{t("min_stock")}</Typography>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        type="number"
+                        {...getFieldProps("minStock")}
+                        error={Boolean(touched.minStock && errors.minStock)}
+                        helperText={touched.minStock && errors.minStock}
+                      />
+                    </Grid>
+                  )}
                   <Grid size={{ xs: 12 }}>
                     <FormControlLabel
                       control={
@@ -417,7 +460,6 @@ export default function SubProductForm({
               </Box>
             )}
 
-            {/* TAB 2 - Price */}
             {tabIndex === 1 && (
               <Box>
                 <Grid container spacing={2}>
@@ -429,6 +471,11 @@ export default function SubProductForm({
                       fullWidth
                       size="small"
                       type="number"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">$</InputAdornment>
+                        ),
+                      }}
                       {...getFieldProps("servicePrice")}
                     />
                   </Grid>
@@ -439,6 +486,11 @@ export default function SubProductForm({
                       fullWidth
                       size="small"
                       type="number"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">$</InputAdornment>
+                        ),
+                      }}
                       {...getFieldProps("salePrice")}
                     />
                   </Grid>
@@ -459,6 +511,11 @@ export default function SubProductForm({
                       fullWidth
                       size="small"
                       type="number"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">$</InputAdornment>
+                        ),
+                      }}
                       {...getFieldProps("costPrice")}
                     />
                   </Grid>
@@ -469,6 +526,12 @@ export default function SubProductForm({
                       fullWidth
                       size="small"
                       type="number"
+                      value={values.totalPrice}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">$</InputAdornment>
+                        ),
+                      }}
                       {...getFieldProps("totalPrice")}
                     />
                   </Grid>
@@ -493,7 +556,6 @@ export default function SubProductForm({
               </Box>
             )}
 
-            {/* TAB 3 - Other / Relation */}
             {tabIndex === 2 && (
               <Box>
                 <Grid container spacing={2}>

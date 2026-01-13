@@ -6,10 +6,11 @@ import React from 'react';
 import ThemeCustomizer from './Components/ThemeCustomizer/ThemeCustomizer';
 import AlertMessage from "./Components/AlertMessage/AlertMessage";
 import { ThemeProvider } from './Context/ThemeContext';
-import { AuthProvider } from './Context/AuthContext';
+
 import { client } from "../apolloClient";
 import './App.scss';
 import Router from './Router';
+import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   return (

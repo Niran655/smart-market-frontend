@@ -77,6 +77,7 @@ const Product = () => {
     setPage(newPage);
   };
 
+
   return (
     <Box>
       {/* =================== HEADER =================== */}
@@ -214,9 +215,9 @@ const Product = () => {
                         ? row?.categoryId?.nameEn
                         : row?.categoryId?.nameKh}
                     </TableCell>
-
+                    
                     <TableCell>{row?.remark}</TableCell>
-
+                        
                     <TableCell className="flex-end">
                       <Stack direction="row" spacing={1}>
                         <ProductAction
@@ -267,6 +268,7 @@ const Product = () => {
                                   <TableCell>{t("tax_rate")}</TableCell>
                                   <TableCell>{t("service")}</TableCell>
                                   <TableCell>{t("total_price")}</TableCell>
+                                  <TableCell>{t("minimun_unit")}</TableCell>
                                   <TableCell className="flex-end">
                                     <IconButton onClick={handleOpenSub}>
                                       <CopyPlus color="#36BBA7" size={20} />
@@ -279,6 +281,7 @@ const Product = () => {
                                         dialogTitle={"Create"}
                                         parentProductId={row._id}
                                         onClose={handleCloseSub}
+                                        unit={row?.unitId}
                                         setRefetch={() =>
                                           refetchSub({
                                             parentProductId: row._id,
@@ -405,12 +408,25 @@ const Product = () => {
                                         $ {p.totalPrice.toFixed(2)}
                                       </TableCell>
                                       <TableCell>
+                                        {p.qty * p.stock}{" "}
+                                        {language == "kh"
+                                          ? row?.unitId?.nameKh
+                                          : row?.unitId?.nameEn}
+                                        / {(p.qty * p.stock) / p.qty}{" "}
+                                        {language == "en"
+                                          ? p.unitId?.nameEn
+                                          : p.unitId?.nameKh}
+                                      </TableCell>
+                                     
+
+                                      <TableCell className="flex-end">
                                         <SubProductAction
                                           setRefetch={refetchSub}
                                           supProductName={t(`delete`)}
                                           parentProductId={row._id}
                                           subProductId={p?._id}
                                           subProductData={p}
+                                          unit={row?.unitId}
                                           t={t}
                                         />
                                       </TableCell>

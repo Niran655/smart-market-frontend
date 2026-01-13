@@ -293,3 +293,15 @@ mutation CreateSale($input: SaleInput) {
   }
 }
 `;
+
+export const ADJUST_STOCK = gql`
+mutation AdjustStock($input: AdjustStockInput!) {
+  adjustStock(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`

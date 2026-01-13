@@ -1,8 +1,11 @@
+import { useMutation } from "@apollo/client/react";
 import { IconButton, Stack } from "@mui/material";
 import { SquarePen, Trash } from "lucide-react";
 import React, { useState } from "react";
 
-import DeleteUser from "./DeleteUser";
+import { DELETE_USER } from "../../../graphql/mutation";
+import { useAuth } from "../../context/AuthContext";
+import UseDeleteForm from "../include/useDeleteForm";
 import UserForm from "./UserForm";
 
 export default function UserAction({
@@ -10,8 +13,6 @@ export default function UserAction({
   setRefetch,
   userId,
   t,
-  userName,
-
 }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -21,14 +22,45 @@ export default function UserAction({
   const handleOpenDelete = () => setOpenDelete(true);
   const handleCloseDelete = () => setOpenDelete(false);
 
+  const [loading, setLoading] = useState(false);
+  const { setAlert } = useAuth();
+
+  const [deleteUser] = useMutation(DELETE_USER, {
+    onCompleted: ({ deleteUser }) => {
+      setLoading(false);
+      if (deleteUser?.isSuccess) {
+        handleCloseDelete();
+        setAlert(true, "success", deleteUser?.message);
+        setRefetch();
+      } else {
+        setAlert(true, "error", deleteUser?.message);
+      }
+    },
+    onError: (error) => {
+      setLoading(false);
+      console.error("Error", error);
+      setAlert(true, "error", t("delete_failed"));
+    },
+  });
+
+  const handleDelete = () => {
+    if (!userId) {
+      setAlert(true, "error", t("user_id_missing"));
+      return;
+    }
+
+    setLoading(true);
+    deleteUser({ variables: { id: userId } });
+  };
+
   return (
     <div>
       <Stack direction="row" spacing={2}>
         <IconButton className="edit-icon" onClick={handleOpen}>
-          <SquarePen  size="18px" color="#36BBA7" />
+          <SquarePen size="18px" color="#36BBA7" />
         </IconButton>
         <IconButton className="delete-icon" onClick={handleOpenDelete}>
-          <Trash size="18px" color="red " />
+          <Trash size="18px" color="red" />
         </IconButton>
       </Stack>
 
@@ -41,13 +73,11 @@ export default function UserAction({
         t={t}
       />
 
-      <DeleteUser
-        setRefetch={setRefetch}
- 
+      <UseDeleteForm
         open={openDelete}
         onClose={handleCloseDelete}
-        userId={userId}
-        userName={userName}
+        handleDelete={handleDelete}
+        loading={loading}
       />
     </div>
   );

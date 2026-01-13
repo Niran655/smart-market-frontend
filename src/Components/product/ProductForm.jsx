@@ -8,12 +8,13 @@ import { useMutation, useQuery } from "@apollo/client/react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import { styled } from "@mui/material/styles";
-import { Autocomplete, Checkbox, Divider, FormControlLabel, Grid, TextField } from "@mui/material";
+import { Checkbox, Divider, FormControlLabel, Grid, TextField } from "@mui/material";
 import { Form, FormikProvider, useFormik } from "formik";
 import * as React from "react";
 import { useEffect } from "react";
 import * as Yup from "yup";
 
+import UseAutocomplete from "../include/useAutoComplete";
 import { CREATE_PRODUCT, UPDATE_PRODUCT } from "../../../graphql/mutation";
 import { useAuth } from "../../context/AuthContext";
 import { GET_CATEGORY, GET_UNIT } from "../../../graphql/queries";
@@ -39,12 +40,9 @@ export default function ProductForm({
   console.log("productData", productData);
   const [loading, setLoading] = React.useState(false);
   const { setAlert } = useAuth();
-  const { data: CategoryData, loading: categoryLoading } =
-    useQuery(GET_CATEGORY);
-  const { data: UnitData, loading: unitLoading } = useQuery(GET_UNIT);
+  const { data: CategoryData } = useQuery(GET_CATEGORY);
+  const { data: UnitData } = useQuery(GET_UNIT);
   const [uploadedFilePath, setUploadedFilePath] = React.useState(null);
-  const categories = CategoryData?.getCategory || [];
-  const units = UnitData?.getUnit || [];
 
   const [createProduct] = useMutation(CREATE_PRODUCT, {
     onCompleted: ({ createProduct }) => {
@@ -93,8 +91,6 @@ export default function ProductForm({
       nameKh: "",
       nameEn: "",
       categoryId: "",
-      stock: 1,
-      minStock: 0,
       unitId: "",
       active: true,
       remark: "",
@@ -118,8 +114,6 @@ export default function ProductForm({
         type: values.type,
         categoryId: values.categoryId,
         unitId: values.unitId,
-        stock: values.stock,
-        minStock: values.minStock,
         remark: values.remark,
         active: values.active,
       };
@@ -152,10 +146,6 @@ export default function ProductForm({
     values,
   } = formik;
 
-  const selectedCategory =
-    categories.find((cat) => cat._id === values.categoryId) || null;
-  const selectedUnit = units.find((unit) => unit._id === values.unitId) || null;
-
   useEffect(() => {
     if (open) {
       if (productData && dialogTitle === "Update") {
@@ -164,7 +154,7 @@ export default function ProductForm({
           nameKh: productData.nameKh || "",
           nameEn: productData.nameEn || "",
           categoryId:
-          productData?.categoryId?._id || productData?.categoryId || "",
+            productData?.categoryId?._id || productData?.categoryId || "",
           unitId: productData?.unitId?._id || productData?.unitId || "",
           remark: productData.remark || "",
           active: productData.active !== undefined ? productData.active : true,
@@ -183,11 +173,6 @@ export default function ProductForm({
       setUploadedFilePath(null);
     }
     onClose();
-  };
-
-  const getDisplayName = (item) => {
-    if (!item) return "";
-    return item.name || item.nameEn || item.nameKh || "";
   };
 
   return (
@@ -253,54 +238,28 @@ export default function ProductForm({
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <Typography variant="body2">{t(`category`)} *</Typography>
-                <Autocomplete
-                  options={categories}
-                  loading={categoryLoading}
-                  getOptionLabel={(option) => getDisplayName(option)}
-                  value={selectedCategory}
-                  onChange={(event, newValue) => {
-                    setFieldValue("categoryId", newValue ? newValue._id : "");
-                  }}
-                  isOptionEqualToValue={(option, value) =>
-                    option._id === value._id
+                <UseAutocomplete
+                  name="categoryId"
+                  label={`${t("category")} *`}
+                  placeholder={t("select_category")}
+                  query={GET_CATEGORY}
+                  dataKey="getCategory"
+                  getOptionLabel={(item) =>
+                    item?.name || item?.nameEn || item?.nameKh || ""
                   }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder={t(`select_category`)}
-                      variant="outlined"
-                      size="small"
-                      error={Boolean(touched.categoryId && errors.categoryId)}
-                      helperText={touched.categoryId && errors.categoryId}
-                    />
-                  )}
                 />
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <Typography variant="body2">{t(`unit`)} *</Typography>
-                <Autocomplete
-                  options={units}
-                  loading={unitLoading}
-                  getOptionLabel={(option) => getDisplayName(option)}
-                  value={selectedUnit}
-                  onChange={(event, newValue) => {
-                    setFieldValue("unitId", newValue ? newValue._id : "");
-                  }}
-                  isOptionEqualToValue={(option, value) =>
-                    option._id === value._id
+                <UseAutocomplete
+                  name="unitId"
+                  label={`${t("unit")} *`}
+                  placeholder={t("select_unit")}
+                  query={GET_UNIT}
+                  dataKey="getUnit"
+                  getOptionLabel={(item) =>
+                    item?.name || item?.nameEn || item?.nameKh || ""
                   }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder={t(`select_unit`)}
-                      variant="outlined"
-                      size="small"
-                      error={Boolean(touched.unitId && errors.unitId)}
-                      helperText={touched.unitId && errors.unitId}
-                    />
-                  )}
                 />
               </Grid>
 

@@ -1,45 +1,33 @@
-import FilterListIcon from "@mui/icons-material/FilterList";
+import ManageHistoryOutlinedIcon from "@mui/icons-material/ManageHistoryOutlined";
+import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import RemoveIcon from "@mui/icons-material/Remove";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { Navigate, useParams } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardMedia,
-  Chip,
-  Divider,
-  fabClasses,
-  Grid,
-  IconButton,
-  InputAdornment,
-  MenuItem,
-  Paper,
-  Select,
-  Stack,
-  Tab,
-  Tabs,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { Trash, Trash2 } from "lucide-react";
+import { Box, Button, Card, CardContent, CardMedia, Chip, Divider, Grid, IconButton, InputAdornment, MenuItem, Paper, Select, Stack, Tab, Tabs, TextField, Tooltip, Typography } from "@mui/material";
+import { Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import InvoicePending from "../Components/pos/InvoicePending";
+import SaleHistory from "../Components/pos/SaleHistory";
 import { CREATE_SALE } from "../../graphql/mutation";
 import { useAuth } from "../context/AuthContext";
 import { GET_PRODUCT_FOR_SALE_WITH_PAGINATION } from "../../graphql/queries";
 import { translateLauguage } from "../function/translate";
 import "../Styles/pos.scss";
-
 const POS = () => {
   const { shopId } = useParams();
   const activeShopId = localStorage.getItem("activeShopId");
-  const {setAlert} = useAuth()
+  const { setAlert } = useAuth();
   const { language } = useAuth();
   const { t } = translateLauguage(language);
+  const [openHistory, setOpenHistory] = useState(false);
+  const handleOpenSaleHistory = () => setOpenHistory(true);
+  const handleCloseSaleHistory = () => setOpenHistory(false);
+  const [openSalePending, setOpenSalePending] = useState(false);
+  const handleOpenSalePending = () => setOpenSalePending(true);
+  const handleCloseSalePending = () => setOpenSalePending(false);
   const { data, loading } = useQuery(GET_PRODUCT_FOR_SALE_WITH_PAGINATION, {
     variables: {
       shopId,
@@ -49,21 +37,26 @@ const POS = () => {
       keyword: "",
       categoryId: "",
     },
-  });
-
-  const [createSale, { loading: creating, error: createError }] = useMutation(CREATE_SALE,{
-    onCompleted:({createSale})=>{
-      if(createSale?.isSuccess){
-        setAlert(true, "success", createSale?.message)
-      }else{
-         setAlert(true, "error", createSale?.message)
-      }
-    },
-    onError:(error)=>{
-      console.log("Error",error)
-    }
+    pollInterval: 1000,
   });
   const [cart, setCart] = useState([]);
+  const [createSale, { loading: creating, error: createError }] = useMutation(
+    CREATE_SALE,
+    {
+      onCompleted: ({ createSale }) => {
+        if (createSale?.isSuccess) {
+          setAlert(true, "success", createSale?.message);
+          setCart([]);
+        } else {
+          setAlert(true, "error", createSale?.message);
+        }
+      },
+      onError: (error) => {
+        console.log("Error", error);
+      },
+    }
+  );
+
   const [orderType, setOrderType] = useState("dine_in");
   const [selectedTable, setSelectedTable] = useState("Table 01");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -163,6 +156,7 @@ const POS = () => {
         ...prev,
         {
           id: item._id,
+          subProductId: item._id,
           productId: item.parentProductId._id,
           name:
             language === "kh"
@@ -217,6 +211,7 @@ const POS = () => {
         shopId: shopId,
         items: cart.map((item) => ({
           product: item.productId,
+          subProductId: item.subProductId,
           name: item.name,
           price: Number(item.price.toFixed(2)),
           quantity: item.qty,
@@ -234,7 +229,6 @@ const POS = () => {
       };
       console.log("input sale", input);
       await createSale({ variables: { input } });
-      setCart([]);
     } catch (error) {
       console.error("Error creating sale:", error);
     }
@@ -351,14 +345,39 @@ const POS = () => {
         <Grid size={{ xs: 4 }}>
           <Paper className="cart-panel">
             <Box className="cart-header">
-              <Typography className="cart-title">
-                {t(`current_order`)}
-              </Typography>
-              {cart.length > 0 && (
-                <Button size="small" color="error" onClick={clearCart}>
-                  <Typography>{t(`clear`)}</Typography>
-                </Button>
-              )}
+              <Stack direction={"row"} spacing={2} alignItems={"center"}>
+                <Typography className="cart-title">
+                  {t(`current_order`)}
+                </Typography>
+                <Tooltip title="View  history">
+                  <IconButton onClick={handleOpenSaleHistory}>
+                    <ReceiptOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="View Stop Invoice">
+                  <IconButton onClick={handleOpenSalePending}>
+                    <ManageHistoryOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+                <SaleHistory
+                  open={openHistory}
+                  onClose={handleCloseSaleHistory}
+                  t={t}
+                />
+                <InvoicePending
+                  t={t}
+                  open={openSalePending}
+                  onClose={handleCloseSalePending}
+                />
+              </Stack>
+
+              <Stack direction={"row"} spacing={2}>
+                {cart.length > 0 && (
+                  <Button size="small" color="error" onClick={clearCart}>
+                    <Typography color="error">{t(`clear`)}</Typography>
+                  </Button>
+                )}
+              </Stack>
             </Box>
 
             <Tabs
@@ -391,7 +410,7 @@ const POS = () => {
               <Box className="customer-info">
                 <TextField
                   fullWidth
-                  label={t(`customer`)}
+                  placeholder={t(`customer`)}
                   size="small"
                   className="customer-field"
                 />
@@ -517,17 +536,28 @@ const POS = () => {
                 </Typography>
               </Box>
             </Box>
-
-            <Button
-              fullWidth
-              variant="contained"
-              size="medium"
-              onClick={handleCreateSale}
-              disabled={cart.length === 0 || creating}
-              className="pay-button"
-            >
-              {t(`pay`)} {total.toLocaleString()}$
-            </Button>
+            <Stack direction={"row"} spacing={2} alignItems={"center"}>
+              <Button
+                fullWidth
+                variant="contained"
+                size="medium"
+                disabled={cart.length === 0 || creating}
+                className="pay-button"
+                sx={{ bgcolor: "red" }}
+              >
+                {t(`stop_invoice`)}
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                size="medium"
+                onClick={handleCreateSale}
+                disabled={cart.length === 0 || creating}
+                className="pay-button"
+              >
+                {t(`pay_now`)} {total.toLocaleString()}$
+              </Button>
+            </Stack>
           </Paper>
         </Grid>
       </Grid>

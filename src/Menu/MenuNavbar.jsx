@@ -2,7 +2,7 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoSettingsOutline } from "react-icons/io5";
 import { Avatar, Box, Collapse, List, ListItem, ListItemButton, ListItemIcon, Stack, Typography } from "@mui/material";
-import { Bag2, Category, DocumentText1, House2, Messages2, Tag, User, UserOctagon } from "iconsax-react";
+import { Bag2, Category, DocumentText1, HomeHashtag, House2, Messages2, Tag, User, UserOctagon } from "iconsax-react";
 import { useState } from "react";
 
 import logo from "../assets/Image/logo.png";
@@ -14,7 +14,6 @@ export default function MenuNavbar() {
   const location = useLocation();
   const { sidebarColor, layoutMode } = useThemeContext();
   const [openDropdown, setOpenDropdown] = useState(null);
-
   const menuData = [
     {
       pageTitle: "Dashboard",
@@ -39,7 +38,7 @@ export default function MenuNavbar() {
     {
       pageTitle: "Warehouse",
       routeTo: "/warehouse",
-      pageIcon: <House2 className="icon" />,
+      pageIcon: <HomeHashtag className="icon" />,
     },
     {
       pageTitle: "Order",
@@ -122,6 +121,7 @@ export default function MenuNavbar() {
                           ? "rgba(255, 255, 255, 0.15)"
                           : "rgba(255, 255, 255, 0.1)",
                       },
+                      borderRadius: "8px"
                     }}
                     onClick={() => {
                       if (hasChildren) {
@@ -139,6 +139,7 @@ export default function MenuNavbar() {
                         justifyContent:
                           layoutMode === "compact" ? "center" : "flex-start",
                         px: layoutMode === "compact" ? 0 : 2,
+                        borderRadius: "8px"
                       }}
                     >
                       {layoutMode !== "compact" && <Box sx={{ width: 6 }} />}

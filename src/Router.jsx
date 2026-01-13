@@ -1,10 +1,13 @@
 import { Navigate, useRoutes } from 'react-router-dom';
 import React from 'react';
 
+import WarehouseInShop from './Pages/WarehouseInShop';
 import AppLayout from './Components/AppLayout';
 import { useAuth } from './context/AuthContext';
 import Dashboard from './Pages/Dashboard';
+import Warehouse from './Pages/Warehouse';
 import Category from './Pages/Category';
+import NotFound from './Pages/NotFound';
 import Settings from './Pages/Settings';
 import Product from './Pages/Product';
 import Report from './Pages/Report';
@@ -36,7 +39,10 @@ export default function Router() {
         { path: '/setting/user', element: <User/> },
         { path: '/setting/category', element: <Category/> },
         { path: '/setting/product', element: <Product/>},
-        { path: '/store/pos/:shopId', element: <Pos/>}
+        { path: '/store/pos/:shopId', element: <Pos/>},
+        { path: 'warehouse', element: <Warehouse/>},
+        { path: '/store/pos/:id/warehouse-in-shop', element: <WarehouseInShop/>},
+        { path: "*", element: <NotFound /> },
       ],
     },
   ]);

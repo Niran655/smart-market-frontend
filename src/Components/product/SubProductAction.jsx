@@ -11,7 +11,8 @@ export default function SubProductAction({
   subProductId,
   t,
   supProductName,
-  parentProductId
+  parentProductId,
+  unit
   
 }) {
   const [open, setOpen] = useState(false);
@@ -55,6 +56,7 @@ export default function SubProductAction({
         subProductId={subProductId}
         setRefetch={setRefetch}
         parentProductId={parentProductId}
+        unit={unit}
         t={t}
       />
 
