@@ -305,3 +305,14 @@ mutation AdjustStock($input: AdjustStockInput!) {
   }
 }
 `
+export const CREATE_WAREHOUSE_TRANSFER = gql`
+mutation CreateWarehouseTransfer($input: CreateWarehouseTransferInput!) {
+  createWarehouseTransfer(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`

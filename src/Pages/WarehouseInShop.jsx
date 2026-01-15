@@ -4,10 +4,9 @@ import { useQuery } from "@apollo/client/react";
 import { Box, Breadcrumbs, Button, Chip, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import React, { useState } from "react";
 
-import ProductWarehouseAction from "../Components/warehouse/ProductWarehouseAction";
 import FooterPagination from "../include/FooterPagination";
 import { useAuth } from "../context/AuthContext";
-import { GET_PRDUCT_WAREHOUSE_WITH_PAGINATION } from "../../graphql/queries";
+import { GET_PRODUCT_WAREHOUSE_IN_SHOP_WITH_PAGINATION } from "../../graphql/queries";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
@@ -15,27 +14,28 @@ const WarehouseInShop = () => {
   const [activeTab, setActiveTab] = useState("1");
   const { language } = useAuth();
   const { t } = translateLauguage(language);
-  const [page,setPage] = useState(1);
+  const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
-  
+  const savedStoreId = localStorage.getItem("activeShopId");
   const {
-    data: productWarehouse,
+    data: productWarehouseInShop,
     refetch,
     loading,
-  } = useQuery(GET_PRDUCT_WAREHOUSE_WITH_PAGINATION, {
+  } = useQuery(GET_PRODUCT_WAREHOUSE_IN_SHOP_WITH_PAGINATION, {
     variables: {
+      shopId: savedStoreId,
       page,
       limit,
       pagination: true,
       keyword: "",
     },
   });
-  const product =
-    productWarehouse?.getProductWareHouseWithPagination?.data || [];
+  const products =
+    productWarehouseInShop?.getProductWareHouseInShopoWithPagination?.data || [];
   const paginator =
-    productWarehouse?.getProductWareHouseWithPagination?.paginator || [];
+    productWarehouseInShop?.getProductWareHouseInShopoWithPagination?.paginator || [];
 
-    
+
   const handleLimit = (e) => {
     const newLimit = parseInt(e.target.value, 10);
     setLimit(newLimit);
@@ -48,7 +48,7 @@ const WarehouseInShop = () => {
 
 
   return (
-    <Box sx={{ width: "100%",padding:"16px" }}>
+    <Box sx={{ width: "100%", padding: "16px" }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Box textAlign="start">
           <Breadcrumbs aria-label="breadcrumb" separator="/">
@@ -118,12 +118,12 @@ const WarehouseInShop = () => {
 
                 {loading ? (
                   <CircularIndeterminate />
-                ) : product?.length == 0 ? (
+                ) : products?.length == 0 ? (
                   <EmptyData />
                 ) : (
                   <TableBody>
-                    {product?.map((row, index) => (
-                      <TableRow className="table-row">
+                    {products.map((row, index) => (
+                      <TableRow key={row._id}>
                         <TableCell>{paginator.slNo + index}</TableCell>
                         <TableCell>
                           <Box display="flex" alignItems="center" gap={1}>
@@ -131,70 +131,37 @@ const WarehouseInShop = () => {
                               src={row?.subProduct?.productImg}
                               width={40}
                               height={40}
-                              style={{
-                                borderRadius: "100%",
-                                objectFit: "cover",
-                              }}
+                              style={{ borderRadius: "100%", objectFit: "cover" }}
                             />
-                            {language == "kh"
+                            {language === "kh"
                               ? row?.subProduct?.parentProductId?.nameKh
                               : row?.subProduct?.parentProductId?.nameEn}
                           </Box>
                         </TableCell>
                         <TableCell>
-                          {language == "kh"
+                          {language === "kh"
                             ? row?.subProduct?.unitId?.nameKh
                             : row?.subProduct?.unitId?.nameEn}
                         </TableCell>
+                        <TableCell>{row?.stock}</TableCell>
+                        <TableCell>{row?.minStock}</TableCell>
                         <TableCell>
-                          {row?.stock}{" "}
-                          {language == "kh"
-                            ? row?.subProduct?.unitId?.nameKh
-                            : row?.subProduct?.unitId?.nameEn}
-                        </TableCell>
-                        <TableCell>
-                          {row?.subProduct?.minStock}{" "}
-                          {language == "kh"
-                            ? row?.subProduct?.unitId?.nameKh
-                            : row?.subProduct?.unitId?.nameEn}
-                        </TableCell>
-                        <TableCell>
-                          {row?.stock < row?.subProduct?.minStock ? (
+                          {row?.stock < row?.minStock ? (
                             <Chip
                               icon={<WarningAmberOutlinedIcon />}
                               label={t("low_stock")}
-                              color=" "
-                              size="small"
-                              // variant="outlined"
-                              sx={{
-                                fontWeight: 600,
-                                bgcolor: "#df4a6fff",
-                                color: "white",
-                              }}
+                              sx={{ fontWeight: 600, bgcolor: "#df4a6fff", color: "white" }}
                             />
                           ) : (
                             <Chip
                               icon={<CheckOutlinedIcon />}
                               label={t("in_stock")}
-                              color=""
-                              size="small"
-                              // variant="outlined"
-                              sx={{
-                                fontWeight: 600,
-                                bgcolor: "#0097A7",
-                                color: "white",
-                              }}
+                              sx={{ fontWeight: 600, bgcolor: "#0097A7", color: "white" }}
                             />
                           )}
                         </TableCell>
+                        <TableCell>
 
-                        <TableCell className="flex-end">
-                          <ProductWarehouseAction
-                            unit={row?.subProduct?.unitId}
-                            setRefetch={refetch}
-                            subProductId={row?.subProduct?._id}
-                            t={t}
-                          />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -202,20 +169,20 @@ const WarehouseInShop = () => {
                 )}
               </Table>
               <Stack
-          direction="row"
-          justifyContent="flex-end"
-          alignItems="center"
-          sx={{ padding: 2 }}
-        >
-          <FooterPagination
-            page={page}
-            limit={limit}
-            setPage={handlePageChange}
-            handleLimit={handleLimit}
-            totalDocs={paginator?.totalDocs}
-            totalPages={paginator?.totalPages}
-          />
-        </Stack>
+                direction="row"
+                justifyContent="flex-end"
+                alignItems="center"
+                sx={{ padding: 2 }}
+              >
+                <FooterPagination
+                  page={page}
+                  limit={limit}
+                  setPage={handlePageChange}
+                  handleLimit={handleLimit}
+                  totalDocs={paginator?.totalDocs}
+                  totalPages={paginator?.totalPages}
+                />
+              </Stack>
             </TableContainer>
           </Box>
         )}

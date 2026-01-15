@@ -1,12 +1,9 @@
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import { useNavigate } from "react-router-dom";
-import { FaRegBell } from "react-icons/fa6";
 import { FaAngleUp } from "react-icons/fa6";
 import { FaAngleDown } from "react-icons/fa6";
 import { IoLogOutOutline } from "react-icons/io5";
 import { Avatar, Button, IconButton, Menu, MenuItem, Stack, Toolbar, Typography } from "@mui/material";
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 
 import CambodiaFlag from "../assets/Image/cambodiaflag.png";
 import EnglishFlag from "../assets/Image/englishflag.png";

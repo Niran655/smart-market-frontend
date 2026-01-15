@@ -1,14 +1,28 @@
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import CloseIcon from "@mui/icons-material/Close";
-import { useQuery } from "@apollo/client/react";
+import { useMutation } from "@apollo/client/react";
 import { styled } from "@mui/material/styles";
-import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, IconButton, MenuItem, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Grid,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { X } from "lucide-react";
 import { Form, FormikProvider, useFormik } from "formik";
-import { useEffect, useState } from "react";
 import * as Yup from "yup";
 
-import { GET_PRDUCT_WAREHOUSE_WITH_PAGINATION } from "../../../../graphql/queries";
+import { CREATE_WAREHOUSE_TRANSFER } from "../../../../graphql/mutation";
+import useGetAllShopAutoComplete from "../../include/includeAutoComplete";
+import useGetProductWarehouse from "../../hook/useGetProductWithPagination";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": { padding: theme.spacing(2) },
@@ -16,176 +30,142 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 }));
 
 export default function ProductTransferForm({ open, onClose, t }) {
-  const [loading, setLoading] = useState(false);
+  const { options: shopOptions, loading: shopLoading } =
+    useGetAllShopAutoComplete();
 
- 
-  const { data } = useQuery(GET_PRDUCT_WAREHOUSE_WITH_PAGINATION, {
-    variables: { page: 1, limit: 50, pagination: true, keyword: "" },
-  });
+  const { products, loading: productLoading } =
+    useGetProductWarehouse({
+      page: 1,
+      limit: 20,
+      pagination: false,
+    });
 
-  const products =
-    data?.getProductWareHouseWithPagination?.data || [];
+  const [createWarehouseTransfer, { loading }] = useMutation(
+    CREATE_WAREHOUSE_TRANSFER,
+    {
+      onCompleted: ({ createWarehouseTransfer }) => {
+        if (createWarehouseTransfer?.isSuccess) {
+          onClose();
+        }
+      },
+    }
+  );
 
- 
-  const emptyItem = () => ({
-    productObj: null,
-    productId: "",
+  const emptyItem = {
+    subProductId: "",
     quantity: "",
-    price: "",
-    total: 0,
-  });
+  };
 
-  const emptyTab = () => ({
-    id: Date.now(),
-    shop: "",
-    items: [emptyItem()],
-    grandTotal: 0,
-  });
-
-  const [tabs, setTabs] = useState([emptyTab()]);
-  const [activeTab, setActiveTab] = useState(0);
-
- 
   const formik = useFormik({
-    initialValues: tabs[activeTab],
-    enableReinitialize: true,
+    initialValues: {
+      toShopIds: "",
+      note: "",
+      items: [emptyItem],
+    },
     validationSchema: Yup.object({
-      shop: Yup.string().required(t("require")),
+      toShopIds: Yup.array().min(1, t("require")),
+      items: Yup.array().of(
+        Yup.object({
+          subProductId: Yup.string().required(t("require")),
+          quantity: Yup.number().required(t("require")).min(1),
+        })
+      ),
     }),
-    onSubmit: () => {
-      setLoading(true);
-      console.log("TRANSFER PAYLOAD 👉", tabs);
-      setTimeout(() => {
-        setLoading(false);
-        onClose();
-      }, 1000);
+    onSubmit: (values) => {
+      createWarehouseTransfer({
+        variables: {
+          input: {
+            toShopId: values.toShopIds,
+            note: values.note,
+            items: values.items.map((i) => ({
+              subProductId: i.subProductId,
+              quantity: Number(i.quantity),
+            })),
+          },
+        },
+      });
     },
   });
 
-  const { values, handleSubmit, setValues } = formik;
-
-  useEffect(() => {
-    setValues(tabs[activeTab]);
-  }, [activeTab]);
-
- 
-  const recalcTabTotal = (tab) => {
-    tab.grandTotal = tab.items.reduce(
-      (sum, i) => sum + Number(i.total || 0),
-      0
-    );
-  };
-
-  const updateItem = (index, field, value) => {
-    const updatedTabs = [...tabs];
-    const item = updatedTabs[activeTab].items[index];
-    item[field] = value;
-
-    if (field === "quantity" || field === "price") {
-      item.total =
-        Number(item.quantity || 0) * Number(item.price || 0);
-    }
-
-    recalcTabTotal(updatedTabs[activeTab]);
-    setTabs(updatedTabs);
-    setValues(updatedTabs[activeTab]);
-  };
+  const { values, setValues, handleSubmit } = formik;
+  console.log("formik", formik?.values)
 
   const addItem = () => {
-    const updatedTabs = [...tabs];
-    updatedTabs[activeTab].items.push(emptyItem());
-    setTabs(updatedTabs);
-    setValues(updatedTabs[activeTab]);
+    setValues({
+      ...values,
+      items: [...values.items, emptyItem],
+    });
   };
 
   const deleteItem = (index) => {
-    const updatedTabs = [...tabs];
-    if (updatedTabs[activeTab].items.length === 1) return;
-    updatedTabs[activeTab].items.splice(index, 1);
-    recalcTabTotal(updatedTabs[activeTab]);
-    setTabs(updatedTabs);
-    setValues(updatedTabs[activeTab]);
+    if (values.items.length === 1) return;
+    const items = [...values.items];
+    items.splice(index, 1);
+    setValues({ ...values, items });
   };
 
-  const addTab = () => {
-    setTabs([...tabs, emptyTab()]);
-    setActiveTab(tabs.length);
-  };
-
-  const deleteTab = (index) => {
-    if (tabs.length === 1) return;
-    const updated = tabs.filter((_, i) => i !== index);
-    setTabs(updated);
-    setActiveTab(Math.max(0, index - 1));
+  const updateItem = (index, field, value) => {
+    const items = [...values.items];
+    items[index][field] = value;
+    setValues({ ...values, items });
   };
 
   return (
     <BootstrapDialog open={open} fullWidth maxWidth="md">
       <DialogTitle>
         {t("create_transfer")}
-        <IconButton onClick={addTab} sx={{ ml: 1 }}>
-          <AddBoxOutlinedIcon />
+        <IconButton
+          onClick={onClose}
+          sx={{ position: "absolute", right: 8, top: 8 }}
+        >
+          <CloseIcon />
         </IconButton>
       </DialogTitle>
 
-      <IconButton
-        onClick={onClose}
-        sx={{ position: "absolute", right: 8, top: 8 }}
-      >
-        <CloseIcon />
-      </IconButton>
-
       <Divider />
 
-  
-      <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)}>
-        {tabs.map((_, i) => (
-          <Tab
-            key={i}
-            label={
-              <Box display="flex" alignItems="center" gap={1}>
-                Shop {i + 1}
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteTab(i);
-                  }}
-                >
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            }
-          />
-        ))}
-      </Tabs>
-
-      {/* ================= FORM ================= */}
       <FormikProvider value={formik}>
         <Form onSubmit={handleSubmit}>
           <DialogContent dividers>
             <Grid container spacing={2}>
-               
+
               <Grid size={{ xs: 12, md: 6 }}>
-                <Typography>{t("shop")}</Typography>
-                <TextField
-                  select
-                  fullWidth
-                  size="small"
-                  value={values.shop}
-                  onChange={(e) => {
-                    const updated = [...tabs];
-                    updated[activeTab].shop = e.target.value;
-                    setTabs(updated);
-                    setValues(updated[activeTab]);
-                  }}
-                >
-                  <MenuItem value="shop1">Shop 1</MenuItem>
-                  <MenuItem value="shop2">Shop 2</MenuItem>
-                </TextField>
+                <Typography>{t("to_shop")}</Typography>
+                <Autocomplete
+                  multiple
+                  options={shopOptions}
+                  loading={shopLoading}
+                  value={shopOptions.filter((o) =>
+                    values.toShopIds.includes(o.value)
+                  )}
+                  getOptionLabel={(o) => o.label}
+                  onChange={(e, selected) =>
+                    setValues({
+                      ...values,
+                      toShopIds: selected.map((s) => s.value),
+                    })
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} size="small" />
+                  )}
+                />
               </Grid>
 
-               
+              <Grid size={{ xs: 12 }}>
+                <Typography>{t("note")}</Typography>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={2}
+                  size="small"
+                  value={values.note}
+                  onChange={(e) =>
+                    setValues({ ...values, note: e.target.value })
+                  }
+                />
+              </Grid>
+
+
               <Grid size={{ xs: 12 }}>
                 <Stack
                   direction="row"
@@ -199,76 +179,59 @@ export default function ProductTransferForm({ open, onClose, t }) {
                 </Stack>
               </Grid>
 
-              {values.items.map((item, index) => (
-                <Grid container spacing={2} key={index}>
-                 
-                  <Grid size={{ xs: 12, md: 4 }}>
-                     <Typography>{t("product")}</Typography>
-                    <Autocomplete
-                      options={products}
-                      getOptionLabel={(p) =>
-                        p?.subProduct?.parentProductId?.nameEn ||
-                        p?.subProduct?.parentProductId?.nameKh ||
-                        ""
-                      }
-                      value={item.productObj}
-                      onChange={(e, val) => {
-                        updateItem(index, "productObj", val);
-                        updateItem(
-                          index,
-                          "productId",
-                          val?.subProduct?._id || ""
-                        );
-                        updateItem(index, "price", val?.subProduct?.qty || 0);
-                      }}
-                      renderInput={(params) => (
-                        <TextField {...params} size="small" />
-                      )}
-                    />
-                  </Grid>
-
-                  <Grid size={{ xs: 12, md: 2 }}>
-                    <Typography>{t("quantity")}</Typography>
-                    <TextField
-                      size="small"
-                      value={item.quantity}
-                      onChange={(e) =>
-                        updateItem(index, "quantity", e.target.value)
-                      }
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 2 }}>
-                    <Typography>{t("qty_in_unit")}</Typography>
-                    <TextField
-                      size="small"
-                      value={item.price}
-                      onChange={(e) =>
-                        updateItem(index, "price", e.target.value)
-                      }
-                    />
-                  </Grid>
-
-                  
-
-                  <Grid size={{ xs: 12, md: 2 }}>
-                    <Typography>{t("total")}</Typography>
-                    <TextField size="small" value={item.total} disabled />
-                  </Grid>
-
-                  <Grid size={{ xs: 12, md: 2 }}>
-                    <Typography>{t("delete")}</Typography>
-                    <IconButton onClick={() => deleteItem(index)}>
-                      <X color="red" />
-                    </IconButton>
-                  </Grid>
-                </Grid>
-              ))}
-
               <Grid size={{ xs: 12 }}>
-                <Typography align="right">
-                  {t("total")} : {values.grandTotal}
-                </Typography>
+                {values.items.map((item, index) => (
+                  <Grid container spacing={2} key={index}>
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Typography>{t("product")}</Typography>
+                      <Autocomplete
+                        options={products}
+                        loading={productLoading}
+                        value={
+                          products.find(
+                            (p) => p.subProduct?._id === item.subProductId
+                          ) || null
+                        }
+                        getOptionLabel={(p) =>
+                          p?.subProduct?.parentProductId?.nameEn ||
+                          p?.subProduct?.parentProductId?.nameKh ||
+                          ""
+                        }
+                        onChange={(e, val) =>
+                          updateItem(
+                            index,
+                            "subProductId",
+                            val?.subProduct?._id || ""
+                          )
+                        }
+                        renderInput={(params) => (
+                          <TextField {...params} size="small" />
+                        )}
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <Typography>{t("quantity")}</Typography>
+                      <TextField
+                        size="small"
+                        type="number"
+                        value={item.quantity}
+                        onChange={(e) =>
+                          updateItem(index, "quantity", e.target.value)
+                        }
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <Typography>{t("delete")}</Typography>
+                      <IconButton onClick={() => deleteItem(index)}>
+                        <X color="red" />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                ))}
               </Grid>
+
             </Grid>
           </DialogContent>
 

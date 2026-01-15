@@ -11,7 +11,7 @@ import { styled } from "@mui/material/styles";
 import { Divider, Grid, InputAdornment, TextField } from "@mui/material";
 import { Form, FormikProvider, useFormik } from "formik";
 import * as React from "react";
-import { useEffect, useState } from "react";
+ 
 import * as Yup from "yup";
 
 import { ADJUST_STOCK } from "../../../graphql/mutation";

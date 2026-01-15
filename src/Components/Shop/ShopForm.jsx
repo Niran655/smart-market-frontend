@@ -16,7 +16,14 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogActions-root": { padding: theme.spacing(1) },
 }));
 
-export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setRefetch }) {
+export default function ShopForm({
+  open,
+  onClose,
+  t,
+  shopData,
+  dialogTitle,
+  setRefetch,
+}) {
   const { setAlert } = useAuth();
   const [loading, setLoading] = useState(false);
   const [uploadedFilePath, setUploadedFilePath] = useState(null);
@@ -33,7 +40,10 @@ export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setR
     },
     onError: (error) => {
       setLoading(false);
-      setAlert(true, "error", { messageEn: error.message, messageKh: error.message });
+      setAlert(true, "error", {
+        messageEn: error.message,
+        messageKh: error.message,
+      });
     },
   });
 
@@ -48,7 +58,10 @@ export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setR
     },
     onError: (error) => {
       setLoading(false);
-      setAlert(true, "error", { messageEn: error.message, messageKh: error.message });
+      setAlert(true, "error", {
+        messageEn: error.message,
+        messageKh: error.message,
+      });
     },
   });
 
@@ -75,13 +88,21 @@ export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setR
     }),
     onSubmit: (values, { resetForm }) => {
       setLoading(true);
-      if (dialogTitle === "Create") createShop({ variables: { input: values } });
+      if (dialogTitle === "Create")
+        createShop({ variables: { input: values } });
       else updateShop({ variables: { id: shopData?._id, input: values } });
       resetForm();
     },
   });
 
-  const { errors, touched, handleSubmit, getFieldProps, setFieldValue, setValues } = formik;
+  const {
+    errors,
+    touched,
+    handleSubmit,
+    getFieldProps,
+    setFieldValue,
+    setValues,
+  } = formik;
 
   useEffect(() => {
     if (shopData) {
@@ -96,11 +117,8 @@ export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setR
         active: shopData?.active ?? true,
       });
       if (shopData?.image) setUploadedFilePath(shopData.image.split("/").pop());
-
     }
   }, [shopData, setValues]);
-
-
 
   const handleClose = async () => {
     if (dialogTitle === "Create" && uploadedFilePath) {
@@ -111,14 +129,24 @@ export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setR
   };
 
   return (
-    <BootstrapDialog aria-labelledby="customized-dialog-title" open={open} fullWidth maxWidth="sm">
+    <BootstrapDialog
+      aria-labelledby="customized-dialog-title"
+      open={open}
+      fullWidth
+      maxWidth="sm"
+    >
       <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
         {dialogTitle === "Create" ? t("add_shop") : t("update_shop")}
       </DialogTitle>
       <IconButton
         aria-label="close"
         onClick={handleClose}
-        sx={(theme) => ({ position: "absolute", right: 8, top: 8, color: theme.palette.grey[500] })}
+        sx={(theme) => ({
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: theme.palette.grey[500],
+        })}
       >
         <CloseIcon color="error" />
       </IconButton>
@@ -128,14 +156,14 @@ export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setR
         <Form onSubmit={handleSubmit}>
           <DialogContent dividers>
             <Grid container spacing={2}>
-              <Grid size={{xs:12}}>
+              <Grid size={{ xs: 12 }}>
                 <UploadImage
                   value={formik.values.image}
                   onChange={(url) => setFieldValue("image", url)}
                   setFilePath={setUploadedFilePath}
                 />
               </Grid>
-              <Grid size={{xs:12,md:6}}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="body2">{t(`khmer_name`)}</Typography>
                 <TextField
                   fullWidth
@@ -148,7 +176,7 @@ export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setR
                 />
               </Grid>
 
-              <Grid size={{xs:12,md:6}}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="body2">{t(`english_name`)}</Typography>
                 <TextField
                   fullWidth
@@ -161,7 +189,7 @@ export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setR
                 />
               </Grid>
 
-              <Grid size={{xs:12,md:6}}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="body2">{t(`code`)}</Typography>
                 <TextField
                   fullWidth
@@ -172,7 +200,7 @@ export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setR
                 />
               </Grid>
 
-              <Grid size={{xs:12,md:6}}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="body2">{t(`type`)}</Typography>
                 <TextField
                   fullWidth
@@ -183,7 +211,7 @@ export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setR
                 />
               </Grid>
 
-              <Grid size={{xs:12,md:6}}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="body2">{t(`remark`)}</Typography>
                 <TextField
                   fullWidth
@@ -194,7 +222,7 @@ export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setR
                 />
               </Grid>
 
-              <Grid size={{xs:12,md:6}}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="body2">{t(`address`)}</Typography>
                 <TextField
                   fullWidth
@@ -205,7 +233,7 @@ export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setR
                 />
               </Grid>
 
-              <Grid size={{xs:12,md:6}}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="body2">{t(`active`)}</Typography>
                 <TextField
                   fullWidth
@@ -222,7 +250,12 @@ export default function ShopForm({ open, onClose, t, shopData, dialogTitle, setR
           </DialogContent>
 
           <DialogActions>
-            <Button type="submit" fullWidth disabled={loading} variant="contained">
+            <Button
+              type="submit"
+              fullWidth
+              disabled={loading}
+              variant="contained"
+            >
               {loading
                 ? t(`loading`)
                 : dialogTitle === "Create"

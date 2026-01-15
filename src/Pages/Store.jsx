@@ -37,7 +37,7 @@ const Store = () => {
 
   const { data, refetch, loading } = useQuery(GET_ALL_SHOP, {
     variables: {
-      id: userObject?._id,
+      id: "",
     },
   });
 

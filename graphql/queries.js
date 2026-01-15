@@ -141,7 +141,7 @@ query GetAllShops($id: ID!) {
   }
 }
 `
-export const GET_SHOP_BY_SHOP_ID =gql`
+export const GET_SHOP_BY_SHOP_ID = gql`
 query GetShopByShopId($shopId: ID!, $id: ID) {
   getShopByShopId(shopId: $shopId, _id: $id) {
     _id
@@ -289,8 +289,10 @@ export const GET_PRDUCT_WAREHOUSE_WITH_PAGINATION = gql`
 query GetProductWareHouseWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
   getProductWareHouseWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
    data {
+    _id
       stock
       subProduct {
+        _id
         qty
         unitId {
           nameEn
@@ -317,6 +319,59 @@ query GetProductWareHouseWithPagination($page: Int, $limit: Int, $pagination: Bo
       hasNextPage
       totalDocs
     }  
+  }
+}
+`
+
+export const GET_PRODUCT_WAREHOUSE_IN_SHOP_WITH_PAGINATION = gql`
+query GetProductWareHouseInShopoWithPagination($shopId: ID, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
+  getProductWareHouseInShopoWithPagination(shopId: $shopId, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+    data {
+      minStock
+      createdAt
+      updatedAt
+      stock
+      subProduct {
+        _id
+    priceDes
+    priceImg
+    productDes
+    productImg
+    qty
+    salePrice
+    saleType
+    sell
+    servicePrice
+    taxRate
+    totalPrice
+    updatedAt
+    using 
+    stock
+    minStock
+     
+    unitId {
+      _id
+      nameEn
+      nameKh
+    }
+    check
+    barCode
+    costPrice
+    createdAt
+      }
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
   }
 }
 `

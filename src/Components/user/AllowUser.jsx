@@ -9,7 +9,7 @@ export default function AllowUser({ refetch, editData }) {
   const [checked, setChecked] = useState(!!editData?.active);
   const prev = useRef(checked);
   const [busy, setBusy] = useState(false);
-  const { setAlert, logout, user } = useAuth(); 
+  const { setAlert, logout, user } = useAuth();
 
   useEffect(() => setChecked(!!editData?.active), [editData?.active]);
 
@@ -21,22 +21,23 @@ export default function AllowUser({ refetch, editData }) {
         if (!checked) {
           localStorage.removeItem("token");
 
-
           if (editData?._id === user?._id) {
-            logout(); 
+            logout();
           }
         }
 
         refetch?.();
       } else {
-        setChecked(prev.current); 
+        setChecked(prev.current);
         setAlert?.(true, "error", updateUserStatus?.message);
       }
     },
-    onError: (e) => {
-      setChecked(prev.current); 
-      setAlert?.(true, "error", e.message || "Error");
-      console.error("Update error:", e);
+    onError: (error) => {
+      setChecked(prev.current);
+      setAlert(true, "error", {
+        messageEn: error.message,
+        messageKh: error.message,
+      });
     },
   });
 
@@ -48,7 +49,9 @@ export default function AllowUser({ refetch, editData }) {
     setBusy(true);
 
     try {
-      await updateUserStatus({ variables: { id: editData._id, active: e.target.checked } });
+      await updateUserStatus({
+        variables: { id: editData._id, active: e.target.checked },
+      });
     } finally {
       setBusy(false);
     }

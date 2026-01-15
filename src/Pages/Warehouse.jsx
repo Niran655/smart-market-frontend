@@ -4,7 +4,7 @@ import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import { useQuery } from "@apollo/client/react";
 import { Box, Breadcrumbs, Button, Chip, Grid, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { CopyPlus, Search } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import ProductTransferForm from "../Components/warehouse/product-transfer/ProductTransferForm";
 import ProductWarehouseAction from "../Components/warehouse/ProductWarehouseAction";
@@ -18,9 +18,12 @@ const Warehouse = () => {
   const [activeTab, setActiveTab] = useState("1");
   const { language } = useAuth();
   const { t } = translateLauguage(language);
-  const  [openTransfer, setOpenTransfer ] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(5);
+  const [openTransfer, setOpenTransfer] = useState(false);
   const handleOpenTransfer = () => setOpenTransfer(true);
   const handleCloseTransfer = () => setOpenTransfer(false);
+  const [product, setProduct] = useState([]);
   const {
     data: productWarehouse,
     refetch,
@@ -31,12 +34,32 @@ const Warehouse = () => {
       limit: 6,
       pagination: true,
       keyword: "",
+
     },
+    fetchPolicy: "cache-and-network",
   });
-  const product =
-    productWarehouse?.getProductWareHouseWithPagination?.data || [];
+
+  useEffect(() => {
+    if (productWarehouse?.getProductWareHouseWithPagination?.data) {
+      setProduct(productWarehouse.getProductWareHouseWithPagination.data);
+    }
+  }, [productWarehouse?.getProductWareHouseWithPagination?.data]);
+
+
+
+  // const product =
+  //   productWarehouse?.getProductWareHouseWithPagination?.data || [];
   const paginator =
     productWarehouse?.getProductWareHouseWithPagination?.paginator || [];
+  const handleLimit = (e) => {
+    const newLimit = parseInt(e.target.value, 10);
+    setLimit(newLimit);
+    setPage(1);
+  };
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
   return (
     <Box sx={{ width: "100%" }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -198,21 +221,21 @@ const Warehouse = () => {
                   </TableBody>
                 )}
               </Table>
-              {/* <Stack
-          direction="row"
-          justifyContent="flex-end"
-          alignItems="center"
-          sx={{ padding: 2 }}
-        >
-          <FooterPagination
-            page={page}
-            limit={limit}
-            setPage={handlePageChange}
-            handleLimit={handleLimit}
-            totalDocs={paginator?.totalDocs}
-            totalPages={paginator?.totalPages}
-          />
-        </Stack> */}
+              <Stack
+                direction="row"
+                justifyContent="flex-end"
+                alignItems="center"
+                sx={{ padding: 2 }}
+              >
+                <FooterPagination
+                  page={page}
+                  limit={limit}
+                  setPage={handlePageChange}
+                  handleLimit={handleLimit}
+                  totalDocs={paginator?.totalDocs}
+                  totalPages={paginator?.totalPages}
+                />
+              </Stack>
             </TableContainer>
           </Box>
         )}
