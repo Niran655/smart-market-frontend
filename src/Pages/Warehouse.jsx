@@ -1,67 +1,89 @@
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
-import { useQuery } from "@apollo/client/react";
 import { Box, Breadcrumbs, Button, Chip, Grid, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import { CopyPlus, Search } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { Search } from "lucide-react";
+import dayjs from "dayjs";
+import { useState } from "react";
 
+import ProductTransferAction from "../Components/warehouse/product-transfer/ProductTransferAction";
 import ProductTransferForm from "../Components/warehouse/product-transfer/ProductTransferForm";
+import useGetWarehouseTransferWithPagination from "../Components/hook/useGetWarehouseTransferWithPagination";
+import useGetProductWarehouseWithPagination from "../Components/hook/useGetProductWarehouseWithPagination";
 import ProductWarehouseAction from "../Components/warehouse/ProductWarehouseAction";
 import FooterPagination from "../include/FooterPagination";
+import "../Styles/TableStyle.scss";
 import { useAuth } from "../context/AuthContext";
-import { GET_PRDUCT_WAREHOUSE_WITH_PAGINATION } from "../../graphql/queries";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
+
 const Warehouse = () => {
   const [activeTab, setActiveTab] = useState("1");
   const { language } = useAuth();
   const { t } = translateLauguage(language);
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(5);
+
+  const [productWarehousePage, setProductWarehousePage] = useState(1);
+  const [productWarehouseLimit, setProductWarehouseLimit] = useState(5);
+  const [productWarehouseKeyword, setProductWarehouseKeyword] = useState("");
+
+  const [productWarehouseTransferPage, setProductWarehouseTransferPage] =
+    useState(1);
+  const [productWarehouseTransferLimit, setProductWarehouseTransferLimit] =
+    useState(5);
+  const [productWarehouseTransferKeyword, setProductWarehouseTransferKeyword] =
+    useState("");
+
   const [openTransfer, setOpenTransfer] = useState(false);
   const handleOpenTransfer = () => setOpenTransfer(true);
   const handleCloseTransfer = () => setOpenTransfer(false);
-  const [product, setProduct] = useState([]);
-  const {
-    data: productWarehouse,
-    refetch,
-    loading,
-  } = useQuery(GET_PRDUCT_WAREHOUSE_WITH_PAGINATION, {
-    variables: {
-      page: 1,
-      limit: 6,
-      pagination: true,
-      keyword: "",
 
-    },
-    fetchPolicy: "cache-and-network",
+  const {
+    productWarehouseWithPagination,
+    loading: productWarehouseLoading,
+    refetch: productWarehouseRefetch,
+    paginator: productWarehousePaginator,
+  } = useGetProductWarehouseWithPagination({
+    page: productWarehousePage,
+    limit: productWarehouseLimit,
+    pagination: true,
+    keyword: productWarehouseKeyword,
   });
 
-  useEffect(() => {
-    if (productWarehouse?.getProductWareHouseWithPagination?.data) {
-      setProduct(productWarehouse.getProductWareHouseWithPagination.data);
-    }
-  }, [productWarehouse?.getProductWareHouseWithPagination?.data]);
+  const {
+    productsWarehouseTransfer,
+    loading: productLoading,
+    refetch: productsWarehouseTransferRefetch,
+    paginator: productWarehouseTransferPaginator,
+  } = useGetWarehouseTransferWithPagination({
+    page: productWarehouseTransferPage,
+    limit: productWarehouseTransferLimit,
+    pagination: true,
+    keyword: productWarehouseTransferKeyword,
+  });
 
-
-
-  // const product =
-  //   productWarehouse?.getProductWareHouseWithPagination?.data || [];
-  const paginator =
-    productWarehouse?.getProductWareHouseWithPagination?.paginator || [];
   const handleLimit = (e) => {
     const newLimit = parseInt(e.target.value, 10);
-    setLimit(newLimit);
-    setPage(1);
+    setProductWarehouseLimit(newLimit);
+    setProductWarehousePage(1);
   };
 
   const handlePageChange = (newPage) => {
-    setPage(newPage);
+    setProductWarehousePage(newPage);
   };
+
+  const handleLimitPrductWarehouseTransfer = (e) => {
+    const newLimit = parseInt(e.target.value, 10);
+    setProductWarehouseTransferLimit(newLimit);
+    setProductWarehouseTransferPage(1);
+  };
+
+  const handleProductWarehouseTransferPageChange = (newPage) => {
+    setProductWarehouseTransferPage(newPage);
+  };
+
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Box textAlign="start">
           <Breadcrumbs aria-label="breadcrumb" separator="/">
@@ -81,7 +103,7 @@ const Warehouse = () => {
           </Breadcrumbs>
         </Box>
       </Stack>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }} mt={5}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2  }} mt={5} >
         <Button
           variant={activeTab === "1" ? "contained" : "outlined"}
           onClick={() => setActiveTab("1")}
@@ -119,11 +141,11 @@ const Warehouse = () => {
         </Button>
       </Box>
 
-      <Box mt={5}>
+      <Box>
         {activeTab === "1" && (
           <Box>
             <TableContainer className="table-container">
-              <Table className="table">
+              <Table className="table" sx={{ mt: 3 }}>
                 <TableHead className="table-header">
                   <TableRow>
                     <TableCell>{t(`no`)}</TableCell>
@@ -135,16 +157,17 @@ const Warehouse = () => {
                     <TableCell></TableCell>
                   </TableRow>
                 </TableHead>
-
-                {loading ? (
+                {productWarehouseLoading ? (
                   <CircularIndeterminate />
-                ) : product?.length == 0 ? (
+                ) : productWarehouseWithPagination?.length == 0 ? (
                   <EmptyData />
                 ) : (
                   <TableBody>
-                    {product?.map((row, index) => (
+                    {productWarehouseWithPagination?.map((row, index) => (
                       <TableRow className="table-row">
-                        <TableCell>{paginator.slNo + index}</TableCell>
+                        <TableCell>
+                          {productWarehousePaginator.slNo + index}
+                        </TableCell>
                         <TableCell>
                           <Box display="flex" alignItems="center" gap={1}>
                             <img
@@ -211,7 +234,7 @@ const Warehouse = () => {
                         <TableCell className="flex-end">
                           <ProductWarehouseAction
                             unit={row?.subProduct?.unitId}
-                            setRefetch={refetch}
+                            setRefetch={productWarehouseRefetch}
                             subProductId={row?.subProduct?._id}
                             t={t}
                           />
@@ -228,12 +251,12 @@ const Warehouse = () => {
                 sx={{ padding: 2 }}
               >
                 <FooterPagination
-                  page={page}
-                  limit={limit}
+                  page={productWarehousePage}
+                  limit={productWarehouseLimit}
                   setPage={handlePageChange}
                   handleLimit={handleLimit}
-                  totalDocs={paginator?.totalDocs}
-                  totalPages={paginator?.totalPages}
+                  totalDocs={productWarehousePaginator?.totalDocs}
+                  totalPages={productWarehousePaginator?.totalPages}
                 />
               </Stack>
             </TableContainer>
@@ -247,13 +270,14 @@ const Warehouse = () => {
                 justifyContent: "space-between",
                 alignItems: "center",
               }}
-              mt={5}
+           
             >
               <Grid
                 container
                 spacing={2}
                 alignItems="center"
                 textAlign={"start"}
+        
               >
                 <Grid size={{ xs: 12 }}>
                   <Typography variant="body2" fontWeight={500} mb={0.5}>
@@ -296,10 +320,100 @@ const Warehouse = () => {
                     open={openTransfer}
                     onClose={handleCloseTransfer}
                     dialogTitle={"Create"}
+                    language={language}
+                    setRefetch={productsWarehouseTransferRefetch}
                   />
                 )}
               </Stack>
             </Box>
+            <TableContainer className="table-container">
+              <Table className="table" >
+                <TableHead className="table-header">
+                  <TableRow>
+                    <TableCell>{t("no")}</TableCell>
+
+                    <TableCell>{t("to_shop")}</TableCell>
+
+                    <TableCell>{t("items_count")}</TableCell>
+
+                    <TableCell>{t("total_quantity")}</TableCell>
+
+                    <TableCell>{t("status")}</TableCell>
+
+                    <TableCell>{t("date")}</TableCell>
+
+                    <TableCell>{t("action")}</TableCell>
+                  </TableRow>
+                </TableHead>
+
+                {productLoading ? (
+                  <CircularIndeterminate />
+                ) : productsWarehouseTransfer?.length == 0 ? (
+                  <EmptyData />
+                ) : (
+                  <TableBody>
+                    {productsWarehouseTransfer.map((row, index) => {
+                      const totalQty = row.items.reduce(
+                        (sum, item) => sum + Number(item.quantity || 0),
+                        0,
+                      );
+
+                      return (
+                        <TableRow key={row._id} className="table-row">
+                          <TableCell>
+                            {productWarehouseTransferPaginator.slNo + index}
+                          </TableCell>
+                          <TableCell>
+                            {row.toShop?.nameEn || row.toShop?.nameKh || "-"}
+                          </TableCell>
+                          <TableCell>{row.items.length}</TableCell>
+                          <TableCell>{totalQty}</TableCell>
+
+                          <TableCell>
+                            <Chip
+                              size="small"
+                              label={row.status}
+                              color={
+                                row.status === "PENDING"
+                                  ? "warning"
+                                  : row.status === "APPROVED"
+                                    ? "success"
+                                    : "default"
+                              }
+                            />
+                          </TableCell>
+                          <TableCell>
+                            {dayjs(row.createdAt).format("DD/MM/YYYY")}
+                          </TableCell>
+                          <TableCell>
+                            <ProductTransferAction
+                              language={language}
+                              editData={row}
+                              t={t}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                )}
+              </Table>
+              <Stack
+                direction="row"
+                justifyContent="flex-end"
+                alignItems="center"
+                sx={{ padding: 2 }}
+              >
+                <FooterPagination
+                  page={productWarehouseTransferPage}
+                  limit={productWarehouseTransferLimit}
+                  setPage={handleProductWarehouseTransferPageChange}
+                  handleLimit={handleLimitPrductWarehouseTransfer}
+                  totalDocs={productWarehouseTransferPaginator?.totalDocs}
+                  totalPages={productWarehouseTransferPaginator?.totalPages}
+                />
+              </Stack>
+            </TableContainer>
           </Box>
         )}
         {activeTab === "2" && <Typography> Orders Content</Typography>}

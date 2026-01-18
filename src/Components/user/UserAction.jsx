@@ -39,7 +39,10 @@ export default function UserAction({
     onError: (error) => {
       setLoading(false);
       console.error("Error", error);
-      setAlert(true, "error", t("delete_failed"));
+      setAlert(true, "error", {
+        messageEn: error.message,
+        messageKh: error.message,
+      });
     },
   });
 

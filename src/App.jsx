@@ -1,16 +1,14 @@
 import { ApolloProvider } from "@apollo/client/react";
 import { BrowserRouter } from 'react-router-dom';
 import { CssBaseline } from '@mui/material';
-import React from 'react';
 
 import ThemeCustomizer from './Components/ThemeCustomizer/ThemeCustomizer';
 import AlertMessage from "./Components/AlertMessage/AlertMessage";
 import { ThemeProvider } from './Context/ThemeContext';
-
+import { AuthProvider } from "./context/AuthContext";
 import { client } from "../apolloClient";
 import './App.scss';
 import Router from './Router';
-import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   return (

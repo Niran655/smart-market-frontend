@@ -8,6 +8,7 @@ import StudentForm from "../Components/students/StudentForm";
 import "../Styles/studentGrid.scss";
 import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../Function/translate";
+
 const ranges = [
   { label: "Today", value: "today" },
   { label: "Yesterday", value: "yesterday" },

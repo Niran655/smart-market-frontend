@@ -2,43 +2,44 @@ import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import { useMutation } from "@apollo/client/react";
 import { styled } from "@mui/material/styles";
-import {
-  Autocomplete,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Grid,
-  IconButton,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Autocomplete, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { X } from "lucide-react";
 import { Form, FormikProvider, useFormik } from "formik";
 import * as Yup from "yup";
 
-import { CREATE_WAREHOUSE_TRANSFER } from "../../../../graphql/mutation";
-import useGetAllShopAutoComplete from "../../include/includeAutoComplete";
 import useGetProductWarehouse from "../../hook/useGetProductWithPagination";
+import useGetAllShopAutoComplete from "../../include/includeAutoComplete";
+import { CREATE_WAREHOUSE_TRANSFER } from "../../../../graphql/mutation";
+import { useAuth } from "../../../context/AuthContext";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": { padding: theme.spacing(2) },
   "& .MuiDialogActions-root": { padding: theme.spacing(1) },
 }));
 
-export default function ProductTransferForm({ open, onClose, t }) {
-  const { options: shopOptions, loading: shopLoading } =
-    useGetAllShopAutoComplete();
+const emptyItem = {
+  subProductId: "",
+  quantity: "",
+};
 
-  const { products, loading: productLoading } =
-    useGetProductWarehouse({
-      page: 1,
-      limit: 20,
-      pagination: false,
-    });
+export default function ProductTransferForm({
+  open,
+  onClose,
+  t,
+  language,
+  setRefetch,
+}) {
+  const {
+    options: shopOptions,
+    loading: shopLoading,
+    refetch,
+  } = useGetAllShopAutoComplete();
+  const { setAlert } = useAuth();
+  const { products, loading: productLoading } = useGetProductWarehouse({
+    page: 1,
+    limit: 20,
+    pagination: false,
+  });
 
   const [createWarehouseTransfer, { loading }] = useMutation(
     CREATE_WAREHOUSE_TRANSFER,
@@ -46,19 +47,22 @@ export default function ProductTransferForm({ open, onClose, t }) {
       onCompleted: ({ createWarehouseTransfer }) => {
         if (createWarehouseTransfer?.isSuccess) {
           onClose();
+          refetch();
+          setRefetch();
+          setAlert(true, "success", createWarehouseTransfer?.message);
+        } else {
+          setAlert(true, "error", createWarehouseTransfer?.message);
         }
       },
-    }
+      onError: (error) => {
+        setAlert(true, "error", createWarehouseTransfer?.message);
+      },
+    },
   );
-
-  const emptyItem = {
-    subProductId: "",
-    quantity: "",
-  };
 
   const formik = useFormik({
     initialValues: {
-      toShopIds: "",
+      toShopIds: [],
       note: "",
       items: [emptyItem],
     },
@@ -67,15 +71,18 @@ export default function ProductTransferForm({ open, onClose, t }) {
       items: Yup.array().of(
         Yup.object({
           subProductId: Yup.string().required(t("require")),
-          quantity: Yup.number().required(t("require")).min(1),
-        })
+          quantity: Yup.number()
+            .typeError(t("require"))
+            .required(t("require"))
+            .min(1),
+        }),
       ),
     }),
     onSubmit: (values) => {
       createWarehouseTransfer({
         variables: {
           input: {
-            toShopId: values.toShopIds,
+            toShopIds: values.toShopIds,
             note: values.note,
             items: values.items.map((i) => ({
               subProductId: i.subProductId,
@@ -87,8 +94,7 @@ export default function ProductTransferForm({ open, onClose, t }) {
     },
   });
 
-  const { values, setValues, handleSubmit } = formik;
-  console.log("formik", formik?.values)
+  const { values, errors, touched, handleSubmit, setValues } = formik;
 
   const addItem = () => {
     setValues({
@@ -99,15 +105,14 @@ export default function ProductTransferForm({ open, onClose, t }) {
 
   const deleteItem = (index) => {
     if (values.items.length === 1) return;
-    const items = [...values.items];
-    items.splice(index, 1);
-    setValues({ ...values, items });
+    const newItems = values.items.filter((_, i) => i !== index);
+    setValues({ ...values, items: newItems });
   };
 
   const updateItem = (index, field, value) => {
-    const items = [...values.items];
-    items[index][field] = value;
-    setValues({ ...values, items });
+    const newItems = [...values.items];
+    newItems[index] = { ...newItems[index], [field]: value };
+    setValues({ ...values, items: newItems });
   };
 
   return (
@@ -128,15 +133,16 @@ export default function ProductTransferForm({ open, onClose, t }) {
         <Form onSubmit={handleSubmit}>
           <DialogContent dividers>
             <Grid container spacing={2}>
-
+              {/* TO SHOP */}
               <Grid size={{ xs: 12, md: 6 }}>
                 <Typography>{t("to_shop")}</Typography>
                 <Autocomplete
                   multiple
+                  placeholder={t(`select_shop`)}
                   options={shopOptions}
                   loading={shopLoading}
                   value={shopOptions.filter((o) =>
-                    values.toShopIds.includes(o.value)
+                    values.toShopIds.includes(o.value),
                   )}
                   getOptionLabel={(o) => o.label}
                   onChange={(e, selected) =>
@@ -146,17 +152,22 @@ export default function ProductTransferForm({ open, onClose, t }) {
                     })
                   }
                   renderInput={(params) => (
-                    <TextField {...params} size="small" />
+                    <TextField
+                      {...params}
+                      size="small"
+                      error={Boolean(touched.toShopIds && errors.toShopIds)}
+                      helperText={touched.toShopIds && errors.toShopIds}
+                    />
                   )}
                 />
               </Grid>
-
-              <Grid size={{ xs: 12 }}>
-                <Typography>{t("note")}</Typography>
+              ​
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Typography>{t("remark")}</Typography>
                 <TextField
                   fullWidth
                   multiline
-                  rows={2}
+                  placeholder={t(`remark`)}
                   size="small"
                   value={values.note}
                   onChange={(e) =>
@@ -164,8 +175,7 @@ export default function ProductTransferForm({ open, onClose, t }) {
                   }
                 />
               </Grid>
-
-
+              {/* PRODUCT HEADER */}
               <Grid size={{ xs: 12 }}>
                 <Stack
                   direction="row"
@@ -178,7 +188,7 @@ export default function ProductTransferForm({ open, onClose, t }) {
                   </IconButton>
                 </Stack>
               </Grid>
-
+              {/* PRODUCT LIST */}
               <Grid size={{ xs: 12 }}>
                 {values.items.map((item, index) => (
                   <Grid container spacing={2} key={index}>
@@ -189,19 +199,32 @@ export default function ProductTransferForm({ open, onClose, t }) {
                         loading={productLoading}
                         value={
                           products.find(
-                            (p) => p.subProduct?._id === item.subProductId
+                            (p) => p.subProduct?._id === item.subProductId,
                           ) || null
                         }
-                        getOptionLabel={(p) =>
-                          p?.subProduct?.parentProductId?.nameEn ||
-                          p?.subProduct?.parentProductId?.nameKh ||
-                          ""
+                        isOptionEqualToValue={(option, value) =>
+                          option.subProduct?._id === value.subProduct?._id
                         }
+                        getOptionLabel={(p) => {
+                          const productName =
+                            language === "en"
+                              ? p?.subProduct?.parentProductId?.nameEn ||
+                                "Unnamed"
+                              : p?.subProduct?.parentProductId?.nameKh ||
+                                "គ្មានឈ្មោះ";
+
+                          const unitKh =
+                            p?.subProduct?.unitId?.nameKh || "គ្មានឯកតា";
+                          const unitEn =
+                            p?.subProduct?.unitId?.nameEn || "No Unit";
+
+                          return `${productName} (${unitKh} / ${unitEn})`;
+                        }}
                         onChange={(e, val) =>
                           updateItem(
                             index,
                             "subProductId",
-                            val?.subProduct?._id || ""
+                            val?.subProduct?._id || "",
                           )
                         }
                         renderInput={(params) => (
@@ -209,7 +232,6 @@ export default function ProductTransferForm({ open, onClose, t }) {
                         )}
                       />
                     </Grid>
-
                     <Grid size={{ xs: 12, md: 3 }}>
                       <Typography>{t("quantity")}</Typography>
                       <TextField
@@ -218,6 +240,14 @@ export default function ProductTransferForm({ open, onClose, t }) {
                         value={item.quantity}
                         onChange={(e) =>
                           updateItem(index, "quantity", e.target.value)
+                        }
+                        error={Boolean(
+                          touched.items?.[index]?.quantity &&
+                          errors.items?.[index]?.quantity,
+                        )}
+                        helperText={
+                          touched.items?.[index]?.quantity &&
+                          errors.items?.[index]?.quantity
                         }
                       />
                     </Grid>
@@ -231,7 +261,6 @@ export default function ProductTransferForm({ open, onClose, t }) {
                   </Grid>
                 ))}
               </Grid>
-
             </Grid>
           </DialogContent>
 

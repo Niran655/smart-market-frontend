@@ -299,6 +299,7 @@ query GetProductWareHouseWithPagination($page: Int, $limit: Int, $pagination: Bo
           nameKh
         }
         parentProductId {
+          _id
           nameKh
           nameEn
         }
@@ -375,3 +376,144 @@ query GetProductWareHouseInShopoWithPagination($shopId: ID, $page: Int, $limit: 
   }
 }
 `
+
+export const GET_PRODUCTS_WAREHOUSE_TRANSFER_WITH_PAGINATION = gql`
+query GetWarehouseTransfersWithPagination($status: TransferStatus, $shopId: ID, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
+  getWarehouseTransfersWithPagination(status: $status, shopId: $shopId, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+    data {
+       _id
+    toShop {
+      nameKh
+      nameEn
+    }
+    items {
+      quantity
+      subProduct {
+        _id
+        saleType
+        qty
+        barCode
+        productDes
+        productImg
+        using
+        check
+        sell
+        servicePrice
+        salePrice
+        taxRate
+        costPrice
+        priceImg
+        totalPrice
+        priceDes
+        createdAt
+        updatedAt
+        stock
+        minStock
+        parentProductId {
+          nameEn
+          nameKh
+          _id
+        }
+        unitId {
+          _id
+          nameEn
+          nameKh
+        }
+      }
+    }
+    status
+    requestedBy {
+      nameEn
+      nameKh
+    }
+    acceptedBy {
+      _id
+      image
+      nameEn
+      nameKh
+      email
+      gender
+      phone
+      active
+      role
+      createdAt
+      updatedAt
+    }
+    remark
+    createdAt
+    acceptedAt
+  }
+    
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
+  }
+}
+`
+export const GET_WAREHOUSE_TRANSFER_BY_ID = gql`
+query GetWarehouseTransferById($id: ID!) {
+  getWarehouseTransferById(_id: $id) {
+     _id
+    toShop {
+      nameKh
+      nameEn
+    }
+    items {
+      quantity
+      subProduct {
+        _id
+        saleType
+        qty
+        barCode
+        productDes
+        productImg
+        using
+        check
+        sell
+        servicePrice
+        salePrice
+        taxRate
+        costPrice
+        priceImg
+        totalPrice
+        priceDes
+        createdAt
+        updatedAt
+        stock
+        minStock
+      }
+    }
+    status
+    requestedBy {
+      nameEn
+      nameKh
+    }
+    acceptedBy {
+      _id
+      image
+      nameEn
+      nameKh
+      email
+      gender
+      phone
+      active
+      role
+      createdAt
+      updatedAt
+    }
+    remark
+    createdAt
+    acceptedAt
+  }
+}
+`
+

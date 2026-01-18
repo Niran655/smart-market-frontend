@@ -55,9 +55,12 @@ export default function UserForm({
         setRefetch();
       } else setAlert(true, "error", updateUser.message);
     },
-    onError: (err) => {
+    onError: (error) => {
       setLoading(false);
-      setAlert(true, "error", err.message);
+      setAlert(true, "error", {
+        messageEn: error.message,
+        messageKh: error.message,
+      });
     },
   });
 
@@ -156,7 +159,7 @@ export default function UserForm({
   return (
     <ReusableForm
       open={open}
-      onClose={handleClose} 
+      onClose={handleClose}
       dialogTitle={dialogTitle === "Create" ? t("add_user") : t("update_user")}
       initialValues={formValues}
       validationSchema={validationSchema}

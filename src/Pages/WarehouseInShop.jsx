@@ -4,6 +4,7 @@ import { useQuery } from "@apollo/client/react";
 import { Box, Breadcrumbs, Button, Chip, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import React, { useState } from "react";
 
+import useGetProductWarehouseInShopWithPagination from "../Components/hook/useGetProductWarehouseInShopWithPagination";
 import FooterPagination from "../include/FooterPagination";
 import { useAuth } from "../context/AuthContext";
 import { GET_PRODUCT_WAREHOUSE_IN_SHOP_WITH_PAGINATION } from "../../graphql/queries";
@@ -17,6 +18,10 @@ const WarehouseInShop = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
   const savedStoreId = localStorage.getItem("activeShopId");
+  const [productWarehouseInShopPage, setProductWarehouseInShopPage] = useState(1);
+  const [productWarehouseInShopLimit, setProductWarehouseInShopLimit] = useState(5);
+  const [productWarehouseInShopKeyword, setProductWarehouseInShopKeyword] = useState(""); 
+
   const {
     data: productWarehouseInShop,
     refetch,
@@ -30,20 +35,36 @@ const WarehouseInShop = () => {
       keyword: "",
     },
   });
+
+    const {
+      producteWarehouseInShop,
+      loading: productWarehouseLoading,
+      refetch: productWarehouseRefetch,
+      paginator: productWarehousePaginator,
+    } = useGetProductWarehouseInShopWithPagination({
+      shopId: savedStoreId,
+      page: productWarehouseInShopPage,
+      limit: productWarehouseInShopLimit,
+      pagination: true,
+      keyword: productWarehouseInShopKeyword,
+    });
+
   const products =
     productWarehouseInShop?.getProductWareHouseInShopoWithPagination?.data || [];
   const paginator =
     productWarehouseInShop?.getProductWareHouseInShopoWithPagination?.paginator || [];
 
 
-  const handleLimit = (e) => {
+  const handleLimitProductWarehouseInShop = (e) => {
     const newLimit = parseInt(e.target.value, 10);
-    setLimit(newLimit);
-    setPage(1);
+    setProductWarehouseInShopLimit(newLimit);
+    setProductWarehouseInShopPage(1);
   };
 
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
+
+
+  const handlePageChangeProductWarehouseInShop = (newPage) => {
+    setProductWarehouseInShopPage(newPage);
   };
 
 
@@ -116,13 +137,13 @@ const WarehouseInShop = () => {
                   </TableRow>
                 </TableHead>
 
-                {loading ? (
+                {productWarehouseLoading ? (
                   <CircularIndeterminate />
-                ) : products?.length == 0 ? (
+                ) : producteWarehouseInShop?.length == 0 ? (
                   <EmptyData />
                 ) : (
                   <TableBody>
-                    {products.map((row, index) => (
+                    {producteWarehouseInShop.map((row, index) => (
                       <TableRow key={row._id}>
                         <TableCell>{paginator.slNo + index}</TableCell>
                         <TableCell>
@@ -177,8 +198,8 @@ const WarehouseInShop = () => {
                 <FooterPagination
                   page={page}
                   limit={limit}
-                  setPage={handlePageChange}
-                  handleLimit={handleLimit}
+                  setPage={handlePageChangeProductWarehouseInShop}
+                  handleLimit={handleLimitProductWarehouseInShop}
                   totalDocs={paginator?.totalDocs}
                   totalPages={paginator?.totalPages}
                 />
