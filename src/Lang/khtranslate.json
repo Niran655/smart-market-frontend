@@ -156,10 +156,17 @@
   "warehouse": "ឃ្លាំង",
   "warehouse_in_shop": "ឃ្លាំងក្នុងហាង",
   "wholesale": "លក់ដុំ",
-    "items_count":"ចំនួនផលិតផល",
-  "total_quantity":"ចំនួនសរុប",
-  "date":"កាលបរិច្ឆេទ",
-    "view_product_transfer":"មើលការបញ្ចូនផលិតផល",
-  "transfer_information":"ព័ត៍មាននៃការបញ្ចូន",
-    "price_in_unit":"តម្លៃក្នុងមួយឯកតា"
+  "items_count": "ចំនួនផលិតផល",
+  "total_quantity": "ចំនួនសរុប",
+  "date": "កាលបរិច្ឆេទ",
+  "view_product_transfer": "មើលការបញ្ចូនផលិតផល",
+  "transfer_information": "ព័ត៍មាននៃការបញ្ចូន",
+  "price_in_unit": "តម្លៃក្នុងមួយឯកតា",
+  "get_product_transfer": "ទទួលផលិតផល",
+  "view_product_transfer_detail": "មើលការបញ្ចូនផលិតផលលម្អិត",
+  "remaining_goods":"ទំនិញនៅសល់",
+  "confirm_getting_all_product":"បញ្ជាក់ការទទួលផលិតផលទាំងអស់",
+  "reject":"បដិសេធ",
+  "approve":"អនុម័ត",
+  "reject_all_product":"បដិសេធទំនិញទាំងអស់"
 }

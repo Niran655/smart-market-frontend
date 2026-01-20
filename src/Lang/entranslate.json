@@ -156,11 +156,17 @@
   "warehouse": "Warehouse",
   "warehouse_in_shop": "Warehouse In Shop",
   "wholesale": "Wholesale",
-  "items_count":"Items Count",
-  "total_quantity":"Total Quantity",
-  "date":"Date",
-  "view_product_transfer":"View Product Transfer",
-  "transfer_information":"Transfer Information",
-  "price_in_unit":"Price In Unit"
-
+  "items_count": "Items Count",
+  "total_quantity": "Total Quantity",
+  "date": "Date",
+  "view_product_transfer": "View Product Transfer",
+  "transfer_information": "Transfer Information",
+  "price_in_unit": "Price In Unit",
+  "get_product_transfer": "Get Product Transfer",
+  "view_product_transfer_detail": "View Product Transfer Detail",
+  "remaining_goods":"Remaining Goods",
+  "confirm_getting_all_product":"Confirm Getting All Product",
+  "reject":"Reject",
+  "approve":"Approve",
+  "reject_all_product":"Reject All Product"
 }

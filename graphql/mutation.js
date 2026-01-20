@@ -316,3 +316,28 @@ mutation CreateWarehouseTransfer($input: CreateWarehouseTransferInput!) {
   }
 }
 `
+
+
+export const ACCEPT_WAREHOUSE_TRANSFER = gql`
+mutation AcceptWarehouseTransfer($transferId: ID!) {
+  acceptWarehouseTransfer(transferId: $transferId) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const REJECT_WAREHOUSE_TRANSFER = gql`
+mutation RejectWarehouseTransfer($transferId: ID!, $reason: String) {
+  rejectWarehouseTransfer(transferId: $transferId, reason: $reason) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`

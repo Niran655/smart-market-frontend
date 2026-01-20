@@ -1,7 +1,7 @@
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import Box from "@mui/material/Box";
 import { Link as RouterLink } from "react-router-dom";
-import { Grid, Stack, Typography } from "@mui/material";
+import { Button, Grid, Stack, Typography } from "@mui/material";
 import { CornerUpLeft, ScrollText } from "lucide-react";
 import { ShoppingCart, Users, Warehouse } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -51,7 +51,7 @@ export default function Menu({ open, onClose }) {
         <Box className="menu-content">
           <Grid container spacing={3}>
             <Grid size={{ xs: 6,sm:4, md: 3 }}>
-              <Box
+              <Button
                 className="menu-box"
                 component={RouterLink}
                 to="/store"
@@ -70,10 +70,10 @@ export default function Menu({ open, onClose }) {
                     {t(`exit_the_shop`)}
                   </Typography>
                 </Stack>
-              </Box>
+              </Button>
             </Grid>
             <Grid size={{ xs: 6,sm:4, md: 3 }}>
-              <Box
+              <Button
                 className="menu-box"
                 component={RouterLink}
                 to={`/store/pos/${id}`}
@@ -92,10 +92,10 @@ export default function Menu({ open, onClose }) {
                     {t(`pos`)}
                   </Typography>
                 </Stack>
-              </Box>
+              </Button>
             </Grid>
             <Grid size={{ xs: 6,sm:4, md: 3 }}>
-              <Box
+              <Button
                 className="menu-box"
                 component={RouterLink}
                 to={`store/pos/${id}/warehouse-in-shop`}
@@ -114,11 +114,11 @@ export default function Menu({ open, onClose }) {
                     {t(`warehouse`)}
                   </Typography>
                 </Stack>
-              </Box>
+              </Button>
             </Grid>
 
             <Grid size={{ xs: 6,sm:4, md: 3 }}>
-              <Box
+              <Button
                 className="menu-box"
                 component={RouterLink}
                 to={`store/pos/${id}/warehouse-in-shop`}
@@ -137,11 +137,11 @@ export default function Menu({ open, onClose }) {
                     {t(`report`)}
                   </Typography>
                 </Stack>
-              </Box>
+              </Button>
             </Grid>
 
             <Grid size={{ xs: 6,sm:4, md: 3 }}>
-              <Box
+              <Button
                 className="menu-box"
                 component={RouterLink}
                 to={`store/pos/${id}/warehouse-in-shop`}
@@ -160,7 +160,7 @@ export default function Menu({ open, onClose }) {
                     {t(`staff`)}
                   </Typography>
                 </Stack>
-              </Box>
+              </Button>
             </Grid>
           </Grid>
         </Box>

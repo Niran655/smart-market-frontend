@@ -8,11 +8,13 @@ const useGetWarehouseTransferWithPagination = ({
   limit = 10,
   pagination = true,
   keyword = "",
+  status,
+  shopId
 } = {}) => {
   const { data, loading, error, refetch } = useQuery(
     GET_PRODUCTS_WAREHOUSE_TRANSFER_WITH_PAGINATION,
     {
-      variables: { page, limit, pagination, keyword },
+      variables: { page, limit, pagination, keyword,shopId },
       fetchPolicy: "cache-and-network",
     },
   );
