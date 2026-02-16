@@ -2,10 +2,10 @@
 .alert-message {
     .snackbar-alert {
         margin-top: 10px;
-        border-radius: 20px;
+        border-radius: 30px;
 
         .alert-success {
-            border-radius: 20px;
+            border-radius: 30px;
             background-color: #00C9A7;
             color: #fff;
             user-select: text !important;
@@ -13,7 +13,7 @@
         }
 
         .alert-error {
-            border-radius: 20px;
+            border-radius: 30px;
             background-color: #FF6F91;
             color: #fff;
             user-select: text !important;
@@ -21,7 +21,7 @@
         }
 
         .alert-warning {
-            border-radius: 20px;
+            border-radius: 30px;
             background-color: orange;
 
             color: #fff;

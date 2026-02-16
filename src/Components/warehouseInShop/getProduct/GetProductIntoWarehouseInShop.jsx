@@ -1,14 +1,30 @@
 import { useMutation } from "@apollo/client/react";
 import { Box, Button, Chip, Divider, Drawer, IconButton, Paper, Stack, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { X } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import "../../../Styles/TableStyle.scss";
-import { ACCEPT_WAREHOUSE_TRANSFER, REJECT_WAREHOUSE_TRANSFER } from "../../../../graphql/mutation";
+import { REJECT_WAREHOUSE_TRANSFER, ACCEPT_WAREHOUSE_TRANSFER } from "../../../../graphql/mutation";
 import EmptyData from "../../../include/EmptyData";
 import CircularIndeterminate from "../../../include/Loading";
 import GetProductAction from "./GetProductAction";
 
+const getStatusColor = (status) => {
+  switch (status) {
+    case "pending":
+      return "warning";
+    case "accepted":
+      return "success";
+    case "rejected":
+      return "error";
+    case "partial_accepted":
+      return "info";
+    case "cancelled":
+      return "default";
+    default:
+      return "default";
+  }
+};
 export default function GetProductIntoWarehouseInShop({
   open,
   onClose,
@@ -17,6 +33,7 @@ export default function GetProductIntoWarehouseInShop({
   language,
   loading,
   refetch,
+  productWarehouseInShopRefetch
 }) {
   if (!editData) return null;
   const {
@@ -29,10 +46,19 @@ export default function GetProductIntoWarehouseInShop({
     acceptedAt,
     items = [],
   } = editData;
+
+  const isPending = status === "pending";
+  const isPartialAccepted = status === "partial_accepted";
+
+  const isFinalStatus = ["accepted", "rejected", "cancelled"].includes(status);
+
+  const canAcceptAll = isPending || isPartialAccepted;
+  const canRejectAll = isPending || isPartialAccepted;
+
+
   const [acceptWarehouseTransfer] = useMutation(ACCEPT_WAREHOUSE_TRANSFER);
   const [rejectWarehouseTransfer] = useMutation(REJECT_WAREHOUSE_TRANSFER);
 
-  
   const [quantities, setQuantities] = useState({});
 
   useEffect(() => {
@@ -45,10 +71,48 @@ export default function GetProductIntoWarehouseInShop({
     }
   }, [items]);
 
+
+  const handleAcceptAll = async () => {
+    try {
+      const itemsPayload = items.map((item) => ({
+        subProductId: item.subProduct?._id,
+        receivedQty: item.remainingQty ?? item.quantity,
+      }));
+
+      await acceptWarehouseTransfer({
+        variables: {
+          transferId: editData?._id,
+          items: itemsPayload,
+        },
+      });
+
+      refetch();
+      productWarehouseInShopRefetch();
+      onClose();
+    } catch (error) {
+      console.error("Accept all error:", error);
+    }
+  };
+
+  const handleRejectAll = async () => {
+    try {
+      await rejectWarehouseTransfer({
+        variables: {
+          transferId: editData?._id,
+        },
+      });
+
+      refetch();
+      onClose();
+    } catch (error) {
+      console.error("Reject all error:", error);
+    }
+  };
+
+
   return (
     <Drawer anchor="top" open={open} onClose={onClose}>
       <Box sx={{ height: "100vh", p: 2 }}>
-        {/* ================= HEADER ================= */}
         <Stack
           direction="row"
           justifyContent="space-between"
@@ -84,10 +148,16 @@ export default function GetProductIntoWarehouseInShop({
 
             <InfoRow label="Shop (KH)" value={toShop?.nameKh} />
             <InfoRow label="Shop (EN)" value={toShop?.nameEn} />
-
             <InfoRow
               label="Status"
-              value={<Chip size="small" label={status} color="primary" />}
+              value={
+                <Chip
+                  size="small"
+                  label={t(`${status}`)}
+                  color={getStatusColor(status)}
+                  sx={{ fontWeight: 600 }}
+                />
+              }
             />
 
             <InfoRow
@@ -115,14 +185,32 @@ export default function GetProductIntoWarehouseInShop({
             <Typography variant="body2" color="text.secondary">
               {remark || "-"}
             </Typography>
-            <Stack spacing={2} mt={4}>
-              <Button variant="contained" color="error" fullWidth>
-                {t(`reject_all_product`)}
-              </Button>
-              <Button variant="contained" fullWidth>
-                {t(`confirm_getting_all_product`)}
-              </Button>
-            </Stack>
+            {!isFinalStatus && (
+              <Stack spacing={2} mt={4}>
+                {canRejectAll && (
+                  <Button
+                    variant="contained"
+                    color="error"
+                    fullWidth
+                    onClick={handleRejectAll}
+                  >
+                    {t("reject_all_product")}
+                  </Button>
+                )}
+
+                {canAcceptAll && (
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={handleAcceptAll}
+                  >
+                    {t("confirm_getting_all_product")}
+                  </Button>
+                )}
+              </Stack>
+            )}
+
+
           </Box>
 
           <Box sx={{ flex: 1, overflow: "hidden" }}>
@@ -136,6 +224,7 @@ export default function GetProductIntoWarehouseInShop({
                     <TableCell>{t(`price_in_unit`)}</TableCell>
                     <TableCell>{t(`quantity`)}</TableCell>
                     <TableCell>{t(`total_price`)}</TableCell>
+                    <TableCell>{t(`product_received_qty`)}</TableCell>
                     <TableCell>{t(`remaining_goods`)}</TableCell>
                     <TableCell align="right">{t(`action`)}</TableCell>
                   </TableRow>
@@ -149,7 +238,6 @@ export default function GetProductIntoWarehouseInShop({
                     {items.map((row, index) => (
                       <TableRow className="table-row" key={index}>
                         <TableCell>{index + 1}</TableCell>
-
                         <TableCell>
                           <Stack
                             direction="row"
@@ -176,54 +264,29 @@ export default function GetProductIntoWarehouseInShop({
                             alignItems="center"
                             spacing={1}
                           >
-                            <TextField
-                              type="number"
-                              size="small"
-                              value={quantities[index] || ""}
-                              inputProps={{
-                                min: 0,
-                                max: row.quantity,
-                              }}
-                              slotProps={{
-                                input: {
-                                  endAdornment: (
-                                    <Typography
-                                      variant="caption"
-                                      display="block"
-                                    >
-                                      {language === "en"
-                                        ? row.subProduct?.unitId?.nameEn
-                                        : row.subProduct?.unitId?.nameKh}
-                                    </Typography>
-                                  ),
-                                },
-                              }}
-                              onChange={(e) => {
-                                const value = Number(e.target.value);
-                                if (value <= row.quantity) {
-                                  setQuantities({
-                                    ...quantities,
-                                    [index]: value,
-                                  });
-                                }
-                              }}
-                              sx={{ width: 90 }}
-                            />
+                            {quantities[index] || 0}{" "}
+                            {language === "en"
+                              ? row.subProduct?.unitId?.nameEn
+                              : row.subProduct?.unitId?.nameKh}
                           </Stack>
                         </TableCell>
-
                         <TableCell>
                           {" "}
                           ${" "}
                           {(quantities[index] || 0) * row.subProduct?.costPrice}
                         </TableCell>
-
-                        <TableCell>
-                          {row?.quantity - (quantities[index] || 0)}
-                        </TableCell>
+                        <TableCell>{row?.receivedQty || 0} </TableCell>
+                        <TableCell>{row?.remainingQty || 0} </TableCell>
 
                         <TableCell align="right">
-                          <GetProductAction t={t} />
+                          <GetProductAction
+                            language={language}
+                            item={row}
+                            editData={editData}
+                            t={t}
+                            refetch={refetch}
+                            productWarehouseInShopRefetch={productWarehouseInShopRefetch}
+                          />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -238,7 +301,7 @@ export default function GetProductIntoWarehouseInShop({
   );
 }
 
-/* ================= SMALL COMPONENT ================= */
+
 function InfoRow({ label, value }) {
   return (
     <Stack direction="row" justifyContent="space-between" mb={0.5}>

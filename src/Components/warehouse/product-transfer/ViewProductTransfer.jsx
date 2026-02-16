@@ -1,22 +1,8 @@
-import React from "react";
-import {
-  Drawer,
-  Box,
-  Typography,
-  IconButton,
-  Stack,
-  Divider,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Chip,
-} from "@mui/material";
+import { Box, Chip, Divider, Drawer, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { X } from "lucide-react";
-import "../../../Styles/TableStyle.scss"
+import React from "react";
+
+import "../../../Styles/TableStyle.scss";
 export default function ViewProductTransfer({ open, onClose, viewData, t, language }) {
   if (!viewData) return null;
 

@@ -2,39 +2,36 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoSettingsOutline } from "react-icons/io5";
 import { Avatar, Box, Collapse, List, ListItem, ListItemButton, ListItemIcon, Stack, Typography } from "@mui/material";
-import { Bag2, Category, DocumentText1, HomeHashtag, House2, Messages2, Tag, User, UserOctagon } from "iconsax-react";
+import { Bag2, Category, DocumentText1, HomeHashtag, Messages2, Tag, UserOctagon } from "iconsax-react";
 import { useState } from "react";
 
 import logo from "../assets/Image/logo.png";
 import { useThemeContext } from "../Context/ThemeContext";
 import "./menuNavbar.scss";
 
+ 
+function getContrastText(hexColor) {
+  // Convert hex to RGB
+  const r = parseInt(hexColor.slice(1, 3), 16);
+  const g = parseInt(hexColor.slice(3, 5), 16);
+  const b = parseInt(hexColor.slice(5, 7), 16);
+  // Compute relative luminance (WCAG formula)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? '#000000' : '#ffffff';
+}
+
 export default function MenuNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { sidebarColor, layoutMode } = useThemeContext();
   const [openDropdown, setOpenDropdown] = useState(null);
+
   const menuData = [
     {
       pageTitle: "Dashboard",
       routeTo: "/dashboard",
       pageIcon: <Category className="icon" />,
     },
-    // {
-    //   pageTitle: "Student",
-    //   pageIcon: <User className="icon" />,
-    //   matchPaths: ["/student-grid", "/student/details"],
-    //   children: [
-    //     {
-    //       pageTitle: "All Student",
-    //       routeTo: "/student-grid",
-    //     },
-    //     {
-    //       pageTitle: "Student List",
-    //       routeTo: "/student-list",
-    //     },
-    //   ], 
-    // },
     {
       pageTitle: "Warehouse",
       routeTo: "/warehouse",
@@ -69,6 +66,9 @@ export default function MenuNavbar() {
     },
   ];
 
+ 
+  const textColor = getContrastText(sidebarColor);
+
   const isActive = (menu) => {
     const paths = menu.matchPaths || [menu.routeTo];
     return paths.some((path) => location.pathname === path);
@@ -78,36 +78,55 @@ export default function MenuNavbar() {
     <Box
       sx={{
         backgroundColor: sidebarColor,
-        color: "white",
+        color: textColor,
         height: "100vh",
-        paddingTop: "10px",
         position: "sticky",
         top: 0,
+        overflowY: "auto",               
+        paddingTop: "10px",
+        "&::-webkit-scrollbar": {
+          width: "6px",
+        },
+        "&::-webkit-scrollbar-track": {
+          background: "rgba(255, 255, 255, 0.1)",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          background: "rgba(255, 255, 255, 0.3)",
+          borderRadius: "3px",
+        },
       }}
     >
       <Stack
         direction="column"
         justifyContent="space-between"
-        sx={{ height: "100%" }}
+        sx={{ minHeight: "100%" }}       
       >
-        {/* Top section */}
+   
         <Stack direction="column" spacing={3} sx={{ px: 2 }}>
-          <Stack direction="row" spacing={1.5} alignItems="center">
+         <Stack
+            direction="row"
+            spacing={1.5}
+            alignItems="center"
+            justifyContent="center"
+            
+          >
             <Avatar alt="logo" src={logo} sx={{ width: 48, height: 48 }} />
             {layoutMode !== "compact" && (
               <Stack direction="column">
-                <Typography sx={{ fontWeight: 600 }}>Welcome</Typography>
+                <Typography sx={{ fontWeight: 600, color: textColor }}>
+                  LIKA COMPANY
+                </Typography>
               </Stack>
             )}
           </Stack>
 
-          <List>
+          <List >
             {menuData.map((menu) => {
               const active = isActive(menu);
               const hasChildren = !!menu.children;
 
               return (
-                <Box key={menu.pageTitle}>
+                <Box key={menu.pageTitle} >
                   <ListItem
                     disablePadding
                     className={active ? "list-item-active" : "list-item"}
@@ -121,7 +140,8 @@ export default function MenuNavbar() {
                           ? "rgba(255, 255, 255, 0.15)"
                           : "rgba(255, 255, 255, 0.1)",
                       },
-                      borderRadius: "8px"
+                      borderRadius: "8px",
+                      
                     }}
                     onClick={() => {
                       if (hasChildren) {
@@ -135,11 +155,11 @@ export default function MenuNavbar() {
                   >
                     <ListItemButton
                       sx={{
-                        color: "white",
+                        color: textColor,                     // dynamic text color
                         justifyContent:
                           layoutMode === "compact" ? "center" : "flex-start",
                         px: layoutMode === "compact" ? 0 : 2,
-                        borderRadius: "8px"
+                        borderRadius: "8px",
                       }}
                     >
                       {layoutMode !== "compact" && <Box sx={{ width: 6 }} />}
@@ -154,7 +174,7 @@ export default function MenuNavbar() {
                       >
                         <ListItemIcon
                           sx={{
-                            color: "inherit",
+                            color: "inherit",             
                             minWidth: 0,
                             display: "flex",
                             justifyContent: "center",
@@ -164,14 +184,14 @@ export default function MenuNavbar() {
                         </ListItemIcon>
                         {layoutMode !== "compact" && (
                           <>
-                            <Typography sx={{ ml: 1, flexGrow: 1 }}>
+                            <Typography sx={{ ml: 1, flexGrow: 1, color: textColor }}>
                               {menu.pageTitle}
                             </Typography>
                             {hasChildren &&
                               (openDropdown === menu.pageTitle ? (
-                                <ExpandLess fontSize="small" />
+                                <ExpandLess fontSize="small" sx={{ color: textColor }} />
                               ) : (
-                                <ExpandMore fontSize="small" />
+                                <ExpandMore fontSize="small" sx={{ color: textColor }} />
                               ))}
                           </>
                         )}
@@ -206,8 +226,10 @@ export default function MenuNavbar() {
                                 },
                               }}
                             >
-                              <ListItemButton sx={{ pl: 6, color: "white" }}>
-                                <Typography>{child.pageTitle}</Typography>
+                              <ListItemButton sx={{ pl: 6, color: textColor }}>
+                                <Typography sx={{ color: textColor }}>
+                                  {child.pageTitle}
+                                </Typography>
                               </ListItemButton>
                             </ListItem>
                           );
@@ -221,6 +243,7 @@ export default function MenuNavbar() {
           </List>
         </Stack>
 
+        {/* Settings at bottom */}
         <List sx={{ px: 2, pb: 2 }}>
           <ListItem
             disablePadding
@@ -240,7 +263,7 @@ export default function MenuNavbar() {
               },
             }}
           >
-            <ListItemButton sx={{ color: "white" }}>
+            <ListItemButton sx={{ color: textColor }}>
               <Box sx={{ width: 6 }} />
               <Stack
                 direction="row"
@@ -262,7 +285,7 @@ export default function MenuNavbar() {
                   <IoSettingsOutline size={25} className="icon" />
                 </ListItemIcon>
                 {layoutMode !== "compact" && (
-                  <Typography sx={{ ml: 1 }}>Setting</Typography>
+                  <Typography sx={{ ml: 1, color: textColor }}>Setting</Typography>
                 )}
               </Stack>
             </ListItemButton>

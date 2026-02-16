@@ -5,14 +5,14 @@ import emptybox from "../assets/Image/empty-box.png";
 const EmptyData = () => {
   return (
 
-      <TableBody  sx={{ height: "300px", borderRadius: "20px"}}>
+      <TableBody  sx={{ height: "300px", borderRadius: "20px" }}>
         <TableRow>
           <TableCell colSpan={10} align="center">
-            <Box>
+            <Box >
               <Stack
                 direction="row"
                 justifyContent="center"
-                sx={{ width: "100%" }}
+                sx={{ width: "100%"}}
               >
                 <Stack
                   direction="column"
@@ -27,6 +27,7 @@ const EmptyData = () => {
                       textAlign: "center",
                       height: "100px",
                       width: "100%",
+                
                     }}
                   >
                     <img className="box-image" style={{width:'100px',height:"100px"}} src={emptybox} alt={emptybox} />

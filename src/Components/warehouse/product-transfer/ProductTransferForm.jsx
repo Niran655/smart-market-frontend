@@ -11,6 +11,7 @@ import useGetProductWarehouse from "../../hook/useGetProductWithPagination";
 import useGetAllShopAutoComplete from "../../include/includeAutoComplete";
 import { CREATE_WAREHOUSE_TRANSFER } from "../../../../graphql/mutation";
 import { useAuth } from "../../../context/AuthContext";
+import useGetProductWarehouseWithPagination from "../../hook/useGetProductWarehouseWithPagination";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": { padding: theme.spacing(2) },
@@ -35,7 +36,7 @@ export default function ProductTransferForm({
     refetch,
   } = useGetAllShopAutoComplete();
   const { setAlert } = useAuth();
-  const { products, loading: productLoading } = useGetProductWarehouse({
+  const { productWarehouseWithPagination, loading: productLoading } = useGetProductWarehouseWithPagination({
     page: 1,
     limit: 20,
     pagination: false,
@@ -195,10 +196,10 @@ export default function ProductTransferForm({
                     <Grid size={{ xs: 12, md: 6 }}>
                       <Typography>{t("product")}</Typography>
                       <Autocomplete
-                        options={products}
+                        options={productWarehouseWithPagination}
                         loading={productLoading}
                         value={
-                          products.find(
+                          productWarehouseWithPagination.find(
                             (p) => p.subProduct?._id === item.subProductId,
                           ) || null
                         }

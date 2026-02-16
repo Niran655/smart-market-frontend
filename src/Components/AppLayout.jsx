@@ -1,14 +1,29 @@
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
- 
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { AppBar, Avatar, Box, Button, ButtonBase, Drawer, IconButton, ListItemIcon, MenuItem, Menu as MuiMenu, Stack, Toolbar, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+  AppBar,
+  Avatar,
+  Box,
+  Button,
+  ButtonBase,
+  Drawer,
+  IconButton,
+  ListItemIcon,
+  MenuItem,
+  Menu as MuiMenu,
+  Stack,
+  Toolbar,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { Store } from "lucide-react";
- 
 import { useEffect, useState } from "react";
 
 import CambodiaFlag from "../assets/Image/cambodiaflag.png";
@@ -35,7 +50,7 @@ export default function AppLayout() {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { t } = translateLauguage(language);
   const id = localStorage.getItem("activeShopId");
-
+  const [activeTab, setActiveTab] = useState("orders");
   const isPosPage = location.pathname.startsWith("/store/pos/");
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -44,7 +59,10 @@ export default function AppLayout() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userObject, setUserObject] = useState(null);
-  const textColor = topbarColor === "#FDFDFD" ? "black" : "white";
+
+  // Sidebar width based on layout mode
+  const sidebarWidth = layoutMode === "compact" ? 70 : 250;
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -89,25 +107,39 @@ export default function AppLayout() {
     { icon: SettingsOutlinedIcon, label: `${t(`setting`)}`, path: "/setting" },
   ];
 
+  const tabs = [
+    { key: "pos", label: t("pos"), link: `/store/pos/${id}` },
+    { key: "orders", label: t("orders"), link: `/store/orders/${id}` },
+    { key: "kitchen", label: t("kitchen"), link: `/store/kitchen/${id}` },
+    { key: "reservation", label: t("reservation"), link: `/store/reservation/${id}` },
+    { key: "table", label: t("table"), link: `/store/table/${id}` },
+  ];
+
+
+
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", width: "100vw" }}>
-      {/* ============ SIDEBAR HIDDEN IN POS PAGE ============ */}
+    <Box sx={{ minHeight: "100vh", width: "100vw", position: "relative" }}>
+      {/* Desktop fixed sidebar (not on POS page, not mobile) */}
       {!isPosPage && !isMobile && (
         <Box
           sx={{
-            width: layoutMode === "compact" ? 70 : 250,
+            position: "fixed",
+            left: 0,
+            top: 0,
+            height: "100vh",
+            width: sidebarWidth,
             background: `linear-gradient(180deg, ${sidebarColor} 0%, #1c1c1c 100%)`,
             color: "white",
-            p: 0,
-            display: "flex",
-            flexDirection: "column",
             borderRight: "1px solid rgba(255,255,255,0.1)",
+            zIndex: theme.zIndex.drawer,
+            overflow: "hidden", // MenuNavbar handles its own scrolling
           }}
         >
           <MenuNavbar />
         </Box>
       )}
 
+      {/* Mobile drawer */}
       {!isPosPage && isMobile && (
         <Drawer
           anchor="left"
@@ -129,15 +161,28 @@ export default function AppLayout() {
         </Drawer>
       )}
 
-      <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        {/* =================== NORMAL TOPBAR =================== */}
+      {/* Main content area */}
+      <Box
+        sx={{
+          marginLeft: !isPosPage && !isMobile ? `${sidebarWidth}px` : 0,
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          transition: theme.transitions.create("margin-left", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
+        }}
+      >
+        {/* Topbar (hidden on POS page? Actually POS page has its own topbar) */}
         {!isPosPage && (
           <AppBar
             position="sticky"
             color="default"
             sx={{
               backgroundColor: topbarColor,
-              borderBottom: "1px solid rgba(0,0,0,0.1)",
+              // borderBottom: "1px solid rgba(0,0,0,0.1)",
+              borderBottom: "1px solid rgba(255,255,255,0.1)",
             }}
           >
             <Toolbar sx={{ justifyContent: "space-between" }}>
@@ -161,9 +206,10 @@ export default function AppLayout() {
                       <Button
                         startIcon={<IconComponent />}
                         sx={{
-                          borderRadius: 20,
+                          borderRadius: 1,
                           px: 2,
-                          color: textColor,
+                          color:
+                            topbarColor === "#FDFDFD" ? "black" : "white",
                           backgroundColor: isActive
                             ? topbarColor === "#FDFDFD"
                               ? "rgba(0,0,0,0.1)"
@@ -192,7 +238,14 @@ export default function AppLayout() {
                       src={userObject?.image}
                       alt={userObject?.nameKh}
                     />
-                    <Typography color="white">{userObject?.nameKh}</Typography>
+                    <Typography
+                      sx={{
+                        color:
+                          topbarColor === "#FDFDFD" ? "black" : "white",
+                      }}
+                    >
+                      {userObject?.nameKh}
+                    </Typography>
                   </Stack>
                 </ButtonBase>
 
@@ -230,7 +283,7 @@ export default function AppLayout() {
           </AppBar>
         )}
 
-        {/* =================== CUSTOM POS TOPBAR =================== */}
+        {/* POS Topbar */}
         {isPosPage && (
           <>
             <AppBar
@@ -244,37 +297,78 @@ export default function AppLayout() {
               <Toolbar sx={{ justifyContent: "space-between" }}>
                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
                   <Link to={`/store/pos/${id}`}>
-                    {" "}
                     <Button>
-                      <Typography color="white" fontSize={20} fontWeight="bold">
+                      <Typography
+                        sx={{
+                          color:
+                            topbarColor === "#FDFDFD" ? "black" : "white",
+                          fontSize: 20,
+                          fontWeight: "bold",
+                        }}
+                      >
                         POS System
                       </Typography>
                     </Button>
                   </Link>
                   <Box display="flex" gap={3}>
-                    <Button
+
+                    <IconButton
                       onClick={handleOpen}
                       sx={{
-                        borderRadius: 20,
-                        px: 2,
-                        py:1,
-                        color: textColor,
+                        borderRadius: 10,
+                        // px: 2,
+                        // py: 1,
+                        color: topbarColor === "#FDFDFD" ? "black" : "white",
                         backgroundColor: "rgba(255,255,255,0.15)",
                         cursor: "pointer",
                         "&:hover": {
-                          backgroundColor: "rgba(255,255,255,0.15)",
-                        }
+                          backgroundColor: "rgba(255,255,255,0.25)",
+                        },
                       }}
-                      startIcon={<GridViewOutlinedIcon size={20} color="white" />}
                     >
-                      <Typography
-                        sx={{ ml: 1, fontWeight: "bold", color: "white" }}
-                      >
-                        {t(`menu`)}
-                      </Typography>
-                    </Button>
+                      <GridViewOutlinedIcon fontSize="small" />
+                    </IconButton>
+
                   </Box>
                 </Stack>
+
+                <Stack direction="row" alignItems="center" spacing={2}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: 1,
+                      mt: 2,
+                      // backgroundColor: "rgba(0, 0, 0, 0.64)",
+                      borderRadius: 0.5,
+                      p: 0.5,
+                    }}
+                  >
+                    {tabs.map((tab) => (
+                      <Button
+                        key={tab.key}
+                        variant={activeTab === tab.key ? "contained" : "text"}
+                        onClick={() => setActiveTab(tab.key)}
+                        component={Link}
+                        to={tab.link}
+                        sx={{
+                          borderRadius: 10,
+                          backgroundColor: activeTab === tab.key ? "#ffffff" : "transparent",
+                          color: activeTab === tab.key ? "#000" : "#fff",
+                          fontWeight:"bold",
+                          "&:hover": {
+                            backgroundColor:
+                              activeTab === tab.key ? "#f0f0f0" : "rgba(255,255,255,0.1)",
+                          },
+                        }}
+                      >
+                        {tab.label}
+                      </Button>
+                    ))}
+                  </Box>
+                </Stack>
+
 
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Tooltip title={selectedLanguage}>
@@ -293,7 +387,12 @@ export default function AppLayout() {
                         src={userObject?.image}
                         alt={userObject?.nameKh}
                       />
-                      <Typography color="white">
+                      <Typography
+                        sx={{
+                          color:
+                            topbarColor === "#FDFDFD" ? "black" : "white",
+                        }}
+                      >
                         {userObject?.nameKh}
                       </Typography>
                     </Stack>
@@ -305,7 +404,14 @@ export default function AppLayout() {
           </>
         )}
 
-        <Box sx={{ flex: 1, overflow: "auto", p: isPosPage ? 1 : 3 }}>
+        {/* Main content (scrollable) */}
+        <Box
+          sx={{
+            flex: 1,
+            overflow: "auto",
+            p: isPosPage ? 1 : 3,
+          }}
+        >
           <Outlet />
         </Box>
       </Box>

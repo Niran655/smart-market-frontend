@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 
 import { useThemeContext } from '../../Context/ThemeContext';
 import './ThemeCustomizer.scss';
+
 export default function ThemeCustomizer() {
   const [open, setOpen] = useState(false);
   const {
@@ -27,31 +28,39 @@ export default function ThemeCustomizer() {
     setMobileShowLabels,
     resetSettings,
   } = useThemeContext();
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
   const primaryColors = [
     { name: 'Blue', value: '#1D4592' },
-    { name: 'Green', value: '#2e7d32' },  
+    { name: 'Green', value: '#2e7d32' },
     { name: 'Orange', value: '#ed6c02' },
     { name: 'Red', value: '#d32f2f' },
     { name: 'Purple', value: '#9c27b0' },
     { name: 'Teal', value: '#0097a7' },
   ];
+
+  // Added Black (#000000) to sidebar and topbar colors
   const sidebarColors = [
     { name: 'White', value: '#FDFDFD' },
+    { name: 'Black', value: '#000000' },
     { name: 'Dark', value: '#1e293b' },
     { name: 'Blue', value: '#1e40af' },
     { name: 'Green', value: '#15803d' },
     { name: 'Purple', value: '#7c3aed' },
     { name: 'Red', value: '#b91c1c' },
   ];
+
   const topbarColors = [
     { name: 'White', value: '#FDFDFD' },
+    { name: 'Black', value: '#000000' },
     { name: 'Dark', value: '#1e293b' },
     { name: 'Blue', value: '#1976d2' },
     { name: 'Gray', value: '#64748b' },
   ];
+
   return (
     <>
       <Tooltip title="Theme Settings" placement="left">
@@ -76,18 +85,19 @@ export default function ThemeCustomizer() {
             backdropFilter: mode === 'dark' ? 'blur(10px)' : 'none',
           }}
         >
-          <SettingsIcon size={10} className="rotating-icon" />
+          <SettingsIcon className="rotating-icon" />
         </IconButton>
       </Tooltip>
+
       <Drawer
         anchor="right"
         open={open}
         onClose={toggleDrawer}
         PaperProps={{
-          sx: { 
+          sx: {
             width: 320,
             backgroundColor: mode === 'dark' ? '#0f172a' : 'background.paper',
-            backgroundImage: mode === 'dark' 
+            backgroundImage: mode === 'dark'
               ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)'
               : 'none',
             color: mode === 'dark' ? '#e2e8f0' : 'text.primary',
@@ -105,17 +115,17 @@ export default function ThemeCustomizer() {
               borderBottom: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
             }}
           >
-            <Typography 
-              variant="h6" 
+            <Typography
+              variant="h6"
               fontWeight="bold"
               sx={{ color: mode === 'dark' ? '#f8fafc' : 'text.primary' }}
             >
               Theme Customizer
             </Typography>
-            <IconButton 
-              onClick={toggleDrawer} 
+            <IconButton
+              onClick={toggleDrawer}
               size="small"
-              sx={{ 
+              sx={{
                 color: mode === 'dark' ? '#94a3b8' : 'text.secondary',
                 '&:hover': {
                   backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)',
@@ -125,10 +135,12 @@ export default function ThemeCustomizer() {
               <CloseIcon />
             </IconButton>
           </Box>
+
           <Divider sx={{ borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'divider' }} />
-          <Box sx={{ 
-            p: 2, 
-            overflowY: 'auto', 
+
+          <Box sx={{
+            p: 2,
+            overflowY: 'auto',
             maxHeight: 'calc(100vh - 120px)',
             '&::-webkit-scrollbar': {
               width: '6px',
@@ -146,10 +158,11 @@ export default function ThemeCustomizer() {
             }
           }}>
             <Stack spacing={3}>
+              {/* Theme Mode */}
               <Box>
-                <Typography 
-                  variant="subtitle2" 
-                  fontWeight="bold" 
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="bold"
                   mb={1.5}
                   sx={{ color: mode === 'dark' ? '#f1f5f9' : 'text.primary' }}
                 >
@@ -161,16 +174,16 @@ export default function ThemeCustomizer() {
                     onClick={() => mode === 'dark' && toggleColorMode()}
                     fullWidth
                     sx={{
-                      backgroundColor: mode === 'light' 
-                        ? (mode === 'dark' ? '#334155' : 'primary.main') 
+                      backgroundColor: mode === 'light'
+                        ? (mode === 'dark' ? '#334155' : 'primary.main')
                         : 'transparent',
-                      color: mode === 'light' 
-                        ? 'white' 
+                      color: mode === 'light'
+                        ? 'white'
                         : (mode === 'dark' ? '#e2e8f0' : 'text.primary'),
                       borderColor: mode === 'dark' ? '#475569' : 'rgba(0, 0, 0, 0.23)',
                       '&:hover': {
-                        backgroundColor: mode === 'light' 
-                          ? (mode === 'dark' ? '#475569' : 'primary.dark') 
+                        backgroundColor: mode === 'light'
+                          ? (mode === 'dark' ? '#475569' : 'primary.dark')
                           : (mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)'),
                       }
                     }}
@@ -186,8 +199,8 @@ export default function ThemeCustomizer() {
                       color: mode === 'dark' ? 'white' : (mode === 'dark' ? '#e2e8f0' : 'text.primary'),
                       borderColor: mode === 'dark' ? '#475569' : 'rgba(0, 0, 0, 0.23)',
                       '&:hover': {
-                        backgroundColor: mode === 'dark' 
-                          ? '#475569' 
+                        backgroundColor: mode === 'dark'
+                          ? '#475569'
                           : (mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)'),
                       }
                     }}
@@ -196,11 +209,14 @@ export default function ThemeCustomizer() {
                   </Button>
                 </Stack>
               </Box>
+
               <Divider sx={{ borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'divider' }} />
+
+              {/* Mobile Drawer Width */}
               <Box>
-                <Typography 
-                  variant="subtitle2" 
-                  fontWeight="bold" 
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="bold"
                   mb={1.5}
                   sx={{ color: mode === 'dark' ? '#f1f5f9' : 'text.primary' }}
                 >
@@ -233,11 +249,14 @@ export default function ThemeCustomizer() {
                   }}
                 />
               </Box>
+
               <Divider sx={{ borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'divider' }} />
+
+              {/* Show Labels on Mobile */}
               <Box>
-                <Typography 
-                  variant="subtitle2" 
-                  fontWeight="bold" 
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="bold"
                   mb={1.5}
                   sx={{ color: mode === 'dark' ? '#f1f5f9' : 'text.primary' }}
                 >
@@ -261,11 +280,14 @@ export default function ThemeCustomizer() {
                   </Typography>
                 </Stack>
               </Box>
+
               <Divider sx={{ borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'divider' }} />
+
+              {/* Primary Color */}
               <Box>
-                <Typography 
-                  variant="subtitle2" 
-                  fontWeight="bold" 
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="bold"
                   mb={1.5}
                   sx={{ color: mode === 'dark' ? '#f1f5f9' : 'text.primary' }}
                 >
@@ -279,7 +301,7 @@ export default function ThemeCustomizer() {
                           primaryColor === color.value ? 'active' : ''
                         }`}
                         onClick={() => setPrimaryColor(color.value)}
-                        sx={{ 
+                        sx={{
                           backgroundColor: color.value,
                           boxShadow: mode === 'dark' ? '0 2px 8px rgba(0, 0, 0, 0.3)' : '0 2px 4px rgba(0, 0, 0, 0.1)',
                           '&:hover': {
@@ -287,7 +309,7 @@ export default function ThemeCustomizer() {
                             boxShadow: mode === 'dark' ? '0 4px 12px rgba(0, 0, 0, 0.5)' : '0 4px 8px rgba(0, 0, 0, 0.2)',
                           },
                           '&.active': {
-                            boxShadow: mode === 'dark' 
+                            boxShadow: mode === 'dark'
                               ? `0 0 0 3px ${color.value}, 0 0 0 6px rgba(255, 255, 255, 0.2)`
                               : `0 0 0 3px ${color.value}, 0 0 0 6px rgba(0, 0, 0, 0.1)`,
                           }
@@ -297,11 +319,14 @@ export default function ThemeCustomizer() {
                   ))}
                 </Box>
               </Box>
+
               <Divider sx={{ borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'divider' }} />
+
+              {/* Sidebar Color */}
               <Box>
-                <Typography 
-                  variant="subtitle2" 
-                  fontWeight="bold" 
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="bold"
                   mb={1.5}
                   sx={{ color: mode === 'dark' ? '#f1f5f9' : 'text.primary' }}
                 >
@@ -315,15 +340,16 @@ export default function ThemeCustomizer() {
                           sidebarColor === color.value ? 'active' : ''
                         }`}
                         onClick={() => setSidebarColor(color.value)}
-                        sx={{ 
+                        sx={{
                           backgroundColor: color.value,
+                          border: color.value === '#FDFDFD' || color.value === '#ffffff' ? '1px solid #e0e0e0' : 'none',
                           boxShadow: mode === 'dark' ? '0 2px 8px rgba(0, 0, 0, 0.3)' : '0 2px 4px rgba(0, 0, 0, 0.1)',
                           '&:hover': {
                             transform: 'scale(1.1)',
                             boxShadow: mode === 'dark' ? '0 4px 12px rgba(0, 0, 0, 0.5)' : '0 4px 8px rgba(0, 0, 0, 0.2)',
                           },
                           '&.active': {
-                            boxShadow: mode === 'dark' 
+                            boxShadow: mode === 'dark'
                               ? `0 0 0 3px ${color.value}, 0 0 0 6px rgba(255, 255, 255, 0.2)`
                               : `0 0 0 3px ${color.value}, 0 0 0 6px rgba(0, 0, 0, 0.1)`,
                           }
@@ -333,11 +359,14 @@ export default function ThemeCustomizer() {
                   ))}
                 </Box>
               </Box>
+
               <Divider sx={{ borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'divider' }} />
+
+              {/* Topbar Color */}
               <Box>
-                <Typography 
-                  variant="subtitle2" 
-                  fontWeight="bold" 
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="bold"
                   mb={1.5}
                   sx={{ color: mode === 'dark' ? '#f1f5f9' : 'text.primary' }}
                 >
@@ -353,14 +382,14 @@ export default function ThemeCustomizer() {
                         onClick={() => setTopbarColor(color.value)}
                         sx={{
                           backgroundColor: color.value,
-                          border: color.value === '#ffffff' ? '1px solid #e0e0e0' : 'none',
+                          border: color.value === '#FDFDFD' || color.value === '#ffffff' ? '1px solid #e0e0e0' : 'none',
                           boxShadow: mode === 'dark' ? '0 2px 8px rgba(0, 0, 0, 0.3)' : '0 2px 4px rgba(0, 0, 0, 0.1)',
                           '&:hover': {
                             transform: 'scale(1.1)',
                             boxShadow: mode === 'dark' ? '0 4px 12px rgba(0, 0, 0, 0.5)' : '0 4px 8px rgba(0, 0, 0, 0.2)',
                           },
                           '&.active': {
-                            boxShadow: mode === 'dark' 
+                            boxShadow: mode === 'dark'
                               ? `0 0 0 3px ${color.value}, 0 0 0 6px rgba(255, 255, 255, 0.2)`
                               : `0 0 0 3px ${color.value}, 0 0 0 6px rgba(0, 0, 0, 0.1)`,
                           }
@@ -370,13 +399,16 @@ export default function ThemeCustomizer() {
                   ))}
                 </Box>
               </Box>
+
               <Divider sx={{ borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'divider' }} />
+
+              {/* Layout Mode */}
               <Box>
                 <FormControl component="fieldset">
                   <FormLabel component="legend">
-                    <Typography 
-                      variant="subtitle2" 
-                      fontWeight="bold" 
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight="bold"
                       mb={1}
                       sx={{ color: mode === 'dark' ? '#f1f5f9' : 'text.primary' }}
                     >
@@ -389,7 +421,7 @@ export default function ThemeCustomizer() {
                   >
                     <FormControlLabel
                       value="default"
-                      control={<Radio sx={{ 
+                      control={<Radio sx={{
                         color: mode === 'dark' ? '#94a3b8' : 'text.secondary',
                         '&.Mui-checked': {
                           color: mode === 'dark' ? '#3b82f6' : 'primary.main',
@@ -400,7 +432,7 @@ export default function ThemeCustomizer() {
                     />
                     <FormControlLabel
                       value="boxed"
-                      control={<Radio sx={{ 
+                      control={<Radio sx={{
                         color: mode === 'dark' ? '#94a3b8' : 'text.secondary',
                         '&.Mui-checked': {
                           color: mode === 'dark' ? '#3b82f6' : 'primary.main',
@@ -411,7 +443,7 @@ export default function ThemeCustomizer() {
                     />
                     <FormControlLabel
                       value="compact"
-                      control={<Radio sx={{ 
+                      control={<Radio sx={{
                         color: mode === 'dark' ? '#94a3b8' : 'text.secondary',
                         '&.Mui-checked': {
                           color: mode === 'dark' ? '#3b82f6' : 'primary.main',
@@ -423,13 +455,16 @@ export default function ThemeCustomizer() {
                   </RadioGroup>
                 </FormControl>
               </Box>
+
               <Divider sx={{ borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'divider' }} />
+
+              {/* Font Size */}
               <Box>
                 <FormControl component="fieldset">
                   <FormLabel component="legend">
-                    <Typography 
-                      variant="subtitle2" 
-                      fontWeight="bold" 
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight="bold"
                       mb={1}
                       sx={{ color: mode === 'dark' ? '#f1f5f9' : 'text.primary' }}
                     >
@@ -442,7 +477,7 @@ export default function ThemeCustomizer() {
                   >
                     <FormControlLabel
                       value="small"
-                      control={<Radio sx={{ 
+                      control={<Radio sx={{
                         color: mode === 'dark' ? '#94a3b8' : 'text.secondary',
                         '&.Mui-checked': {
                           color: mode === 'dark' ? '#3b82f6' : 'primary.main',
@@ -453,7 +488,7 @@ export default function ThemeCustomizer() {
                     />
                     <FormControlLabel
                       value="medium"
-                      control={<Radio sx={{ 
+                      control={<Radio sx={{
                         color: mode === 'dark' ? '#94a3b8' : 'text.secondary',
                         '&.Mui-checked': {
                           color: mode === 'dark' ? '#3b82f6' : 'primary.main',
@@ -464,7 +499,7 @@ export default function ThemeCustomizer() {
                     />
                     <FormControlLabel
                       value="large"
-                      control={<Radio sx={{ 
+                      control={<Radio sx={{
                         color: mode === 'dark' ? '#94a3b8' : 'text.secondary',
                         '&.Mui-checked': {
                           color: mode === 'dark' ? '#3b82f6' : 'primary.main',
@@ -478,8 +513,10 @@ export default function ThemeCustomizer() {
               </Box>
             </Stack>
           </Box>
+
           <Divider sx={{ borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'divider' }} />
-          <Box sx={{ 
+
+          <Box sx={{
             p: 2,
             backgroundColor: mode === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'transparent',
           }}>

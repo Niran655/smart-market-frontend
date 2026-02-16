@@ -1,9 +1,27 @@
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import { useQuery } from "@apollo/client/react";
-import { Box, Breadcrumbs, Button, Chip, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import {
+  Box,
+  Breadcrumbs,
+  Chip,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  Tab,
+  InputAdornment,
+  TextField,
+  MenuItem,
+  Grid
+} from "@mui/material";
+import { TabContext, TabList, TabPanel, } from "@mui/lab";
 import { useState } from "react";
-
+import {  Search } from "lucide-react";
 import GetProductInShopAction from "../Components/warehouseInShop/getProduct/GetProductInShopAction";
 import useGetProductWarehouseInShopWithPagination from "../Components/hook/useGetProductWarehouseInShopWithPagination";
 import useGetWarehouseTransferWithPagination from "../Components/hook/useGetWarehouseTransferWithPagination";
@@ -13,196 +31,242 @@ import { GET_PRODUCT_WAREHOUSE_IN_SHOP_WITH_PAGINATION } from "../../graphql/que
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
+import "../Styles/modernTable.scss";
+
+const getStatusStyle = (status) => {
+  switch (status) {
+    case "pending":
+      return {
+        backgroundColor: "#FFF3E0",
+        color: "#EF6C00",
+        "& .MuiChip-icon": { color: "#EF6C00" },
+        fontWeight: 500,
+        borderRadius: "6px",
+      };
+    case "accepted":
+      return {
+        backgroundColor: "#E8F5E9",  
+        color: "#2E7D32",
+        "& .MuiChip-icon": { color: "#2E7D32" },
+        fontWeight: 500,
+        borderRadius: "6px",
+      };
+    case "rejected":
+      return {
+        backgroundColor: "#FFEBEE",  
+        color: "#C62828",
+        "& .MuiChip-icon": { color: "#C62828" },
+        fontWeight: 500,
+        borderRadius: "6px",
+      };
+    case "partial_accepted":
+      return {
+        backgroundColor: "#E3F2FD",  
+        color: "#1565C0",
+        "& .MuiChip-icon": { color: "#1565C0" },
+        fontWeight: 500,
+        borderRadius: "6px",
+      };
+    default:
+      return {
+        backgroundColor: "#F5F5F5",  
+        color: "#616161",
+        fontWeight: 500,
+        borderRadius: "6px",
+      };
+  }
+};
+
 const WarehouseInShop = () => {
-  const [activeTab, setActiveTab] = useState("1");
   const { language } = useAuth();
   const { t } = translateLauguage(language);
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(5);
+  const [keyword,setKeyword] = useState('');
+  const [productWarehouseKeyWord,setProductWarehouseKeyword] = useState("");
+ 
+  const [tab, setTab] = useState("1");
+  const handleTabChange = (e, newValue) => setTab(newValue);
+
   const savedStoreId = localStorage.getItem("activeShopId");
 
-  const [productWarehouseInShopPage, setProductWarehouseInShopPage] =
-    useState(1);
-  const [productWarehouseInShopLimit, setProductWarehouseInShopLimit] =
-    useState(5);
-  const [productWarehouseInShopKeyword, setProductWarehouseInShopKeyword] =
-    useState("");
+  
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(5);
 
-  const [productWarehouseTransferPage, setProductWarehouseTransferPage] =
-    useState(1);
-  const [productWarehouseTransferLimit, setProductWarehouseTransferLimit] =
-    useState(5);
-  const [productWarehouseTransferKeyword, setProductWarehouseTransferKeyword] =
-    useState("");
+  const [transferPage, setTransferPage] = useState(1);
+  const [transferLimit, setTransferLimit] = useState(5);
+
+ 
+  const {
+    producteWarehouseInShop,
+    loading: productWarehouseLoading,
+    paginator,
+    refetch:productWarehouseInShopRefetch
+  } = useGetProductWarehouseInShopWithPagination({
+    shopId: savedStoreId,
+    page,
+    limit,
+    pagination: true,
+    keyword:productWarehouseKeyWord,
+  });
 
   const {
     productsWarehouseTransfer,
     loading: productWarehouseTransferLoading,
-    refetch: productsWarehouseTransferRefetch,
-    paginator: productWarehouseTransferPaginator,
+    refetch: transferRefetch,
+    paginator: transferPaginator,
   } = useGetWarehouseTransferWithPagination({
-    page: productWarehouseTransferPage,
-    limit: productWarehouseTransferLimit,
-    pagination: true,
-    keyword: productWarehouseTransferKeyword,
     shopId: savedStoreId,
-  });
-
-  const {
-    data: productWarehouseInShop,
-    refetch,
-    loading: productWarehouseInShopLoading,
-  } = useQuery(GET_PRODUCT_WAREHOUSE_IN_SHOP_WITH_PAGINATION, {
-    variables: {
-      shopId: savedStoreId,
-      page,
-      limit,
-      pagination: true,
-      keyword: "",
-    },
-  });
-
-  const {
-    producteWarehouseInShop,
-    loading: productWarehouseLoading,
-    refetch: productWarehouseRefetch,
-    paginator: productWarehousePaginator,
-  } = useGetProductWarehouseInShopWithPagination({
-    shopId: savedStoreId,
-    page: productWarehouseInShopPage,
-    limit: productWarehouseInShopLimit,
+    page: transferPage,
+    limit: transferLimit,
     pagination: true,
-    keyword: productWarehouseInShopKeyword,
+    keyword: "",
   });
-
-  const products =
-    productWarehouseInShop?.getProductWareHouseInShopoWithPagination?.data ||
-    [];
-  const paginator =
-    productWarehouseInShop?.getProductWareHouseInShopoWithPagination
-      ?.paginator || [];
-
-  const handleLimitProductWarehouseInShop = (e) => {
-    const newLimit = parseInt(e.target.value, 10);
-    setProductWarehouseInShopLimit(newLimit);
-    setProductWarehouseInShopPage(1);
-  };
-
-  const handlePageChangeProductWarehouseInShop = (newPage) => {
-    setProductWarehouseInShopPage(newPage);
-  };
-
-  const handleLimitWarehouseTransfer = (e) => {
-    const newLimit = parseInt(e.target.value, 10);
-    setProductWarehouseTransferLimit(newLimit);
-    setProductWarehouseTransferPage(1);
-  };
-
-  const handlePageChangeWarehouseTransfer = (newPage) => {
-    setProductWarehouseTransferPage(newPage);
-  };
 
   return (
-    <Box sx={{ width: "100%", padding: "16px" }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Box textAlign="start">
-          <Breadcrumbs aria-label="breadcrumb" separator="/">
-            <Typography
-              // component={RouterLink}
-              to="/setting"
-              variant="h6"
-              sx={{
-                textDecoration: "none",
-                borderLeft: "3px solid #1D4592",
-                pl: 1.5,
+    <Box sx={{ width: "100%", p: 2 }}>
+  
+      <Breadcrumbs separator="/">
+        <Typography
+          variant="h6"
+          sx={{
+            borderLeft: "3px solid #1D4592",
+            pl: 1.5,
+            fontWeight: 600,
+          }}
+        >
+          {t("warehouse_in_shop")}
+        </Typography>
+      </Breadcrumbs>
+ 
+      <TabContext value={tab}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider", mt: 4 }}>
+          <TabList
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              "& .MuiTab-root": {
+                textTransform: "none",
                 fontWeight: 600,
-              }}
-            >
-              {t("warehouse_in_shop")}
-            </Typography>
-          </Breadcrumbs>
+                fontSize: 14,
+              },
+            }}
+          >
+            <Tab label={t("product_stock")} value="1" />
+            <Tab label={t("purchase_order")} value="2" />
+            <Tab label={t("get_product")} value="3" />
+            <Tab label={t("request_to_warehouse")} value="4" />
+          </TabList>
         </Box>
-      </Stack>
-      <Grid container spacing={2} mt={5}>
-        <Grid size={{ xs: 6, sm: 3 }}>
-          <Button
-            variant={activeTab === "1" ? "contained" : "outlined"}
-            onClick={() => setActiveTab("1")}
-            fullWidth
-          >
-            {t(`product_stock`)}
-          </Button>
-        </Grid>
-        <Grid size={{ xs: 6, sm: 3 }}>
-          <Button
-            variant={activeTab === "2" ? "contained" : "outlined"}
-            onClick={() => setActiveTab("2")}
-            fullWidth
-          >
-            {t(`purchase_order`)}
-          </Button>
-        </Grid>
-        <Grid size={{ xs: 6, sm: 3 }}>
-          <Button
-            variant={activeTab === "3" ? "contained" : "outlined"}
-            onClick={() => setActiveTab("3")}
-            fullWidth
-          >
-            {t(`get_product`)}
-          </Button>
-        </Grid>
-        <Grid size={{ xs: 6, sm: 3 }}>
-          <Button
-            variant={activeTab === "4" ? "contained" : "outlined"}
-            onClick={() => setActiveTab("4")}
-            fullWidth
-          >
-            {t(`request_to_warehouse`)}
-          </Button>
-        </Grid>
-      </Grid>
+  
 
-      <Box mt={5}>
-        {activeTab === "1" && (
-          <Box>
+        <TabPanel value="1">
+       <Stack direction={"row"} justifyContent={"space-between"} mt={1}>
+        <Grid
+          container
+          spacing={5}
+          fullWidth
+          alignItems="center"
+          textAlign="start"
+        >
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Typography variant="body2" fontWeight={500} mb={0.5}>
+              {t("search")}
+            </Typography>
+            <TextField
+              type="search"
+              size="small"
+              placeholder={t("search") + "..."}
+              value={productWarehouseKeyWord}
+              onChange={(e) => setProductWarehouseKeyword(e.target.value)}
+              fullWidth
+              variant="outlined"
+              sx={{
+                width: "250px",
+
+                "& .MuiOutlinedInput-root": {
+                  // "& fieldset": { border: "none" },
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Typography className="search-head-title">{t("status")}</Typography>
+            <TextField
+              className="select-text-field"
+              select
+              fullWidth
+              placeholder="Select"
+              size="small"
+              // value={role}
+              sx={{
+                width: "200px",
+                
+              }}
+              // onChange={handleRoleChange}
+            >
+              <MenuItem value="All">
+                {t("all")}
+              </MenuItem>
+              <MenuItem value="low_stock">
+                {t("low_stock")}
+              </MenuItem>
+              <MenuItem value="in_stock">
+                {t("in_enough")}
+              </MenuItem>
+         
+            </TextField>
+          </Grid>
+        </Grid>
+
+        <Stack direction="row" spacing={2} mt={3}>
+       
+         
+        </Stack>
+      </Stack>
+
             <TableContainer className="table-container">
               <Table className="table">
                 <TableHead className="table-header">
                   <TableRow>
-                    <TableCell>{t(`no`)}</TableCell>
-                    <TableCell>{t(`product`)}</TableCell>
-                    <TableCell>{t(`unit`)}</TableCell>
-                    <TableCell>{t(`current_stock`)}</TableCell>
-                    <TableCell>{t(`min_stock`)}</TableCell>
-                    <TableCell>{t(`status`)}</TableCell>
-                    <TableCell></TableCell>
+                    <TableCell>{t("no")}</TableCell>
+                    <TableCell>{t("product")}</TableCell>
+                    <TableCell>{t("unit")}</TableCell>
+                    <TableCell>{t("current_stock")}</TableCell>
+                    <TableCell>{t("min_stock")}</TableCell>
+                    <TableCell>{t("status")}</TableCell>
                   </TableRow>
                 </TableHead>
 
                 {productWarehouseLoading ? (
                   <CircularIndeterminate />
-                ) : producteWarehouseInShop?.length == 0 ? (
+                ) : producteWarehouseInShop?.length === 0 ? (
                   <EmptyData />
                 ) : (
                   <TableBody>
                     {producteWarehouseInShop.map((row, index) => (
-                      <TableRow key={row._id}>
+                      <TableRow className="table-row" key={row._id}>
                         <TableCell>{paginator.slNo + index}</TableCell>
                         <TableCell>
-                          <Box display="flex" alignItems="center" gap={1}>
+                          <Stack direction="row" spacing={1} alignItems="center">
                             <img
                               src={row?.subProduct?.productImg}
-                              width={40}
-                              height={40}
-                              style={{
-                                borderRadius: "100%",
-                                objectFit: "cover",
-                              }}
+                              width={36}
+                              height={36}
+                              style={{ borderRadius: "50%" }}
                             />
                             {language === "kh"
                               ? row?.subProduct?.parentProductId?.nameKh
                               : row?.subProduct?.parentProductId?.nameEn}
-                          </Box>
+                          </Stack>
                         </TableCell>
                         <TableCell>
                           {language === "kh"
@@ -216,149 +280,137 @@ const WarehouseInShop = () => {
                             <Chip
                               icon={<WarningAmberOutlinedIcon />}
                               label={t("low_stock")}
-                              sx={{
-                                fontWeight: 600,
-                                bgcolor: "#df4a6fff",
-                                color: "white",
-                              }}
+                              color="error"
+                              size="small"
                             />
                           ) : (
                             <Chip
                               icon={<CheckOutlinedIcon />}
                               label={t("in_stock")}
+                              size="small"
                               sx={{
-                                fontWeight: 600,
-                                bgcolor: "#0097A7",
-                                color: "white",
+                                backgroundColor: "#E8F5E9",
+                                color: "#2E7D32",
+                                fontWeight: 500,
+                                borderRadius: "6px",
+                                "& .MuiChip-icon": {
+                                  color: "#2E7D32",
+                                },
+                                "&:hover": {
+                                  backgroundColor: "#C8E6C9",
+                                },
                               }}
                             />
                           )}
                         </TableCell>
-                        <TableCell></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 )}
               </Table>
-              <Stack
-                direction="row"
-                justifyContent="flex-end"
-                alignItems="center"
-                sx={{ padding: 2 }}
-              >
+
+              <Stack alignItems="flex-end" p={2}>
                 <FooterPagination
                   page={page}
                   limit={limit}
-                  setPage={handlePageChangeProductWarehouseInShop}
-                  handleLimit={handleLimitProductWarehouseInShop}
+                  setPage={setPage}
+                  handleLimit={(e) => setLimit(+e.target.value)}
                   totalDocs={paginator?.totalDocs}
                   totalPages={paginator?.totalPages}
                 />
               </Stack>
             </TableContainer>
-          </Box>
-        )}
-        {activeTab === "2" && <Typography> Orders Content</Typography>}
-        {activeTab === "3" && (
-          <Box>
-            <TableContainer className="table-container">
-              <Table className="table">
-                <TableHead className="table-header">
-                  <TableRow>
-                    <TableCell>{t(`no`)}</TableCell>
-                    <TableCell>{t(`items_count`)}</TableCell>
-                    <TableCell>{t(`requested_by`)}</TableCell>
-                    <TableCell>{t(`accepted_by`)}</TableCell>
-                    <TableCell>{t(`status`)}</TableCell>
-                    <TableCell>{t(`remark`)}</TableCell>
-                    <TableCell>{t(`created_at`)}</TableCell>
-                    <TableCell>{t(`action`)}</TableCell>
-                  </TableRow>
-                </TableHead>
+   
 
-                {productWarehouseLoading ? (
-                  <CircularIndeterminate />
-                ) : productsWarehouseTransfer?.length == 0 ? (
-                  <EmptyData />
-                ) : (
-                  <TableBody>
-                    {productsWarehouseTransfer.map((row, index) => (
-                      <TableRow key={row._id}>
-                        <TableCell>{paginator.slNo + index}</TableCell>
+        </TabPanel>
 
-                        <TableCell>
-                          {row?.items?.length} {t(`product`)}
-                        </TableCell>
+        
+        <TabPanel value="2">
+          <Typography>Orders Content</Typography>
+        </TabPanel>
 
-                        <TableCell>
-                          {language === "kh"
-                            ? row?.requestedBy?.nameKh
-                            : row?.requestedBy?.nameEn}
-                        </TableCell>
+        
+        <TabPanel value="3">
+          <TableContainer className="table-container">
+            <Table className="table">
+              <TableHead className="table-header">
+                <TableRow>
+                  <TableCell>{t("no")}</TableCell>
+                  <TableCell>{t("category")}</TableCell>
+                  <TableCell>{t("items_count")}</TableCell>
+                  <TableCell>{t("accepted_by")}</TableCell>
+                  <TableCell>{t("status")}</TableCell>
+                  <TableCell>{t("date_sent")}</TableCell>
+                  <TableCell>{t("action")}</TableCell>
+                </TableRow>
+              </TableHead>
 
-                        <TableCell>
-                          {language === "kh"
-                            ? row?.acceptedBy?.nameKh
-                            : row?.acceptedBy?.nameEn}
-                        </TableCell>
+              {productWarehouseTransferLoading ? (
+                <CircularIndeterminate />
+              ) : productsWarehouseTransfer?.length === 0 ? (
+                <EmptyData />
+              ) : (
+                <TableBody>
+                  {productsWarehouseTransfer.map((row, index) => (
+                    <TableRow className="table-row" key={row._id}>
+                      <TableCell>{transferPaginator.slNo + index}</TableCell>
+                      <TableCell>{row?.items?.length}</TableCell>
+                      <TableCell>
+                        {language === "kh"
+                          ? row?.requestedBy?.nameKh
+                          : row?.requestedBy?.nameEn}
+                      </TableCell>
+                      <TableCell>
+                        {language === "kh"
+                          ? row?.acceptedBy?.nameKh
+                          : row?.acceptedBy?.nameEn}
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={t(row?.status)}
+                          size="small"
+                          icon={row?.status === "accepted" ? <CheckOutlinedIcon /> : undefined}
+                          sx={getStatusStyle(row?.status)}
+                        />
 
-                        <TableCell>
-                          <Chip
-                            label={row?.status}
-                            sx={{
-                              fontWeight: 600,
-                              bgcolor:
-                                row?.status === "APPROVED"
-                                  ? "#0097A7"
-                                  : row?.status === "PENDING"
-                                    ? "#fbc02d"
-                                    : "#df4a6fff",
-                              color: "white",
-                            }}
-                          />
-                        </TableCell>
 
-                        <TableCell>{row?.remark}</TableCell>
+                      </TableCell>
+                      <TableCell>
+                        {new Date(row?.createdAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <GetProductInShopAction
+                          t={t}
+                          language={language}
+                          editData={row}
+                          refetch={transferRefetch}
+                          productWarehouseInShopRefetch={productWarehouseInShopRefetch}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              )}
+            </Table>
 
-                        <TableCell>
-                          {new Date(row?.createdAt).toLocaleDateString()}
-                        </TableCell>
+            <Stack alignItems="flex-end" p={2}>
+              <FooterPagination
+                page={transferPage}
+                limit={transferLimit}
+                setPage={setTransferPage}
+                handleLimit={(e) => setTransferLimit(+e.target.value)}
+                totalDocs={transferPaginator?.totalDocs}
+                totalPages={transferPaginator?.totalPages}
+              />
+            </Stack>
+          </TableContainer>
+        </TabPanel>
 
-                        <TableCell>
-                          <GetProductInShopAction
-                            t={t}
-                            language={language}
-                            editData={row}
-                            loading={productWarehouseTransferLoading}
-                            refetch={productsWarehouseTransferRefetch}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                )}
-              </Table>
-
-              <Stack
-                direction="row"
-                justifyContent="flex-end"
-                alignItems="center"
-                sx={{ padding: 2 }}
-              >
-                <FooterPagination
-                  page={productWarehouseTransferPage}
-                  limit={productWarehouseTransferLimit}
-                  setPage={handlePageChangeWarehouseTransfer}
-                  handleLimit={handleLimitWarehouseTransfer}
-                  totalDocs={productWarehouseTransferPaginator?.totalDocs}
-                  totalPages={productWarehouseTransferPaginator?.totalPages}
-                />
-              </Stack>
-            </TableContainer>
-          </Box>
-        )}
-        {activeTab === "4" && <Typography> 4</Typography>}
-      </Box>
+        {/* ===== TAB 4 ===== */}
+        <TabPanel value="4">
+          <Typography>Request to warehouse</Typography>
+        </TabPanel>
+      </TabContext>
     </Box>
   );
 };

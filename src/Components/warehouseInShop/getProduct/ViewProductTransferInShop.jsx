@@ -3,7 +3,13 @@ import { X } from "lucide-react";
 import React from "react";
 
 import "../../../Styles/TableStyle.scss";
-export default function ViewProductTransferInShop({ open, onClose, viewData, t, language }) {
+export default function ViewProductTransferInShop({
+  open,
+  onClose,
+  viewData,
+  t,
+  language,
+}) {
   if (!viewData) return null;
 
   const {
@@ -20,7 +26,7 @@ export default function ViewProductTransferInShop({ open, onClose, viewData, t, 
   return (
     <Drawer anchor="top" open={open} onClose={onClose}>
       <Box sx={{ height: "100vh", p: 2 }}>
-        {/* ================= HEADER ================= */}
+
         <Stack
           direction="row"
           justifyContent="space-between"
@@ -42,12 +48,12 @@ export default function ViewProductTransferInShop({ open, onClose, viewData, t, 
           spacing={2}
           sx={{ height: "calc(100% - 80px)" }}
         >
-
           <Box
             sx={{
               width: { xs: "100%", md: 320 },
 
               borderRadius: 2,
+
               p: 2,
             }}
           >
@@ -68,10 +74,7 @@ export default function ViewProductTransferInShop({ open, onClose, viewData, t, 
               value={requestedBy?.nameEn || requestedBy?.nameKh}
             />
 
-            <InfoRow
-              label="Accepted By"
-              value={acceptedBy?.nameEn || "-"}
-            />
+            <InfoRow label="Accepted By" value={acceptedBy?.nameEn || "-"} />
 
             <InfoRow
               label="Created At"
@@ -80,11 +83,7 @@ export default function ViewProductTransferInShop({ open, onClose, viewData, t, 
 
             <InfoRow
               label="Accepted At"
-              value={
-                acceptedAt
-                  ? new Date(acceptedAt).toLocaleString()
-                  : "-"
-              }
+              value={acceptedAt ? new Date(acceptedAt).toLocaleString() : "-"}
             />
 
             <Divider sx={{ my: 1 }} />
@@ -97,11 +96,8 @@ export default function ViewProductTransferInShop({ open, onClose, viewData, t, 
             </Typography>
           </Box>
 
-
           <Box sx={{ flex: 1, overflow: "hidden" }}>
-            <TableContainer
-              className="table-container "
-            >
+            <TableContainer className="table-container ">
               <Table stickyHeader className="table">
                 <TableHead className="table-header">
                   <TableRow>
@@ -111,29 +107,32 @@ export default function ViewProductTransferInShop({ open, onClose, viewData, t, 
                     <TableCell align="right">{t(`quantity`)}</TableCell>
                     <TableCell align="right">{t(`price_in_unit`)}</TableCell>
                     <TableCell align="right">{t(`total_price`)}</TableCell>
-                    
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
                   {items.map((row, index) => (
-                    <TableRow className="table-row" key={index}  >
+                    <TableRow className="table-row" key={index}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{row.subProduct?.barCode}</TableCell>
                       <TableCell>
-                        {language == "en" ? row.subProduct?.parentProductId?.nameEn : row.subProduct?.parentProductId?.nameKh}
-
+                        {language == "en"
+                          ? row.subProduct?.parentProductId?.nameEn
+                          : row.subProduct?.parentProductId?.nameKh}
                       </TableCell>
                       <TableCell align="right">
-                        {row.quantity} ({language == "en" ? row.subProduct?.unitId?.nameEn : row.subProduct?.unitId?.nameKh})
+                        {row.quantity} (
+                        {language == "en"
+                          ? row.subProduct?.unitId?.nameEn
+                          : row.subProduct?.unitId?.nameKh}
+                        )
                       </TableCell>
                       <TableCell align="right">
-                        {row.subProduct?.costPrice} 
+                        {row.subProduct?.costPrice}
                       </TableCell>
                       <TableCell align="right">
-                      $ {row.quantity * row.subProduct?.costPrice} 
+                        $ {row.quantity * row.subProduct?.costPrice}
                       </TableCell>
-                 
                     </TableRow>
                   ))}
 
@@ -154,7 +153,7 @@ export default function ViewProductTransferInShop({ open, onClose, viewData, t, 
   );
 }
 
-/* ================= SMALL COMPONENT ================= */
+ 
 function InfoRow({ label, value }) {
   return (
     <Stack direction="row" justifyContent="space-between" mb={0.5}>

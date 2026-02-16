@@ -89,11 +89,7 @@ const Category = () => {
               value={keyword}
               onChange={(e)=>setKeyword(e.target.value)}
               variant="outlined"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { border: "none" },
-                },
-              }}
+               
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">

@@ -1,170 +1,153 @@
-import SwipeableDrawer from "@mui/material/SwipeableDrawer";
-import Box from "@mui/material/Box";
-import { Link as RouterLink } from "react-router-dom";
-import { Button, Grid, Stack, Typography } from "@mui/material";
-import { CornerUpLeft, ScrollText } from "lucide-react";
-import { ShoppingCart, Users, Warehouse } from "lucide-react";
 import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  Box,
+  Grid,
+  Button,
+  Typography,
+  IconButton,
+  Fade,
+  Backdrop,
+} from "@mui/material";
+
+import { Link as RouterLink } from "react-router-dom";
+
+import {
+  CornerUpLeft,
+  ScrollText,
+  ShoppingCart,
+  Users,
+  Warehouse,
+  X,
+} from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
 import { translateLauguage } from "../../function/translate";
+
 import "../../Styles/menu.scss";
-export default function Menu({ open, onClose }) {
-  const [delayedOpen, setDelayedOpen] = useState(false);
+
+export default function MenuModal({ open, onClose }) {
   const { language } = useAuth();
   const { t } = translateLauguage(language);
 
   const id = localStorage.getItem("activeShopId");
 
-  useEffect(() => {
-    let timer;
-    if (open) {
-      timer = setTimeout(() => setDelayedOpen(true), 200);
-    } else {
-      setDelayedOpen(false);
-    }
-    return () => clearTimeout(timer);
-  }, [open]);
-
-  useEffect(() => {
-    if (location.pathname === "/store") {
-      setDelayedOpen(false);
-      onClose();
-    }
-  }, [location, onClose]);
   const handleLogout = () => {
     localStorage.removeItem("activeShopId");
     onClose();
   };
 
+  const menuItems = [
+    {
+      title: t("exit_the_shop"),
+      description: "Back to shop selection",
+      icon: <CornerUpLeft size={32} />,
+      to: "/store",
+      onClick: handleLogout,
+      bgColor: "#FF4C61",
+      textColor: "#fff",
+    },
+    {
+      title: t("pos"),
+      description: "Open POS system",
+      icon: <ShoppingCart size={32} />,
+      to: `/store/pos/${id}`,
+      bgColor: "#00C896",
+      textColor: "#fff",
+    },
+    {
+      title: t("warehouse"),
+      description: "Manage inventory",
+      icon: <Warehouse size={32} />,
+      to: `/store/pos/${id}/warehouse-in-shop`,
+      bgColor: "#FFC107",
+      textColor: "#ffffff",
+    },
+    {
+      title: t("report"),
+      description: "View reports",
+      icon: <ScrollText size={32} />,
+      to: `/store/pos/${id}/report`,
+      bgColor: "#03A9F4",
+      textColor: "#fff",
+    },
+    {
+      title: t("staff"),
+      description: "Manage staff",
+      icon: <Users size={32} />,
+      to: `/store/pos/${id}/staff`,
+      bgColor: "#3F51B5",
+      textColor: "#fff",
+    },
+  ];
+
   return (
-    <SwipeableDrawer
-      anchor="top"
-      open={delayedOpen}
+    <Dialog
+      open={open}
       onClose={onClose}
-      onOpen={() => {}}
-      className="menu-drawer"
-      sx={{height:'100vh'}}
+      fullScreen
+      TransitionComponent={Fade}
+      BackdropComponent={Backdrop}
+      BackdropProps={{
+        timeout: 300,
+        sx: {
+          backgroundColor: "rgba(0,0,0,0.6)",
+        },
+      }}
+      PaperProps={{
+        sx: {
+          mt: "64px",
+          borderRadius: 0,
+          background: "rgba(20,20,30,0.95)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+          p: 3,
+          height: "calc(100% - 64px)",
+          width: "100%",
+        },
+      }}
     >
-     
-      <Box className="menu-container" onClick={onClose}>
-        <Box className="menu-content">
-          <Grid container spacing={3}>
-            <Grid size={{ xs: 6,sm:4, md: 3 }}>
+      <DialogContent>
+        <Grid container spacing={3} mt={1}>
+          {menuItems.map((item, index) => (
+            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
               <Button
-                className="menu-box"
                 component={RouterLink}
-                to="/store"
-                onClick={handleLogout}
-                sx={{ bgcolor: "#FF4C61", color: "#FFFFFF" }}
+                to={item.to}
+                onClick={item.onClick || onClose}
+                fullWidth
+                sx={{
+                  backgroundColor: item.bgColor,
+                  color: item.textColor,
+                  borderRadius: 1,
+                  height: 90,
+                  textTransform: "none",
+                  justifyContent: "flex-start",
+                  gap: 2,
+                  px: 2,
+                  "&:hover": {
+                    opacity: 0.9,
+        
+                  },
+                }}
               >
-                <Stack textAlign="center" spacing={1}>
-                  <Box className="icon">
-                    <CornerUpLeft color="#FFD700" size={40} />
-                  </Box>
-                  <Typography
-                    className="text-title"
-                    variant="h5"
-                    sx={{ color: "#FFFFFF" }}
-                  >
-                    {t(`exit_the_shop`)}
-                  </Typography>
-                </Stack>
-              </Button>
-            </Grid>
-            <Grid size={{ xs: 6,sm:4, md: 3 }}>
-              <Button
-                className="menu-box"
-                component={RouterLink}
-                to={`/store/pos/${id}`}
-             
-                sx={{ bgcolor: "#5EE9B5", color: "#FFFFFF" }}
-              >
-                <Stack textAlign="center" spacing={1}>
-                  <Box className="icon">
-                    <ShoppingCart color="#62748E" size={40} />
-                  </Box>
-                  <Typography
-                    className="text-title"
-                    variant="h5"
-                    sx={{ color: "#FFFFFF" }}
-                  >
-                    {t(`pos`)}
-                  </Typography>
-                </Stack>
-              </Button>
-            </Grid>
-            <Grid size={{ xs: 6,sm:4, md: 3 }}>
-              <Button
-                className="menu-box"
-                component={RouterLink}
-                to={`store/pos/${id}/warehouse-in-shop`}
-                onClick={onClose}
-                sx={{ bgcolor: "#F9D65C", color: "#000000" }}
-              >
-                <Stack textAlign="center" spacing={1}>
-                  <Box className="icon">
-                    <Warehouse color="#37474F" size={40} />
-                  </Box>
-                  <Typography
-                    className="text-title"
-                    variant="h5"
-                    sx={{ color: "#000000" }}
-                  >
-                    {t(`warehouse`)}
-                  </Typography>
-                </Stack>
-              </Button>
-            </Grid>
+                {/* <Box sx={{ color: item.bgColor }}> */}
+                {item.icon}
+                {/* </Box> */}
 
-            <Grid size={{ xs: 6,sm:4, md: 3 }}>
-              <Button
-                className="menu-box"
-                component={RouterLink}
-                to={`store/pos/${id}/warehouse-in-shop`}
-                onClick={onClose}
-                sx={{ bgcolor: "#4FC3F7", color: "#FFFFFF" }}
-              >
-                <Stack textAlign="center" spacing={1}>
-                  <Box className="icon">
-                    <ScrollText color="#1565C0" size={40} />
-                  </Box>
-                  <Typography
-                    className="text-title"
-                    variant="h5"
-                    sx={{ color: "#FFFFFF" }}
-                  >
-                    {t(`report`)}
-                  </Typography>
-                </Stack>
-              </Button>
-            </Grid>
 
-            <Grid size={{ xs: 6,sm:4, md: 3 }}>
-              <Button
-                className="menu-box"
-                component={RouterLink}
-                to={`store/pos/${id}/warehouse-in-shop`}
-                onClick={onClose}
-                sx={{ bgcolor: "#1976D2", color: "#FFFFFF" }}
-              >
-                <Stack textAlign="center" spacing={1}>
-                  <Box className="icon">
-                    <Users color="#BBDEFB" size={40} />
-                  </Box>
-                  <Typography
-                    className="text-title"
-                    variant="h5"
-                    sx={{ color: "#FFFFFF" }}
-                  >
-                    {t(`staff`)}
+                <Box>
+                  <Typography fontWeight="bold">{item.title}</Typography>
+                  <Typography fontSize={12} opacity={0.8}>
+                    {item.description}
                   </Typography>
-                </Stack>
+                </Box>
               </Button>
             </Grid>
-          </Grid>
-        </Box>
-      </Box>
-    </SwipeableDrawer>
+          ))}
+        </Grid>
+      </DialogContent>
+    </Dialog>
   );
 }

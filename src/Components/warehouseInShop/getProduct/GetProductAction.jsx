@@ -1,45 +1,59 @@
-import { Button, IconButton, Stack, Tooltip } from "@mui/material";
-import { CircleOff, ScanEye, Shuffle, Warehouse, X } from "lucide-react";
-import React, { useState } from "react";
+import { Button, Stack } from "@mui/material";
+import { useState } from "react";
 
-import GetProductIntoWarehouseInShop from "./GetProductIntoWarehouseInShop";
-import ViewProductTransferInShop from "./ViewProductTransferInShop";
+import AcceptProductDailog from "./AcceptProductDailog";
 
-export default function GetProductAction({ t }) {
-  // const [open, setOpen] = useState(false);
-  const [openView, setOpenView] = useState(false);
+export default function GetProductAction({ t, item, language, editData, refetch,productWarehouseInShopRefetch }) {
+  const isPending = editData?.status === "pending";
+  const isPartialAccepted = editData?.status === "partial_accepted";
+  const isFinalStatus = ["accepted", "rejected", "cancelled"].includes(
+    editData?.status
+  );
+
+  const [openAccept, setOpenAccept] = useState(false);
   const [openGetProduct, setOpenGetProduct] = useState(false);
 
-  // const handleOpen = () => setOpen(true);
-  // const handleClose = () => setOpen(false);
-
-  const handleOpenview = () => setOpenView(true);
-  const handleCloseView = () => setOpenView(false);
+  const handleOpenAccept = () => setOpenAccept(true);
+  const handleCloseAccept = () => setOpenAccept(false);
 
   const handleOpenGetProduct = () => setOpenGetProduct(true);
   const handleCloseGetProduct = () => setOpenGetProduct(false);
 
-  // const [openDelete, setOpenDelete] = useState(false);
-  // const handleOpenDelete = () => setOpenDelete(true);
-  // const handleCloseDelete = () => setOpenDelete(false);
-
   return (
     <div>
       <Stack direction="row" justifyContent={"flex-end"} spacing={2}>
-        <Button
-          variant="outlined"
-          color="error"
-          onClick={handleCloseGetProduct}
-        >
-          {t(`reject`)}
-        </Button>
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={handleCloseGetProduct}
-        >
-          {t(`approve`)}
-        </Button>
+ 
+        {isPending && !isFinalStatus && (
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={handleOpenGetProduct}
+          >
+            {t("reject")}
+          </Button>
+        )}
+
+ 
+        {(isPending || isPartialAccepted) && !isFinalStatus && (
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={handleOpenAccept}
+          >
+            {t("accept_more")}
+          </Button>
+        )}
+
+        <AcceptProductDailog
+          refetch={refetch}
+          editData={editData}
+          t={t}
+          item={item}
+          language={language}
+          open={openAccept}
+          onClose={handleCloseAccept}
+          productWarehouseInShopRefetch={productWarehouseInShopRefetch}
+        />
       </Stack>
     </div>
   );

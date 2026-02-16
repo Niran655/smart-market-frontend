@@ -1,6 +1,7 @@
 .pos-container {
-  padding: 16px;
-
+  // padding: 0 16px;
+  // background-color: #ffff;
+  height: 80vh;
   .product-list-header {
     margin-bottom: 16px;
     align-items: center;
@@ -24,6 +25,138 @@
       }
     }
   }
+
+  // Order type buttons
+.order-type-button {
+  font-weight: 500;
+  text-transform: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+
+  &--active {
+    
+    color: #fff;
+    border-color: #1976d2;
+  }
+
+  &:hover {
+ 
+    border-color: #1976d2;
+  }
+}
+
+ 
+.order-card {
+  // background: #ffffff;s
+  border-radius: 5px;
+ 
+  padding: 10px 12px;
+  // border: 1px solid #e0e0e0;
+  height: 120px;         
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #1976d2;
+  }
+}
+
+.order-id {
+  font-weight: 600;
+  font-size: 10px!important;      
+  color: #1976d2;
+}
+
+.order-text {
+  font-size: 0.7rem;     
+  line-height: 1.2;
+  // color: #fff!important;
+  
+
+  strong {
+    font-weight: 500;
+    // color: #333;
+  }
+}
+
+.order-status {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #ff9800;
+  margin-top: auto;      
+}
+
+.order-status-container{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  background: #14B51D;
+  
+  border-radius: 35px;
+  padding: 2px 8px;
+  .order-status {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #f0f0f0;
+  }
+}
+
+.order-progress {
+  height: 4px;           
+  border-radius: 4px;
+
+  .MuiLinearProgress-bar {
+    border-radius: 4px;
+  }
+}
+
+
+.order-id {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #1976d2;
+}
+
+.order-text {
+  font-size: 0.85rem;
+  color: #555;
+
+  strong {
+    color: #333;
+    font-weight: 500;
+  }
+}
+
+
+
+.order-progress {
+  height: 6px;
+  border-radius: 6px;
+  margin-top: 4px;
+
+  .MuiLinearProgress-bar {
+    border-radius: 6px;
+  }
+}
+
+
+// Progress bar customization
+.MuiLinearProgress-root {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+}
+
+.MuiLinearProgress-bar {
+  border-radius: 4px;
+  background-color: #1976d2;  
+}
 
   .category-scroll-container {
     display: flex;
@@ -78,7 +211,9 @@
       display: flex;
       flex-direction: column;
       border-radius: 8px;
+ 
     //   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ 
 
       &:hover {
         transform: translateY(-2px);
@@ -139,11 +274,13 @@
     padding: 16px;
     display: flex;
     flex-direction: column;
-    position: sticky;
-    top: 16px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
+ 
+    // position: sticky;
+    // overflow: auto;
+    // height: 90vh;
+    
+    // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    
     .cart-header {
       display: flex;
       justify-content: space-between;
@@ -164,7 +301,7 @@
       padding: 4px;
       background-color: #f8f9fa;
       border-radius: 5px;
-
+      
       .MuiTabs-indicator {
         display: none;
       }
@@ -216,15 +353,16 @@
       overflow: auto;
       margin-bottom: 8px;
       max-height: 400px;
-
+      
       .cart-item {
         padding: 8px;
         margin-bottom: 8px;
         display: flex;
         align-items: center;
         gap: 8px;
-        border-radius: 8px;
+        border-radius: 5px;
         // background-color: #f8f9fa;
+        border:1px solid #D1D5DC;
         transition: background-color 0.2s;
 
         &:hover {

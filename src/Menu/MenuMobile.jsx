@@ -4,7 +4,7 @@ import { Avatar, Box, List, ListItem, ListItemButton, ListItemIcon, Stack, Toolt
 import { Category, Messages2, Tag, UserOctagon } from "iconsax-react";
 import React, { useState } from "react";
 
-import MartLogo from "../assets/Image/mart-logo.png";
+ 
 import { useThemeContext } from "../Context/ThemeContext";
 //Import from project
 import "./menuNavbar.scss";

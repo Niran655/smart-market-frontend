@@ -87,11 +87,7 @@ const Unit = () => {
               onChange={(e)=>setKeyword(e.target.value)}
               fullWidth
               variant="outlined"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { border: "none" },
-                },
-              }}
+               
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">

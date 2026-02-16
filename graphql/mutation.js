@@ -319,8 +319,8 @@ mutation CreateWarehouseTransfer($input: CreateWarehouseTransferInput!) {
 
 
 export const ACCEPT_WAREHOUSE_TRANSFER = gql`
-mutation AcceptWarehouseTransfer($transferId: ID!) {
-  acceptWarehouseTransfer(transferId: $transferId) {
+mutation AcceptWarehouseTransfer($items: [AcceptTransferItemInput!]!, $transferId: ID!) {
+  acceptWarehouseTransfer(items: $items, transferId: $transferId) {
     isSuccess
     message {
       messageEn
@@ -341,3 +341,15 @@ mutation RejectWarehouseTransfer($transferId: ID!, $reason: String) {
   }
 }
 `
+
+export const UPDATE_SALE_STATUS = gql`
+  mutation UpdateSaleStatus($id: ID!, $status: SaleStatus!, $paymentInfo: PaymentInput) {
+    updateSaleStatus(id: $id, status: $status, paymentInfo: $paymentInfo) {
+      isSuccess
+      message {
+        messageEn
+        messageKh
+      }
+    }
+  }
+`;

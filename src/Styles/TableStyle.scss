@@ -1,8 +1,7 @@
 .table-container {
   border-radius: 12px;
-//   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  // background: #fff;
+  background: var(--table-bg);
 }
 
 .table {
@@ -10,31 +9,26 @@
   border-collapse: separate !important;
   border-spacing: 0 10px !important;
   font-family: "Khmer OS Siemreap", sans-serif;
-  
+
   .table-header {
-    background-color: #f3f4f6!important;
+    background-color: var(--table-header-bg) !important;
     font-weight: 700 !important;
+
     th {
       font-weight: 700 !important;
       font-size: 14px !important;
-      color: #374151 !important;
-      // text-transform: uppercase;
+      color: var(--table-header-text) !important;
       border: none !important;
-
     }
   }
 
   .table-row {
-    // background: #f9fafb;
-    // background: white;
-    border-radius: 12px!important;
-    // box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    background: var(--table-row-bg);
+    border-radius: 12px !important;
     transition: all 0.2s ease-in-out;
-    
+
     &:hover {
-      // background: #f1f5f9;
-      // cursor: pointer;
-      // transform: translateY(-2px);
+      background: var(--table-row-hover-bg);
     }
 
     .flex-end {
@@ -48,11 +42,11 @@
       border: none !important;
       padding: 12px 16px !important;
       vertical-align: middle;
-      color: #111827;
-      
+      color: var(--table-text-primary);
+
       .MuiTypography-root {
         font-size: 14px;
-        color: #111827;
+        color: var(--table-text-primary);
       }
 
       .MuiChip-root {
@@ -60,18 +54,19 @@
         border-radius: 6px;
 
         &.MuiChip-colorSuccess {
-          border-color: #265073 !important; 
-          color: #2D9596 !important;
+          border-color: var(--chip-success-color) !important;
+          color: var(--chip-success-color) !important;
+          background-color: var(--chip-success-bg) !important;
         }
 
         &.MuiChip-colorError {
-          border-color: #ef4444 !important;
-          color: #ef4444 !important;
+          border-color: var(--chip-error-color) !important;
+          color: var(--chip-error-color) !important;
+          background-color: var(--chip-error-bg) !important;
         }
       }
 
       &:last-child {
-        // display: flex;
         justify-content: flex-end;
         align-items: center;
         gap: 8px;
@@ -80,13 +75,12 @@
   }
 }
 
-
 .actions {
   display: flex;
   gap: 8px;
 
   .edit-btn {
-    background: #f97316;
+    background: #f97316;  
     border: none;
     padding: 6px 10px;
     border-radius: 6px;
@@ -113,4 +107,3 @@
     }
   }
 }
-

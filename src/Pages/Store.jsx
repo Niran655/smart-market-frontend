@@ -120,7 +120,7 @@ const Store = () => {
 
       <Grid container spacing={3} mt={4}>
         {data?.getAllShops?.map((shop, index) => (
-          <Grid size={{ xs: 12, md: 6, sm: 6 }} key={index}>
+          <Grid size={{ xs: 12, md: 6, sm: 12 }} key={index}>
             <Card sx={{ p: 2 }}>
               <Stack
                 direction="row"

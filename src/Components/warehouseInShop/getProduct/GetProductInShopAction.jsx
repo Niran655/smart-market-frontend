@@ -11,6 +11,7 @@ export default function GetProductInShopAction({
   language,
   loading,
   refetch,
+  productWarehouseInShopRefetch
 }) {
   const [openView, setOpenView] = useState(false);
   const [openGetProduct, setOpenGetProduct] = useState(false);
@@ -52,6 +53,7 @@ export default function GetProductInShopAction({
           onClose={handleCloseGetProduct}
           loading={loading}
           refetch={refetch}
+          productWarehouseInShopRefetch={productWarehouseInShopRefetch}
         />
       </Stack>
     </div>

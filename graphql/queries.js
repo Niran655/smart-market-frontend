@@ -254,9 +254,11 @@ query GetProductForSaleWithPagination($shopId: ID, $page: Int, $limit: Int, $pag
         _id
         nameKh
         nameEn
+        
         categoryId {
           nameEn
           nameKh
+          image
           _id
         }
       }
@@ -266,6 +268,7 @@ query GetProductForSaleWithPagination($shopId: ID, $page: Int, $limit: Int, $pag
         nameEn
       }
       productImg
+      
       taxRate
       salePrice
     }
@@ -334,27 +337,27 @@ query GetProductWareHouseInShopoWithPagination($shopId: ID, $page: Int, $limit: 
       stock
       subProduct {
         _id
-    priceDes
-    priceImg
-    productDes
-    productImg
-    qty
-    salePrice
-    saleType
-    sell
-    servicePrice
-    taxRate
-    totalPrice
-    updatedAt
-    using 
-    stock
-    minStock
-     
-    unitId {
-      _id
-      nameEn
-      nameKh
-    }
+      priceDes
+      priceImg
+      productDes
+      productImg
+        
+      qty
+      salePrice
+      saleType
+      sell
+      servicePrice
+      taxRate
+      totalPrice
+      updatedAt
+      using 
+      stock
+      minStock
+      unitId {
+        _id
+        nameEn
+        nameKh
+      }
     check
     barCode
     costPrice
@@ -420,6 +423,8 @@ query GetWarehouseTransfersWithPagination($status: TransferStatus, $shopId: ID, 
           nameKh
         }
       }
+      remainingQty
+      receivedQty
     }
     status
     requestedBy {
@@ -517,3 +522,99 @@ query GetWarehouseTransferById($id: ID!) {
 }
 `
 
+export const GET_SALES = gql`
+  query GetSales(
+    $shopId: ID
+    $status: SaleStatus
+    $page: Int
+    $limit: Int
+    $pagination: Boolean
+    $startDate: Date
+    $endDate: Date
+  ) {
+    getSales(
+      shopId: $shopId
+      status: $status
+      page: $page
+      limit: $limit
+      pagination: $pagination
+      startDate: $startDate
+      endDate: $endDate
+    ) {
+      data {
+        _id
+        saleNumber
+        user {
+          _id
+          nameEn
+          nameKh
+        }
+        shopId
+        items {
+          product {
+            _id
+            nameEn
+            nameKh
+            image
+          }
+          subProductId 
+          # {
+          #   _id
+          #   productImg
+          # }
+          name
+          price
+          quantity
+          total
+        }
+        subtotal
+        tax
+        discount
+        total
+        paymentMethod
+        amountPaid
+        change
+        status
+        createdAt
+      }
+      paginator {
+        slNo
+        prev
+        next
+        perPage
+        totalPosts
+        totalPages
+        currentPage
+        hasPrevPage
+        hasNextPage
+        totalDocs
+      }
+    }
+  }
+`;
+
+export const DASHBOARD_STATS = gql`
+query DashboardStats($filter: String, $shopId: ID, $dayStart: Date, $dayEnd: Date) {
+  dashboardStats(filter: $filter, shopId: $shopId, dayStart: $dayStart, dayEnd: $dayEnd) {
+    totalOrders
+    totalSales
+    averageValue
+    reservations
+    weeklyRevenue
+    topSellingItems {
+      rank
+      orders
+      name
+    }
+    activeOrders {
+      name
+      type
+      table
+    }
+    categoryStats {
+      orders
+      category
+    }
+        dailyRevenue
+  }
+}`
