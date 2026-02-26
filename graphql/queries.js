@@ -618,3 +618,141 @@ query DashboardStats($filter: String, $shopId: ID, $dayStart: Date, $dayEnd: Dat
         dailyRevenue
   }
 }`
+
+export const GET_REPORT_STATS = gql`
+query GetReportStats($type: ReportType, $shopId: ID, $endDate: Date, $startDate: Date) {
+  getReportStats(type: $type, shopId: $shopId, endDate: $endDate, startDate: $startDate) {
+    staff {
+      totalStaff
+      activeStaff
+      totalHours
+      totalSales
+      salesPerStaff
+      performance {
+        id
+        name
+        role
+        hours
+        sales
+        orders
+      }
+    }
+    sales {
+      totalRevenue
+      totalOrders
+      averageOrderValue
+      topProducts {
+        id
+        name
+        category
+        sales
+        revenue
+      }
+      recentTransactions {
+        id
+        date
+        customer
+        type
+        amount
+        status
+      }
+    }
+    inventory {
+      totalItems
+      lowStockCount
+      totalValue
+      items {
+        id
+        name
+        category
+        stock
+        unit
+        reorderLevel
+        value
+      }
+    }
+  }
+}`
+
+export const GET_SUPPLIERS_WITH_PAGINATION = gql`
+query GetSuppliersWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
+  getSuppliersWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+    data {
+      _id
+      nameKh
+      nameEn
+      remark
+      createdAt
+      updatedAt
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
+  }
+}`
+
+export const GET_PURCHASE_ORDER_WITH_PAGINATION = gql`
+query GetPurchaseOrdersWithPagination($supplierId: ID, $status: PurchaseOrderStatus, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
+  getPurchaseOrdersWithPagination(supplierId: $supplierId, status: $status, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+    data {
+      _id
+      supplier {
+        _id
+        nameKh
+        nameEn
+        remark
+        createdAt
+        updatedAt
+      }
+      items {
+         
+        subProduct {
+            _id
+          parentProductId {
+            nameKh
+            nameEn
+          }
+        }
+        quantity
+        costPrice
+        totalPrice
+        receivedQty
+        remainingQty
+      }
+      totalAmount
+      status
+      remark
+      createdBy {
+        nameKh
+        nameEn
+      }
+      receivedBy {
+        nameKh
+        nameEn
+      }
+      createdAt
+      receivedAt
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
+  }
+}`

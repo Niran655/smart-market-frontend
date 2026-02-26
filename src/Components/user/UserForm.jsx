@@ -166,6 +166,7 @@ export default function UserForm({
       onSubmit={handleSubmit}
       tabs={tabs}
       loading={loading}
+      t={t}
     />
   );
 }

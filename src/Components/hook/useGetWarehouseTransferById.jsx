@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 
 const useGetWarehouseTransferById = ({ id }) => {
+    
     const { data, loading, error, refetch } = useQuery(GET_WAREHOUSE_TRANSFER_BY_ID, {
         variables: {
             id

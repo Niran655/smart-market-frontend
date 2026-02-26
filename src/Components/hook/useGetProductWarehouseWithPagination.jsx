@@ -9,8 +9,7 @@ const useGetProductWarehouseWithPagination = ({
   pagination = true,
   keyword = "",
 }) => {
-  const [productWarehouseWithPagination, setProductwarehouseWithPagination] =
-    useState([]);
+  const [productWarehouseWithPagination, setProductwarehouseWithPagination] = useState([]);
   const [paginator, setPaginator] = useState(true);
   const { data, loading, error, refetch } = useQuery(
     GET_PRDUCT_WAREHOUSE_WITH_PAGINATION,

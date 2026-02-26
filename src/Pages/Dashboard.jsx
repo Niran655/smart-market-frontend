@@ -8,9 +8,7 @@ import {
   Grid,
   IconButton,
   InputAdornment,
-  MenuItem,
-  Paper,
-  Stack,
+  MenuItem, Stack,
   Table,
   TableBody,
   TableCell,
@@ -20,24 +18,17 @@ import {
   TextField,
   Tooltip,
   Typography,
-  Breadcrumbs,
-  Popover,
-  useTheme,
+  Breadcrumbs, useTheme
 } from "@mui/material";
 import {
   ArrowUpward,
-  ArrowDownward,
-  DateRange,
-  Download,
+  ArrowDownward, Download,
   Print,
   MonetizationOn,
   TrendingUp,
   ShoppingCart,
-  EventSeat,
-  PictureAsPdf,
-  TableChart,
-  Search,
-  MoreVert,
+  EventSeat, Search,
+  MoreVert
 } from "@mui/icons-material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -48,27 +39,17 @@ import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
   PieChart,
   Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  Legend,
-  ResponsiveContainer,
+  Cell, Tooltip as RechartsTooltip, ResponsiveContainer
 } from "recharts";
-
+import { TableOfContents } from 'lucide-react';
 import { useAuth } from "../context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import { useQuery } from "@apollo/client/react";
 import { DASHBOARD_STATS } from "../../graphql/queries";
 import Chart from "react-apexcharts";
- 
+
 const formatCurrency = (value) =>
   value != null ? `$${Number(value).toFixed(2)}` : "$0.00";
 
@@ -78,7 +59,7 @@ export default function Dashboard() {
   const { t } = translateLauguage(language);
   const savedStoreId = localStorage.getItem("activeShopId");
 
- 
+
   const [filterType, setFilterType] = useState("today");
   const [customStart, setCustomStart] = useState(null);
   const [customEnd, setCustomEnd] = useState(null);
@@ -354,7 +335,7 @@ export default function Dashboard() {
     saveAs(data, `dashboard_${filterType}.xlsx`);
   };
 
- 
+
   const filterLabel = {
     today: t("today") || "Today",
     yesterday: t("yesterday"),
@@ -446,108 +427,118 @@ export default function Dashboard() {
               <Tooltip title="Print Report">
                 <IconButton
                   onClick={() => window.print()}
-                  sx={{ bgcolor: "white", boxShadow: 1 }}
+                  sx={{
+                    bgcolor: "#f9fafb",
+                    color: "#4a5568",
+
+                    boxShadow: 1,
+                    "&:hover": { bgcolor: "#edf2f7", color: "#2d3748" },
+                  }}
                 >
                   <Print />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Export to PDF">
-                <IconButton onClick={exportToPDF} color="primary">
-                  <PictureAsPdf />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Export to Excel">
-                <IconButton onClick={exportToExcel} color="primary">
-                  <TableChart />
-                </IconButton>
-              </Tooltip>
+
+              <Button
+                variant="contained"
+                startIcon={<TableOfContents />}
+                onClick={exportToExcel}
+                sx={{
+                  bgcolor: "linear-gradient(90deg, #ff6b6b, #f06595)",
+                  color: "white",
+
+                  boxShadow: 2,
+                  "&:hover": {
+                    bgcolor: "linear-gradient(90deg, #f06595, #d6336c)",
+                  },
+                }}
+              >
+                Export Excel
+              </Button>
+
               <Button
                 variant="contained"
                 startIcon={<Download />}
-                onClick={() => exportToPDF()}
-                sx={{ bgcolor: "#667eea", "&:hover": { bgcolor: "#5a67d8" } }}
+                onClick={exportToPDF}
+                sx={{
+                  bgcolor: "linear-gradient(90deg, #667eea, #764ba2)",
+                  color: "white",
+
+                  boxShadow: 2,
+                  "&:hover": {
+                    bgcolor: "linear-gradient(90deg, #5a67d8, #6b46c1)",
+                  },
+                }}
               >
                 Export Report
               </Button>
             </Stack>
+
+
           </Stack>
 
           <Box mt={2}  >
 
-              <Grid container spacing={3} alignItems="center">
-                <Grid size={{ xs: 12, md: 3 }}>
-                  <TextField
-                    select
-                    fullWidth
-                    value={filterType}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === "custom") {
+            <Grid container spacing={3} alignItems="center">
+              <Grid size={{ xs: 12, md:2 }}>
+                <TextField
+                  select
+                  fullWidth
+                  value={filterType}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "custom") {
 
-                      } else {
-                        applyFilter(val);
-                      }
-                    }}
-                    size="small"
-                  >
-                    <MenuItem value="today">{t("today")}</MenuItem>
-                    <MenuItem value="yesterday">{t("yesterday")}</MenuItem>
-                    <MenuItem value="last7days">{t("last7days")}</MenuItem>
-                    <MenuItem value="last30days">{t("last30days")}</MenuItem>
-                    <MenuItem value="thisMonth">{t("thisMonth")}</MenuItem>
-                    <MenuItem value="lastMonth">{t("lastMonth")}</MenuItem>
-                    <MenuItem value="custom" onClick={handleCustomRangeClick}>
-                      Custom Range
-                    </MenuItem>
-                  </TextField>
-                </Grid>
-                <Grid size={{ xs: 12, md: 3 }}>
-                  <DatePicker
-                    label="Start Date"
-                    value={customStart}
-                    onChange={(newValue) => setCustomStart(newValue)}
-                    slotProps={{ textField: { size: "small", fullWidth: true } }}
-                    disabled={filterType !== "custom"}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, md: 3 }}>
-                  <DatePicker
-                    label="End Date"
-                    value={customEnd}
-                    onChange={(newValue) => setCustomEnd(newValue)}
-                    slotProps={{ textField: { size: "small", fullWidth: true } }}
-                    disabled={filterType !== "custom"}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, md: 3 }}>
-                  <TextField
-                    fullWidth
-                    placeholder="Search transactions..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    size="small"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Search />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
+                    } else {
+                      applyFilter(val);
+                    }
+                  }}
+                  size="small"
+                >
+                  <MenuItem value="today">{t("today")}</MenuItem>
+                  <MenuItem value="yesterday">{t("yesterday")}</MenuItem>
+                  <MenuItem value="last7days">{t("last7days")}</MenuItem>
+                  <MenuItem value="last30days">{t("last30days")}</MenuItem>
+                  <MenuItem value="thisMonth">{t("thisMonth")}</MenuItem>
+                  <MenuItem value="lastMonth">{t("lastMonth")}</MenuItem>
+                  <MenuItem value="custom" onClick={handleCustomRangeClick}>
+                    Custom Range
+                  </MenuItem>
+                </TextField>
               </Grid>
-              {filterType === "custom" && (
-                <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-                  <Button
-                    variant="contained"
-                    onClick={() => applyFilter("custom", customStart, customEnd)}
-                    disabled={!customStart || !customEnd}
-                  >
-                    Apply Custom Range
-                  </Button>
-                </Stack>
-              )}
+              <Grid size={{ xs: 12, md: 2 }}>
+                <DatePicker
+                  label="Start Date"
+                  value={customStart}
+                  onChange={(newValue) => setCustomStart(newValue)}
+                  slotProps={{ textField: { size: "small", fullWidth: true } }}
+                  disabled={filterType !== "custom"}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 2 }}>
+                <DatePicker
+                  label="End Date"
+                  value={customEnd}
+                  onChange={(newValue) => setCustomEnd(newValue)}
+                  slotProps={{ textField: { size: "small", fullWidth: true } }}
+                  disabled={filterType !== "custom"}
+                />
+              </Grid>
+              
             
+            </Grid>
+            {filterType === "custom" && (
+              <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                <Button
+                  variant="contained"
+                  onClick={() => applyFilter("custom", customStart, customEnd)}
+                  disabled={!customStart || !customEnd}
+                >
+                  Apply Custom Range
+                </Button>
+              </Stack>
+            )}
+
           </Box>
         </Box>
 
@@ -558,7 +549,7 @@ export default function Dashboard() {
               <Card
                 sx={{
                   borderRadius: 1,
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+
                   height: "100%",
                 }}
               >
@@ -614,13 +605,19 @@ export default function Dashboard() {
             <Card
               sx={{
                 borderRadius: 1,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+
                 height: "100%",
               }}
             >
-              <Box sx={{ height: 350, mt: 2 }}>
-                <Chart options={chartOptions} series={series} type="bar" height={350} />
-              </Box>
+              <CardContent>
+                <Typography variant="h6" fontWeight="600" gutterBottom>
+                  {t(`total_revenue`)}
+                </Typography>
+                <Box sx={{ height: 350, mt: 2 }}>
+                  <Chart options={chartOptions} series={series} type="bar" height={350} />
+                </Box>
+              </CardContent>
+
             </Card>
           </Grid>
 
@@ -629,7 +626,7 @@ export default function Dashboard() {
             <Card
               sx={{
                 borderRadius: 1,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+
                 height: "100%",
               }}
             >
@@ -698,14 +695,13 @@ export default function Dashboard() {
           </Grid>
         </Grid>
 
-        {/* Tables Section */}
         <Grid container spacing={3}>
-          {/* Top Selling Items */}
+
           <Grid size={{ xs: 12, md: 6 }}>
             <Card
               sx={{
                 borderRadius: 1,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+
                 height: "100%",
               }}
             >
@@ -764,12 +760,12 @@ export default function Dashboard() {
             </Card>
           </Grid>
 
-          {/* Active Orders (as Recent Transactions) */}
+
           <Grid size={{ xs: 12, md: 6 }}>
             <Card
               sx={{
                 borderRadius: 1,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+
                 height: "100%",
               }}
             >
@@ -842,37 +838,6 @@ export default function Dashboard() {
             </Card>
           </Grid>
         </Grid>
-
-        {/* Footer CTA */}
-        <Card
-          sx={{
-            mt: 4,
-            borderRadius: 1,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-            bgcolor: "#667eea10",
-          }}
-        >
-          <CardContent>
-            <Grid container spacing={2} alignItems="center">
-              <Grid size={{ xs: 12, md: 8 }}>
-                <Typography variant="body1" color="#1a237e" fontWeight="500">
-                  Need detailed analytics or custom reports?
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Contact our support team for advanced reporting features.
-                </Typography>
-              </Grid>
-              <Grid size={{ xs: 12, md: 4 }} sx={{ textAlign: "right" }}>
-                <Button
-                  variant="contained"
-                  sx={{ bgcolor: "#667eea", "&:hover": { bgcolor: "#5a67d8" } }}
-                >
-                  Generate Detailed Report
-                </Button>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
       </Box>
     </LocalizationProvider>
   );

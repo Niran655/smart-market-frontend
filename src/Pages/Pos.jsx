@@ -1054,7 +1054,7 @@ const POS = () => {
           </Box>
         </Grid>
 
-        {/* Cart Panel Section */}
+    
         <Grid size={{ xs: 4 }} sx={{ borderLeft: "1px solid #D1D5DC" }}>
           <CartPanel
             cart={cart}

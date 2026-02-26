@@ -350,7 +350,7 @@
 
 //                     <TableCell>{t("to_shop")}</TableCell>
 
-//                     <TableCell>{t("items_count")}</TableCell>
+//                     <TableCell>{t("category")}</TableCell>
 
 //                     <TableCell>{t("total_quantity")}</TableCell>
 
@@ -473,6 +473,9 @@ import { useAuth } from "../context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
+import useGetPurchaseOrdersWithPagination from "../Components/hook/useGetPurchaseOrdersWithPagination";
+import PurchaseOrderAction from "../Components/warehouse/purchaseOrder/PurchaseOrderAction";
+import PurchaseOrderForm from "../Components/warehouse/purchaseOrder/PurchaseOrderForm";
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -507,6 +510,10 @@ const Warehouse = () => {
   const [productWarehouseTransferKeyword, setProductWarehouseTransferKeyword] =
     useState("");
 
+  const [purchaseOrderPage, setPurchaseOrderPage] = useState(1);
+  const [purchaseOrderLimit, setPurchaseOrderLimit] = useState(5);
+  const [purchaseOrderKeyword, setPurchaseOrderKeyword] = useState("");
+
   const [openTransfer, setOpenTransfer] = useState(false);
   const handleOpenTransfer = () => setOpenTransfer(true);
   const handleCloseTransfer = () => setOpenTransfer(false);
@@ -535,6 +542,20 @@ const Warehouse = () => {
     keyword: productWarehouseTransferKeyword,
   });
 
+  const {
+      purchaseOrders,
+      loading: purchaseOrderLoading,
+      refetch: purchaseOrderRefetch,
+      paginator: purchaseOrderPaginator,
+  }=useGetPurchaseOrdersWithPagination({
+    page: purchaseOrderPage,
+    limit: purchaseOrderLimit,
+    pagination: true,
+    keyword: purchaseOrderKeyword,
+  });
+
+ 
+
   const handleLimit = (e) => {
     const newLimit = parseInt(e.target.value, 10);
     setProductWarehouseLimit(newLimit);
@@ -555,12 +576,22 @@ const Warehouse = () => {
     setProductWarehouseTransferPage(newPage);
   };
 
+  const handleLimitPurchaseOrder = (e) => {
+    const newLimit = parseInt(e.target.value, 10);
+    setPurchaseOrderLimit(newLimit);
+    setPurchaseOrderPage(1);
+  };
+  const handlePurchaseOrderPageChange = (newPage) => {
+    setPurchaseOrderPage(newPage);
+
+  };
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <Box>
-      {/* Breadcrumbs remain at top */}
+ 
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Box textAlign="start">
           <Breadcrumbs aria-label="breadcrumb" separator="/">
@@ -579,7 +610,7 @@ const Warehouse = () => {
         </Box>
       </Stack>
 
-      {/* Main layout: sidebar + content */}
+      
       <Grid container spacing={2} sx={{ mt: 2 }}>
       
         <Grid   size={{xs:12,sm:3,md:2}}>
@@ -645,7 +676,7 @@ const Warehouse = () => {
               <Box>
                 <TableContainer className="table-container">
                   <Table className="table" sx={{ mt: 3 }}>
-                    <TableHead className="table-header">
+                    <TableHead  >
                       <TableRow>
                         <TableCell>{t("no")}</TableCell>
                         <TableCell>{t("product")}</TableCell>
@@ -767,6 +798,7 @@ const Warehouse = () => {
                     alignItems: "center",
                     flexWrap: "wrap",
                     gap: 2,
+                    mb : 2,
                   }}
                 >
                   <Grid
@@ -819,11 +851,11 @@ const Warehouse = () => {
                 </Box>
                 <TableContainer className="table-container">
                   <Table className="table">
-                    <TableHead className="table-header">
+                    <TableHead  >
                       <TableRow>
                         <TableCell>{t("no")}</TableCell>
                         <TableCell>{t("to_shop")}</TableCell>
-                        <TableCell>{t("items_count")}</TableCell>
+                        <TableCell>{t("category")}</TableCell>
                         <TableCell>{t("total_quantity")}</TableCell>
                         <TableCell>{t("status")}</TableCell>
                         <TableCell>{t("date")}</TableCell>
@@ -895,7 +927,139 @@ const Warehouse = () => {
                 </TableContainer>
               </Box>
             )}
-            {activeTab === "2" && <Typography> Orders Content</Typography>}
+            {activeTab === "2" &&
+                    <Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 2,
+                  }}
+                >
+                  <Grid
+                    container
+                    spacing={2}
+                    alignItems="center"
+                    textAlign={"start"}
+                    sx={{ flex: 1 }}
+                  >
+                    <Grid size={{ xs: 3 }}>
+                      {/* <Typography variant="body2" fontWeight={500} mb={0.5}>
+                        {t("search")}
+                      </Typography> */}
+                      <TextField
+                        type="search"
+                        size="small"
+                        placeholder={t("search") + "..."}
+                        fullWidth
+                        variant="outlined"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Search />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+
+                  <Stack direction="row" spacing={2}>
+                    <Button
+                      variant="contained"
+                      startIcon={<LibraryAddOutlinedIcon size={18} />}
+                      onClick={handleOpenTransfer}
+                    >
+                      {t("create_purchase_order")}
+                    </Button>
+                    {openTransfer && (
+                      <PurchaseOrderForm
+                        t={t}
+                        open={openTransfer}
+                        onClose={handleCloseTransfer}
+                        dialogTitle={"Create"}
+                        language={language}
+                        setRefetch={productsWarehouseTransferRefetch}
+                      />
+                    )}
+                  </Stack>
+                </Box>
+                <TableContainer className="table-container">
+                  <Table className="table">
+                    <TableHead  >
+                      <TableRow>
+                        <TableCell>{t("no")}</TableCell>
+                        <TableCell>{t("suppliers")}</TableCell>
+                        <TableCell>{t("category")}</TableCell>
+                        <TableCell>{t("total_quantity")}</TableCell>
+                        <TableCell>{t("status")}</TableCell>
+                        <TableCell>{t("date")}</TableCell>
+                        <TableCell>{t("action")}</TableCell>
+                      </TableRow>
+                    </TableHead>
+
+                    {purchaseOrderLoading ? (
+                      <CircularIndeterminate />
+                    ) : purchaseOrders?.length === 0 ? (
+                      <EmptyData />
+                    ) : (
+                      <TableBody>
+                        {purchaseOrders.map((row, index) => {
+                          const totalQty = row.items.reduce(
+                            (sum, item) => sum + Number(item.quantity || 0),
+                            0
+                          );
+
+                          return (
+                            <TableRow key={row._id} className="table-row">
+                              <TableCell>
+                                {productWarehouseTransferPaginator.slNo + index}
+                              </TableCell>
+                              <TableCell>
+                                {language === "en" ? row.supplier?.nameEn : row.supplier?.nameKh || "-"}
+                              </TableCell>
+                              <TableCell>{row.items.length}</TableCell>
+                              <TableCell>{totalQty}</TableCell>
+                              <TableCell>
+                                <Chip
+                                  label={t(row?.status)}
+                                  color={getStatusColor(row?.status)}
+                                  size="small"
+                                  sx={{ fontWeight: 600 }}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                {dayjs(row.createdAt).format("DD/MM/YYYY")}
+                              </TableCell>
+                              <TableCell>
+                                <PurchaseOrderAction language={language} setRefetch={purchaseOrderRefetch} purchaseOrder={row} t={t}/>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    )}
+                  </Table>
+                  <Stack
+                    direction="row"
+                    justifyContent="flex-end"
+                    alignItems="center"
+                    sx={{ padding: 2 }}
+                  >
+                    <FooterPagination
+                      page={purchaseOrderPage}
+                      limit={purchaseOrderLimit}
+                      setPage={handlePurchaseOrderPageChange}
+                      handleLimit={handleLimitPurchaseOrder}
+                      totalDocs={purchaseOrderPaginator?.totalDocs}
+                      totalPages={purchaseOrderPaginator?.totalPages}
+                    />
+                  </Stack>
+                </TableContainer>
+              </Box> 
+            }
             {activeTab === "3" && <Typography> Reports Content</Typography>}
             {activeTab === "4" && <Typography> 4</Typography>}
           </Box>

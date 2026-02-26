@@ -117,7 +117,7 @@ export default function ProductTransferForm({
   };
 
   return (
-    <BootstrapDialog open={open} fullWidth maxWidth="md">
+    <BootstrapDialog open={open} fullWidth maxWidth="sm">
       <DialogTitle>
         {t("create_transfer")}
         <IconButton
@@ -134,7 +134,7 @@ export default function ProductTransferForm({
         <Form onSubmit={handleSubmit}>
           <DialogContent dividers>
             <Grid container spacing={2}>
-              {/* TO SHOP */}
+            
               <Grid size={{ xs: 12, md: 6 }}>
                 <Typography>{t("to_shop")}</Typography>
                 <Autocomplete
@@ -162,7 +162,7 @@ export default function ProductTransferForm({
                   )}
                 />
               </Grid>
-              ​
+              
               <Grid size={{ xs: 12, md: 6 }}>
                 <Typography>{t("remark")}</Typography>
                 <TextField
@@ -176,7 +176,7 @@ export default function ProductTransferForm({
                   }
                 />
               </Grid>
-              {/* PRODUCT HEADER */}
+     
               <Grid size={{ xs: 12 }}>
                 <Stack
                   direction="row"
@@ -189,7 +189,7 @@ export default function ProductTransferForm({
                   </IconButton>
                 </Stack>
               </Grid>
-              {/* PRODUCT LIST */}
+         
               <Grid size={{ xs: 12 }}>
                 {values.items.map((item, index) => (
                   <Grid container spacing={2} key={index}>
@@ -233,7 +233,7 @@ export default function ProductTransferForm({
                         )}
                       />
                     </Grid>
-                    <Grid size={{ xs: 12, md: 3 }}>
+                    <Grid size={{ xs: 12, md: 5 }}>
                       <Typography>{t("quantity")}</Typography>
                       <TextField
                         size="small"
@@ -253,7 +253,7 @@ export default function ProductTransferForm({
                       />
                     </Grid>
 
-                    <Grid size={{ xs: 12, md: 3 }}>
+                    <Grid textAlign={"end"} size={{ xs: 12, md: 1 }}>
                       <Typography>{t("delete")}</Typography>
                       <IconButton onClick={() => deleteItem(index)}>
                         <X color="red" />

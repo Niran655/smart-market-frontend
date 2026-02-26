@@ -100,7 +100,7 @@
 //         },
 //         secondary: { main: mode === 'dark' ? '#94a3b8' : '#6b7280' },
 //         background: {
-//           default: mode === 'dark' ? '#0a0a0a' : '#ffffff',
+//           default: mode === 'dark' ? '#0a0a0a' : '#E2E8F0',
 //           paper: mode === 'dark' ? '#1e1e1e' : '#f9fafb',
 //         },
 //         text: {
@@ -196,7 +196,7 @@
 //           styleOverrides: {
 //             root: {
 //               borderCollapse: 'separate',
-//               borderSpacing: '0 10px',
+//               // borderSpacing: '0 10px',
 //               fontFamily: '"Khmer OS Siemreap", sans-serif',
 //               backgroundColor: 'transparent',
 //             },
@@ -325,7 +325,7 @@ export const ThemeProvider = ({ children }) => {
 
   const [sidebarColor, setSidebarColor] = useState(() => {
     return localStorage.getItem('sidebarColor') || '#1e293b';
-  });
+  });                                                                                                                                                                                                                                                                                                                       
 
   const [layoutMode, setLayoutMode] = useState(() => {
     return localStorage.getItem('layoutMode') || 'default';
@@ -422,7 +422,7 @@ export const ThemeProvider = ({ children }) => {
             main: mode === 'dark' ? '#64748b' : '#6b7280',
           },
           background: {
-            default: mode === 'dark' ? '#0f172a' : '#EBEDEF',
+            default: mode === 'dark' ? '#0f172a' : '#E2E8F0',
             paper: mode === 'dark' ? '#1e293b' : '#ffffff',
           },
           text: {

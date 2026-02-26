@@ -20,6 +20,8 @@ export default function ReusableForm({
   onSubmit,
   dialogTitle,
   tabs = [],
+  loading,
+  t
 }) {
   const [tabIndex, setTabIndex] = useState(0);
 
@@ -28,7 +30,7 @@ export default function ReusableForm({
     validationSchema,
     enableReinitialize: true,
     onSubmit: (values) => {
-      onSubmit(values); 
+      onSubmit(values);
     },
   });
 
@@ -47,7 +49,7 @@ export default function ReusableForm({
   }, [initialValues, setValues]);
 
   const renderField = (field) => {
-    const placeholder =field?.label;
+    const placeholder = field?.label;
     switch (field.type) {
       case "image":
         return (
@@ -66,11 +68,11 @@ export default function ReusableForm({
             value={
               field.multiple
                 ? field.options?.filter((o) =>
-                    values[field.name]?.includes(o.id)
-                  ) || []
+                  values[field.name]?.includes(o.id)
+                ) || []
                 : field.options?.find(
-                    (o) => o.id === values[field.name]
-                  ) || null
+                  (o) => o.id === values[field.name]
+                ) || null
             }
             onChange={(e, v) =>
               setFieldValue(
@@ -212,11 +214,11 @@ export default function ReusableForm({
                     {tab.fields.map((field) => (
                       <Grid
                         size={{
-                          xs: field.grid?.xs || null,    
-                          sm: field.grid?.sm || null,   
-                          md: field.grid?.md || null,     
-                          lg: field.grid?.lg || null,     
-                          xl: field.grid?.xl || null,  
+                          xs: field.grid?.xs || null,
+                          sm: field.grid?.sm || null,
+                          md: field.grid?.md || null,
+                          lg: field.grid?.lg || null,
+                          xl: field.grid?.xl || null,
                         }}
                         key={field.name}
                       >
@@ -234,8 +236,11 @@ export default function ReusableForm({
           </DialogContent>
 
           <DialogActions>
-            <Button type="submit" fullWidth variant="contained">
-              {dialogTitle}
+            <Button disabled={loading} type="submit" fullWidth variant="contained">
+              {loading
+                ? t("processing...") || "Processing..."
+                : `${dialogTitle}`}
+              
             </Button>
           </DialogActions>
         </Form>

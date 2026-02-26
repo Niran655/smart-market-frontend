@@ -353,3 +353,85 @@ export const UPDATE_SALE_STATUS = gql`
     }
   }
 `;
+
+
+export const CREATE_SUPPLIER = gql`
+mutation CreateSupplier($input: SupplierInput) {
+  createSupplier(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}`
+
+export const UPDATE_SUPPLIER = gql`
+mutation UpdateSupplier($id: ID!, $input: SupplierInput) {
+  updateSupplier(_id: $id, input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const DELETE_SUPPLIER = gql`
+mutation DeleteSupplier($id: ID!) {
+  deleteSupplier(_id: $id) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+
+export const CREATE_PURCHASE_ORDER = gql`
+mutation CreatePurchaseOrder($input: CreatePurchaseOrderInput) {
+  createPurchaseOrder(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}`
+
+export const  UPDATE_PURCHASE_ORDER = gql`
+mutation UpdatePurchaseOrder($id: ID!, $input: UpdatePurchaseOrderInput!) {
+  updatePurchaseOrder(_id: $id, input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}`
+
+
+export const CANCEL_PURCHASE_ORDER = gql`
+mutation CancelPurchaseOrder($id: ID!, $reason: String) {
+  cancelPurchaseOrder(_id: $id, reason: $reason) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}`
+
+export const RECEIVE_PURCHASE_ORDER = gql`
+mutation ReceivePurchaseOrder($purchaseOrderId: ID, $items: [AcceptPurchaseOrderItemInput]) {
+  receivePurchaseOrder(purchaseOrderId: $purchaseOrderId, items: $items) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}`

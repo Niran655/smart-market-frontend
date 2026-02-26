@@ -582,7 +582,7 @@ export default function SubProductForm({
               sx={{ minWidth: 140 }}
             >
               {loadingLocal
-                ? t("processing") || "Processing..."
+                ? t("processing...")
                 : dialogTitle === "Create"
                 ? t("create") || "Create"
                 : t("update") || "Update"}

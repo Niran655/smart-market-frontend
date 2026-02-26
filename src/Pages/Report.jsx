@@ -1,33 +1,21 @@
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
 import {
-  ArrowDownward,
-  ArrowUpward,
   Download as DownloadIcon,
-  MonetizationOn as MonetizationOnIcon,
-  MoreVert,
-  People as PeopleIcon,
   Print as PrintIcon,
-  Receipt as ReceiptIcon,
-  Search as SearchIcon,
-  ShoppingCart as ShoppingCartIcon,
-  TrendingUp as TrendingUpIcon,
-  Inventory as InventoryIcon,
+  Search as SearchIcon
 } from "@mui/icons-material";
 import {
   Box,
   Breadcrumbs,
   Button,
-  Card,
-  CardContent,
   Chip,
-  Divider,
   FormControl,
   Grid,
   IconButton,
   InputAdornment,
-  InputLabel,
   MenuItem,
   Paper,
   Select,
@@ -39,100 +27,98 @@ import {
   TableHead,
   TableRow,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
   Tooltip,
   Typography,
+  CircularProgress,
+  Alert
 } from "@mui/material";
-import React, { useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@apollo/client/react";
+import { GET_REPORT_STATS } from "../../graphql/queries";
 
+ 
+const formatCurrency = (value) =>
+  value == null
+    ? "$0.00"
+    : `$${value.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`;
 
-const salesData = {
-  totalRevenue: 856000,
-  totalOrders: 524,
-  averageOrderValue: 1633.59,
-  topProducts: [
-    { id: 1, name: "Classic Burger", category: "Burgers", sales: 1280, revenue: 15360 },
-    { id: 2, name: "Margherita Pizza", category: "Pizza", sales: 980, revenue: 17640 },
-    { id: 3, name: "Fresh Juice", category: "Drinks", sales: 1560, revenue: 7800 },
-    { id: 4, name: "Chicken Wings", category: "Appetizers", sales: 870, revenue: 13050 },
-    { id: 5, name: "Chocolate Cake", category: "Desserts", sales: 650, revenue: 5850 },
-  ],
-  recentTransactions: [
-    { id: "#TRX001", date: "2024-01-15", customer: "John Doe", type: "Sale", amount: 45.50, status: "completed" },
-    { id: "#TRX002", date: "2024-01-15", customer: "Jane Smith", type: "Sale", amount: 89.75, status: "completed" },
-    { id: "#TRX003", date: "2024-01-14", customer: "Mike Johnson", type: "Refund", amount: 25.00, status: "refunded" },
-    { id: "#TRX004", date: "2024-01-14", customer: "Sarah Wilson", type: "Sale", amount: 67.80, status: "completed" },
-    { id: "#TRX005", date: "2024-01-13", customer: "David Brown", type: "Sale", amount: 120.25, status: "completed" },
-  ],
-};
+const ReportPage = ({ shopId = null }) => {
+ 
+  const today = new Date();
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(today.getDate() - 30);
 
-const staffData = {
-  totalStaff: 24,
-  activeStaff: 18,
-  totalHours: 2840,
-  salesPerStaff: 35666.67,
-  performance: [
-    { id: 1, name: "Emma Watson", role: "Server", hours: 160, sales: 12450, orders: 187 },
-    { id: 2, name: "James Smith", role: "Chef", hours: 172, sales: 0, orders: 0 }, // Chef might not have direct sales
-    { id: 3, name: "Olivia Brown", role: "Server", hours: 148, sales: 10890, orders: 162 },
-    { id: 4, name: "William Jones", role: "Bartender", hours: 156, sales: 8760, orders: 98 },
-    { id: 5, name: "Sophia Garcia", role: "Server", hours: 144, sales: 11230, orders: 171 },
-  ],
-};
-
-const inventoryData = {
-  totalItems: 156,
-  lowStockCount: 12,
-  totalValue: 45820,
-  items: [
-    { id: 1, name: "Tomatoes", category: "Produce", stock: 45, unit: "kg", reorderLevel: 20, value: 112.50 },
-    { id: 2, name: "Chicken Breast", category: "Meat", stock: 28, unit: "kg", reorderLevel: 15, value: 336.00 },
-    { id: 3, name: "Pizza Dough", category: "Prepared", stock: 60, unit: "pieces", reorderLevel: 25, value: 90.00 },
-    { id: 4, name: "Cheddar Cheese", category: "Dairy", stock: 12, unit: "kg", reorderLevel: 10, value: 96.00 },
-    { id: 5, name: "Olive Oil", category: "Pantry", stock: 8, unit: "liters", reorderLevel: 5, value: 120.00 },
-  ],
-};
-
-// ==================== HELPER ====================
-const formatCurrency = (value) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-const ReportPage = () => {
   const [dateRange, setDateRange] = useState({
-    start: new Date("2024-01-01"),
-    end: new Date("2024-01-15"),
+    start: thirtyDaysAgo,
+    end: today,
   });
   const [reportType, setReportType] = useState("sales");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handlePrint = () => window.print();
+ 
+  const { data, loading, error, refetch } = useQuery(GET_REPORT_STATS, {
+    variables: {
+      type: reportType.toUpperCase(),
+      shopId,
+      startDate: dateRange.start ? dateRange.start.toISOString() : null,
+      endDate: dateRange.end ? dateRange.end.toISOString() : null,
+    },
+  });
 
+  const reportStat = data?.getReportStats;
+  console.log("Report Stat Data:", reportStat);
+
+ 
+  const handlePrint = () => window.print();
   const handleExport = (format) => {
     console.log(`Exporting ${reportType} report in ${format} format`);
-
+    
   };
 
-
   const filterData = (items, field) => {
-    if (!searchQuery) return items;
+    if (!searchQuery || !items) return items || [];
     return items.filter((item) =>
       String(item[field]).toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
-
+ 
   const renderReportContent = () => {
+    if (loading) {
+      return (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+          <CircularProgress />
+        </Box>
+      );
+    }
+
+    if (error) {
+      return (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          Failed to load report: {error.message}
+        </Alert>
+      );
+    }
+
+    if (!reportStat) return null;
+
+    const { sales, staff, inventory } = reportStat;
+
     switch (reportType) {
       case "sales":
+        if (!sales) return <Typography>No sales data available</Typography>;
         return (
           <>
-
+           
             <Grid container spacing={3} sx={{ mb: 4 }}>
               <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Paper sx={{ p: 3, textAlign: "center", borderRadius: 1 }}>
                   <Typography color="text.secondary" variant="body2">Total Revenue</Typography>
                   <Typography variant="h5" fontWeight="600" color="primary.main">
-                    {formatCurrency(salesData.totalRevenue)}
+                    {formatCurrency(sales.totalRevenue)}
                   </Typography>
                 </Paper>
               </Grid>
@@ -140,7 +126,7 @@ const ReportPage = () => {
                 <Paper sx={{ p: 3, textAlign: "center", borderRadius: 1 }}>
                   <Typography color="text.secondary" variant="body2">Total Orders</Typography>
                   <Typography variant="h5" fontWeight="600" color="success.main">
-                    {salesData.totalOrders}
+                    {sales.totalOrders ?? 0}
                   </Typography>
                 </Paper>
               </Grid>
@@ -148,18 +134,17 @@ const ReportPage = () => {
                 <Paper sx={{ p: 3, textAlign: "center", borderRadius: 1 }}>
                   <Typography color="text.secondary" variant="body2">Average Order Value</Typography>
                   <Typography variant="h5" fontWeight="600" color="warning.main">
-                    {formatCurrency(salesData.averageOrderValue)}
+                    {formatCurrency(sales.averageOrderValue)}
                   </Typography>
                 </Paper>
               </Grid>
             </Grid>
-
-
+ 
             <Typography variant="h6" fontWeight="600" sx={{ mt: 4, mb: 2 }}>
               Top Selling Products
             </Typography>
             <TableContainer component={Paper} sx={{ borderRadius: 1, mb: 4 }}>
-              <Table>
+              <Table >
                 <TableHead>
                   <TableRow>
                     <TableCell>Product</TableCell>
@@ -168,8 +153,8 @@ const ReportPage = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filterData(salesData.topProducts, "name").map((product) => (
-                    <TableRow key={product.id}>
+                  {filterData(sales.topProducts, "name").map((product) => (
+                    <TableRow sx={{borderSpacing:"none"}} key={product.id}>
                       <TableCell>
                         <Typography variant="body2" fontWeight="500">{product.name}</Typography>
                         <Typography variant="caption" color="text.secondary">{product.category}</Typography>
@@ -184,7 +169,7 @@ const ReportPage = () => {
               </Table>
             </TableContainer>
 
-
+             
             <Typography variant="h6" fontWeight="600" sx={{ mt: 4, mb: 2 }}>
               Recent Transactions
             </Typography>
@@ -199,7 +184,7 @@ const ReportPage = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filterData(salesData.recentTransactions, "customer").map((tx) => (
+                  {filterData(sales.recentTransactions, "customer").map((tx) => (
                     <TableRow key={tx.id}>
                       <TableCell>
                         <Typography variant="body2" fontWeight="500">{tx.id}</Typography>
@@ -234,14 +219,15 @@ const ReportPage = () => {
         );
 
       case "staff":
+        if (!staff) return <Typography>No staff data available</Typography>;
         return (
           <>
             <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid size={{ xs: 12, sm: 6, md: 3 }} >
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <Paper sx={{ p: 3, textAlign: "center", borderRadius: 1 }}>
                   <Typography color="text.secondary" variant="body2">Total Staff</Typography>
                   <Typography variant="h5" fontWeight="600" color="primary.main">
-                    {staffData.totalStaff}
+                    {staff.totalStaff ?? 0}
                   </Typography>
                 </Paper>
               </Grid>
@@ -249,7 +235,7 @@ const ReportPage = () => {
                 <Paper sx={{ p: 3, textAlign: "center", borderRadius: 1 }}>
                   <Typography color="text.secondary" variant="body2">Active Staff</Typography>
                   <Typography variant="h5" fontWeight="600" color="success.main">
-                    {staffData.activeStaff}
+                    {staff.activeStaff ?? 0}
                   </Typography>
                 </Paper>
               </Grid>
@@ -257,7 +243,7 @@ const ReportPage = () => {
                 <Paper sx={{ p: 3, textAlign: "center", borderRadius: 1 }}>
                   <Typography color="text.secondary" variant="body2">Total Hours</Typography>
                   <Typography variant="h5" fontWeight="600" color="warning.main">
-                    {staffData.totalHours}
+                    {staff.totalHours ?? 0}
                   </Typography>
                 </Paper>
               </Grid>
@@ -265,7 +251,7 @@ const ReportPage = () => {
                 <Paper sx={{ p: 3, textAlign: "center", borderRadius: 1 }}>
                   <Typography color="text.secondary" variant="body2">Sales / Staff</Typography>
                   <Typography variant="h5" fontWeight="600" color="secondary.main">
-                    {formatCurrency(staffData.salesPerStaff)}
+                    {formatCurrency(staff.salesPerStaff)}
                   </Typography>
                 </Paper>
               </Grid>
@@ -286,15 +272,17 @@ const ReportPage = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filterData(staffData.performance, "name").map((staff) => (
-                    <TableRow key={staff.id}>
+                  {filterData(staff.performance, "name").map((staffMember) => (
+                    <TableRow key={staffMember.id}>
                       <TableCell>
-                        <Typography variant="body2" fontWeight="500">{staff.name}</Typography>
+                        <Typography variant="body2" fontWeight="500">{staffMember.name}</Typography>
                       </TableCell>
-                      <TableCell>{staff.role}</TableCell>
-                      <TableCell align="right">{staff.hours}</TableCell>
-                      <TableCell align="right">{staff.sales ? formatCurrency(staff.sales) : "-"}</TableCell>
-                      <TableCell align="right">{staff.orders || "-"}</TableCell>
+                      <TableCell>{staffMember.role}</TableCell>
+                      <TableCell align="right">{staffMember.hours}</TableCell>
+                      <TableCell align="right">
+                        {staffMember.sales ? formatCurrency(staffMember.sales) : "-"}
+                      </TableCell>
+                      <TableCell align="right">{staffMember.orders || "-"}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -304,6 +292,7 @@ const ReportPage = () => {
         );
 
       case "inventory":
+        if (!inventory) return <Typography>No inventory data available</Typography>;
         return (
           <>
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -311,7 +300,7 @@ const ReportPage = () => {
                 <Paper sx={{ p: 3, textAlign: "center", borderRadius: 1 }}>
                   <Typography color="text.secondary" variant="body2">Total Items</Typography>
                   <Typography variant="h5" fontWeight="600" color="primary.main">
-                    {inventoryData.totalItems}
+                    {inventory.totalItems ?? 0}
                   </Typography>
                 </Paper>
               </Grid>
@@ -319,7 +308,7 @@ const ReportPage = () => {
                 <Paper sx={{ p: 3, textAlign: "center", borderRadius: 1 }}>
                   <Typography color="text.secondary" variant="body2">Low Stock Items</Typography>
                   <Typography variant="h5" fontWeight="600" color="error.main">
-                    {inventoryData.lowStockCount}
+                    {inventory.lowStockCount ?? 0}
                   </Typography>
                 </Paper>
               </Grid>
@@ -327,7 +316,7 @@ const ReportPage = () => {
                 <Paper sx={{ p: 3, textAlign: "center", borderRadius: 1 }}>
                   <Typography color="text.secondary" variant="body2">Total Value</Typography>
                   <Typography variant="h5" fontWeight="600" color="success.main">
-                    {formatCurrency(inventoryData.totalValue)}
+                    {formatCurrency(inventory.totalValue)}
                   </Typography>
                 </Paper>
               </Grid>
@@ -348,7 +337,7 @@ const ReportPage = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filterData(inventoryData.items, "name").map((item) => {
+                  {filterData(inventory.items, "name").map((item) => {
                     const isLow = item.stock <= item.reorderLevel;
                     return (
                       <TableRow key={item.id}>
@@ -383,7 +372,7 @@ const ReportPage = () => {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box sx={{ maxWidth: 1400, mx: "auto" }}>
-
+        {/* Header */}
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
           <Breadcrumbs aria-label="breadcrumb" separator="/">
             <Typography
@@ -415,8 +404,8 @@ const ReportPage = () => {
           </Stack>
         </Stack>
 
- 
-        <Box sx={{ p: 3, mb: 4, borderRadius: 1 }}>
+      
+        <Box sx={{ mb: 4, borderRadius: 1 }}>
           <Grid container spacing={3} alignItems="center">
             <Grid size={{ xs: 12, md: 2 }}>
               <FormControl fullWidth size="small">
@@ -424,7 +413,6 @@ const ReportPage = () => {
                 <Select
                   labelId="report-type-label"
                   value={reportType}
-              
                   onChange={(e) => setReportType(e.target.value)}
                 >
                   <MenuItem value="sales">Sales</MenuItem>
@@ -432,43 +420,28 @@ const ReportPage = () => {
                   <MenuItem value="inventory">Inventory</MenuItem>
                 </Select>
               </FormControl>
+            </Grid>
 
-            </Grid>
-            <Grid size={{ xs: 12, md: 2 }}>
-              <Typography>Time Period</Typography>
-              <TextField
-                select
-                fullWidth
-                size="small"
-       
-                value="custom"
-            
-              >
-                <MenuItem value="today">Today</MenuItem>
-                <MenuItem value="week">This Week</MenuItem>
-                <MenuItem value="month">This Month</MenuItem>
-                <MenuItem value="custom">Custom Range</MenuItem>
-              </TextField>
-            </Grid>
+           
             <Grid size={{ xs: 12, md: 2 }}>
               <Typography>Start Date</Typography>
               <DatePicker
-                 
                 value={dateRange.start}
                 onChange={(newValue) => setDateRange({ ...dateRange, start: newValue })}
                 slotProps={{ textField: { size: "small", fullWidth: true } }}
               />
             </Grid>
+
             <Grid size={{ xs: 12, md: 2 }}>
-               <Typography>End Date</Typography>
+              <Typography>End Date</Typography>
               <DatePicker
-             
                 value={dateRange.end}
                 onChange={(newValue) => setDateRange({ ...dateRange, end: newValue })}
                 slotProps={{ textField: { size: "small", fullWidth: true } }}
               />
             </Grid>
-            <Grid size={{xs:12,md:4}}>
+
+            <Grid size={{ xs: 12, md: 4 }}>
               <Typography>Search</Typography>
               <TextField
                 fullWidth
@@ -488,10 +461,8 @@ const ReportPage = () => {
           </Grid>
         </Box>
 
-
+        {/* Report Content */}
         {renderReportContent()}
-
-
       </Box>
     </LocalizationProvider>
   );

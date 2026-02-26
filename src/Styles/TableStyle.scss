@@ -7,12 +7,14 @@
 .table {
   width: 100%;
   border-collapse: separate !important;
-  border-spacing: 0 10px !important;
+  // border-spacing: 0 10px !important;
+ 
   font-family: "Khmer OS Siemreap", sans-serif;
 
   .table-header {
     background-color: var(--table-header-bg) !important;
     font-weight: 700 !important;
+    
 
     th {
       font-weight: 700 !important;
@@ -26,7 +28,7 @@
     background: var(--table-row-bg);
     border-radius: 12px !important;
     transition: all 0.2s ease-in-out;
-
+     
     &:hover {
       background: var(--table-row-hover-bg);
     }

@@ -218,5 +218,26 @@
   "category_statistics":"Category Statistics",
   "active_orders":"Active Orders",
   "top_selling_items":"Top Selling Items",
-  "date_sent":"Date Sent"
+  "date_sent":"Date Sent",
+
+  "add_supplier":"Add Supplier",
+  "supplier_name":"Supplier Name",
+  "suppliers":"Suppliers",
+  "supplier_name_kh":"Supplier Name (Khmer)",
+  "supplier_name_en":"Supplier Name (English)",
+  "update_supplier":"Update Supplier",
+  "create_purchase_order":"Create Purchase Order",
+  "purchase_orders":"Purchase Orders",
+  "cancel_purchase_order":"Cancel Purchase Order",
+  "confirm_cancel": "Confirm Cancel",
+  "to_confirm": "to confirm cancellation.",
+  "update_purchase_order":"Update Purchase Order",
+  "cancelled": "Cancelled",
+  "purchase_order_invoice":"Purchase Order Invoice",
+  "receive_purchase_order":"Receive Purchase Order",
+  "received":"Received",
+  "total_qty":"Total Quantity",
+  "ordered":"Ordered",
+  "remaining":"Remaining",
+  "confirm_receive":"Confirm Receive"
 }

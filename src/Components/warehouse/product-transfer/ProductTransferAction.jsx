@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import ViewProductTransfer from "./ViewProductTransfer";
 
 export default function ProductTransferAction({ editData, t, language }) {
-  console.log("sdf", editData);
+ 
   const [open, setOpen] = useState(false);
   const [openView, setOpenView] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -31,21 +31,13 @@ export default function ProductTransferAction({ editData, t, language }) {
           open={openView}
           onClose={handleCloseView}
         />
-        <Tooltip title="Delete">
-          <IconButton className="delete-icon" onClick={handleOpenDelete}>
-            <FilePenLine  size="18px" color="red" />
-          </IconButton>
-        </Tooltip>
+        
         <Tooltip title="Delete">
           <IconButton className="delete-icon" onClick={handleOpenDelete}>
             <Trash size="18px" color="red" />
           </IconButton>
         </Tooltip>
-        <Tooltip title={t(`transfer`)}>
-          <IconButton className="shuffle-icon" onClick={handleOpenDelete}>
-            <Shuffle size="18px" color="orange" />
-          </IconButton>
-        </Tooltip>
+     
       </Stack>
     </div>
   );

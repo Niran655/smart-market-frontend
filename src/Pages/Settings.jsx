@@ -117,6 +117,26 @@ export default function Settings() {
             </Stack>
           </Paper>
         </Grid>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <Paper
+            className="setting-box"
+            component={RouterLink}
+            to="/setting/supplier"
+            sx={{ cursor: "pointer", textDecoration: "none" }}
+          >
+            <Box>
+              <img src={Product} className="image" alt="Product" />
+            </Box>
+            <Stack textAlign="start" spacing={1}>
+              <Typography className="text-title" variant="h5">
+                {t(`suppliers`)}
+              </Typography>
+              <Typography className="text-body">
+                {t(`create_update_delete`)} {t(`suppliers`)}
+              </Typography>
+            </Stack>
+          </Paper>
+        </Grid>
       </Grid>
     </Box>
   );

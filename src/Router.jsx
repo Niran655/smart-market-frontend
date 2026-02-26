@@ -16,6 +16,7 @@ import Store from './Pages/Store';
 import Unit from './Pages/Unit';
 import User from './Pages/User';
 import Pos from './Pages/Pos';
+import Supplier from './Pages/Supplier';
 export default function Router() {
   const { isAuthenticated } = useAuth();
 
@@ -34,6 +35,7 @@ export default function Router() {
         { path: 'dashboard', element: <Dashboard /> },
         { path: 'setting', element: <Settings/> },
         { path: '/setting/unit', element: <Unit/>},
+        { path: '/setting/supplier', element: <Supplier/>},
         { path: '/store', element: <Store/>},
         { path: 'report', element: <Report/> },
         { path: '/setting/user', element: <User/> },
