@@ -1,7 +1,7 @@
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import { useQuery } from "@apollo/client/react";
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Breadcrumbs, Button, Grid, InputAdornment, Stack, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Box, Breadcrumbs, Button, Grid, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Search } from "lucide-react";
 import { useState } from "react";
 
@@ -118,9 +118,9 @@ const Unit = () => {
           />
         )}
       </Box>
-      <TableContainer className="table-container">
+      <TableContainer className="table-container"  sx={{ mt: 2 }}>
         <Table className="table">
-          <TableHead className="table-header">
+          <TableHead  >
             <TableRow>
               <TableCell>{t(`no`)}</TableCell>
               <TableCell>{t(`khmer_name`)}</TableCell>
@@ -138,7 +138,7 @@ const Unit = () => {
           ) : (
             <TableBody>
               {unitDatas?.map((unit, index) => (
-                <TableRow className="table-row">
+                <TableRow key={index} className="table-row">
                   <TableCell>{paginator.slNo + index}</TableCell>
                   <TableCell>{unit?.nameKh}</TableCell>
                   <TableCell>{unit?.nameEn}</TableCell>

@@ -476,6 +476,7 @@ export const ThemeProvider = ({ children }) => {
             styleOverrides: {
               paper: {
                 backgroundColor: mode === 'dark' ? sidebarColor : '#ffffff',
+              
                 color: mode === 'dark' ? '#f1f5f9' : '#1e293b',
                 border: 'none',
                 backgroundImage: 'none',
@@ -507,9 +508,12 @@ export const ThemeProvider = ({ children }) => {
               root: {
                 textTransform: 'none',
                 borderRadius: 8,
+                color: mode === 'dark' ? '#f1f5f9' : '#1e293b',
               },
               contained: {
                 boxShadow: 'none',
+                border: mode === 'dark' ? '1.5px solid rgba(255, 255, 255, 0.16)' : 'none',
+                color: mode === 'dark' ? '#f1f5f9' : '#ffffff',
                 '&:hover': {
                   boxShadow: 'none',
                 },
@@ -562,7 +566,7 @@ export const ThemeProvider = ({ children }) => {
             styleOverrides: {
               root: {
                 borderCollapse: 'separate',
-                borderSpacing: '0 10px',
+                borderSpacing: '0 2px',
                 fontFamily: '"Khmer OS Siemreap", sans-serif',
                 backgroundColor: 'transparent',
               },

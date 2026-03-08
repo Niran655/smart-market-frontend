@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import PurchaseOrderForm from "./PurchaseOrderForm";
 import PurchaseOrderDelete from "./PurchaseOrderDelete";
- 
+
 import { useState } from "react";
 import PurchaseOrderView from "./PurchaseOrderView";
 import PurchaseOrderReceive from "./PurchaseOrderReceive";
@@ -31,18 +31,18 @@ export default function PurchaseOrderAction({
             <ScanEye size={18} color="#36BBA7" />
           </IconButton>
         </Tooltip>
-
+        <Tooltip title={t("accept")}>
+          <IconButton onClick={() => setOpenReceive(true)}>
+            <SquareArrowDown size={18} color="#F5276C" />
+          </IconButton>
+        </Tooltip>
         <Tooltip title={t("edit")}>
           <IconButton onClick={() => setOpenEdit(true)}>
             <SquarePen size={18} color="orange" />
           </IconButton>
         </Tooltip>
 
-        <Tooltip title={t("accept")}>
-          <IconButton onClick={() => setOpenReceive(true)}>
-            <SquareArrowDown size={18} color="#F5276C" />
-          </IconButton>
-        </Tooltip>
+
 
         <Tooltip title={t("cancel")}>
           <IconButton onClick={() => setOpenCancel(true)}>

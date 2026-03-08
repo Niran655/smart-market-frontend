@@ -26,7 +26,7 @@ export default function PurchaseOrderView({
 
   if (!purchaseOrder) return null;
 
- 
+
   const totalQty = purchaseOrder.items.reduce(
     (sum, i) => sum + i.quantity,
     0
@@ -37,21 +37,21 @@ export default function PurchaseOrderView({
     0
   );
 
- 
-const handlePrint = () => {
-  const win = window.open("", "", "width=900,height=700");
 
-  const supplierName =
-    language === "en"
-      ? purchaseOrder.supplier?.nameEn
-      : purchaseOrder.supplier?.nameKh;
+  const handlePrint = () => {
+    const win = window.open("", "", "width=900,height=700");
 
-  const totalAmount = purchaseOrder.items.reduce(
-    (sum, i) => sum + i.quantity * i.costPrice,
-    0
-  );
+    const supplierName =
+      language === "en"
+        ? purchaseOrder.supplier?.nameEn
+        : purchaseOrder.supplier?.nameKh;
 
-  win.document.write(`
+    const totalAmount = purchaseOrder.items.reduce(
+      (sum, i) => sum + i.quantity * i.costPrice,
+      0
+    );
+
+    win.document.write(`
     <html>
       <head>
         <title>Invoice</title>
@@ -195,24 +195,23 @@ const handlePrint = () => {
           </thead>
           <tbody>
             ${purchaseOrder.items
-              .map(
-                (item, i) => `
+        .map(
+          (item, i) => `
                 <tr>
                   <td>${i + 1}</td>
-                  <td>${
-                    language === "en"
-                      ? item.subProduct.parentProductId.nameEn
-                      : item.subProduct.parentProductId.nameKh
-                  }</td>
+                  <td>${language === "en"
+              ? item.subProduct.parentProductId.nameEn
+              : item.subProduct.parentProductId.nameKh
+            }</td>
                   <td class="right">${item.quantity}</td>
                   <td class="right">${item.costPrice.toLocaleString()}</td>
                   <td class="right">${(
-                    item.quantity * item.costPrice
-                  ).toLocaleString()}</td>
+              item.quantity * item.costPrice
+            ).toLocaleString()}</td>
                 </tr>
               `
-              )
-              .join("")}
+        )
+        .join("")}
           </tbody>
         </table>
 
@@ -241,17 +240,17 @@ const handlePrint = () => {
     </html>
   `);
 
-  win.document.close();
-  win.focus();
-  win.print();
-  win.close();
-};
+    win.document.close();
+    win.focus();
+    win.print();
+    win.close();
+  };
   return (
     <Drawer
       anchor="right"
       open={open}
       onClose={onClose}
-      PaperProps={{ sx: { width:620 } }}
+      PaperProps={{ sx: { width: 620 } }}
     >
       <Stack p={3} spacing={2}>
         {/* HEADER */}
@@ -271,36 +270,41 @@ const handlePrint = () => {
 
         <Divider />
 
- 
+
         <Box ref={printRef}>
-        
-          <Stack spacing={1}>
-            <Typography>
-              <b>{t("suppliers")}:</b>{" "}
-              {language === "en"
-                ? purchaseOrder.supplier?.nameEn
-                : purchaseOrder.supplier?.nameKh}
-            </Typography>
 
-            <Typography>
-              <b>{t("status")}:</b> {purchaseOrder.status}
-            </Typography>
-
-            <Typography>
-              <b>{t("date")}:</b>{" "}
-              {new Date(purchaseOrder.createdAt).toLocaleDateString()}
-            </Typography>
-
-            {purchaseOrder.remark && (
+          <Stack spacing={1} direction={"row"} justifyContent={"space-between"} >
+            <Box>
               <Typography>
-                <b>{t("remark")}:</b> {purchaseOrder.remark}
+                <b>{t("suppliers")}:</b>{" "}
+                {language === "en"
+                  ? purchaseOrder.supplier?.nameEn
+                  : purchaseOrder.supplier?.nameKh}
               </Typography>
-            )}
+
+              <Typography>
+                <b>{t("status")}:</b> {purchaseOrder.status}
+              </Typography>
+            </Box>
+
+            <Box>
+              <Typography>
+                <b>{t("date")}:</b>{" "}
+                {new Date(purchaseOrder.createdAt).toLocaleDateString()}
+              </Typography>
+
+              {purchaseOrder.remark && (
+                <Typography>
+                  <b>{t("remark")}:</b> {purchaseOrder.remark}
+                </Typography>
+              )}
+            </Box>
+
           </Stack>
 
           <Divider sx={{ my: 2 }} />
 
-        
+
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -351,7 +355,7 @@ const handlePrint = () => {
 
         <Divider />
 
-         
+
         <Button
           fullWidth
           variant="contained"

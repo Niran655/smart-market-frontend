@@ -51,8 +51,13 @@ export default function PurchaseOrderCancelForm({
                     onClose();
                     setConfirmationText("");
                     setReason("");
+                }else{
+                    setAlert(true, "error", res?.cancelPurchaseOrder?.message);
                 }
             },
+            onError: (err) => {
+                setAlert(true, "error", err.message);
+            }
         }
     );
 

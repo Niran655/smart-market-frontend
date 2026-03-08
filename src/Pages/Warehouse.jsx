@@ -683,8 +683,8 @@ const Warehouse = () => {
                         <TableCell>{t("unit")}</TableCell>
                         <TableCell>{t("stock")}</TableCell>
                         <TableCell>{t("min_stock")}</TableCell>
-                        <TableCell>{t("status")}</TableCell>
-                        <TableCell></TableCell>
+                        <TableCell >{t("status")}</TableCell>
+                         <TableCell className="flex-center">{t("action")}</TableCell>
                       </TableRow>
                     </TableHead>
                     {productWarehouseLoading ? (
@@ -859,7 +859,7 @@ const Warehouse = () => {
                         <TableCell>{t("total_quantity")}</TableCell>
                         <TableCell>{t("status")}</TableCell>
                         <TableCell>{t("date")}</TableCell>
-                        <TableCell>{t("action")}</TableCell>
+                        <TableCell className="flex-center">{t("action")}</TableCell>
                       </TableRow>
                     </TableHead>
 
@@ -896,7 +896,7 @@ const Warehouse = () => {
                               <TableCell>
                                 {dayjs(row.createdAt).format("DD/MM/YYYY")}
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="flex-end" >
                                 <ProductTransferAction
                                   language={language}
                                   editData={row}
@@ -936,6 +936,7 @@ const Warehouse = () => {
                     alignItems: "center",
                     flexWrap: "wrap",
                     gap: 2,
+                    mb : 2,
                   }}
                 >
                   <Grid
@@ -996,7 +997,7 @@ const Warehouse = () => {
                         <TableCell>{t("total_quantity")}</TableCell>
                         <TableCell>{t("status")}</TableCell>
                         <TableCell>{t("date")}</TableCell>
-                        <TableCell>{t("action")}</TableCell>
+                        <TableCell className="flex-center" >{t("action")}</TableCell>
                       </TableRow>
                     </TableHead>
 
@@ -1033,7 +1034,7 @@ const Warehouse = () => {
                               <TableCell>
                                 {dayjs(row.createdAt).format("DD/MM/YYYY")}
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="flex-end" >
                                 <PurchaseOrderAction language={language} setRefetch={purchaseOrderRefetch} purchaseOrder={row} t={t}/>
                               </TableCell>
                             </TableRow>

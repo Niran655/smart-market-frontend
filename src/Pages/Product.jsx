@@ -1,11 +1,10 @@
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import AccordionSummary from "@mui/material/AccordionSummary";
 import Accordion from "@mui/material/Accordion";
 import { useQuery } from "@apollo/client/react";
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Breadcrumbs, Button, CircularProgress, Grid, IconButton, InputAdornment, Skeleton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Box, Breadcrumbs, Button, Grid, IconButton, InputAdornment, Skeleton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { CopyPlus, Search } from "lucide-react";
 import { useState } from "react";
 
@@ -77,7 +76,6 @@ const Product = () => {
     setPage(newPage);
   };
 
-
   return (
     <Box>
       {/* =================== HEADER =================== */}
@@ -105,7 +103,7 @@ const Product = () => {
         </Box>
       </Stack>
 
-      {/* =================== SEARCH + CREATE =================== */}
+   
       <Box
         sx={{
           display: "flex",
@@ -128,9 +126,7 @@ const Product = () => {
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               variant="outlined"
-              // sx={{
-              //   "& .MuiOutlinedInput-root fieldset": { border: "none" },
-              // }}
+       
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -163,10 +159,10 @@ const Product = () => {
         </Stack>
       </Box>
 
-      {/* =================== MAIN PRODUCT TABLE =================== */}
-      <TableContainer className="table-container">
+ 
+      <TableContainer className="table-container" sx={{ mt: 2 }} >
         <Table className="table">
-          <TableHead className="table-header">
+          <TableHead  >
             <TableRow>
               <TableCell>{t("no")}</TableCell>
               <TableCell>{t("khmer_name")}</TableCell>
@@ -185,7 +181,7 @@ const Product = () => {
             <TableBody>
               {data?.getProductsWithPagination?.data?.map((row, index) => (
                 <>
-                  {/* =================== PRODUCT ROW =================== */}
+  
                   <TableRow key={row._id} className="table-row">
                     <TableCell>{paginator.slNo + index}</TableCell>
 
@@ -215,9 +211,9 @@ const Product = () => {
                         ? row?.categoryId?.nameEn
                         : row?.categoryId?.nameKh}
                     </TableCell>
-                    
+
                     <TableCell>{row?.remark}</TableCell>
-                        
+
                     <TableCell className="flex-end">
                       <Stack direction="row" spacing={1}>
                         <ProductAction
@@ -359,7 +355,7 @@ const Product = () => {
                                 </TableRow>
                               ) : (
                                 <TableBody>
-                                  {subProductData.map((p, idx) => (
+                                  {subProductData.map((p) => (
                                     <TableRow
                                       key={p._id}
                                       sx={{ "& td, & th": { border: 0 } }}
@@ -417,7 +413,6 @@ const Product = () => {
                                           ? p.unitId?.nameEn
                                           : p.unitId?.nameKh}
                                       </TableCell>
-                                     
 
                                       <TableCell className="flex-end">
                                         <SubProductAction

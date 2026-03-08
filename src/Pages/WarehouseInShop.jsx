@@ -1,37 +1,19 @@
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
-import { useQuery } from "@apollo/client/react";
-import {
-  Box,
-  Breadcrumbs,
-  Chip,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-  Tab,
-  InputAdornment,
-  TextField,
-  MenuItem,
-  Grid
-} from "@mui/material";
-import { TabContext, TabList, TabPanel, } from "@mui/lab";
+import { Box, Breadcrumbs, Chip, Grid, InputAdornment, MenuItem, Stack, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Search } from "lucide-react";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { useState } from "react";
-import {  Search } from "lucide-react";
+
 import GetProductInShopAction from "../Components/warehouseInShop/getProduct/GetProductInShopAction";
 import useGetProductWarehouseInShopWithPagination from "../Components/hook/useGetProductWarehouseInShopWithPagination";
 import useGetWarehouseTransferWithPagination from "../Components/hook/useGetWarehouseTransferWithPagination";
 import FooterPagination from "../include/FooterPagination";
+import "../Styles/modernTable.scss";
 import { useAuth } from "../context/AuthContext";
-import { GET_PRODUCT_WAREHOUSE_IN_SHOP_WITH_PAGINATION } from "../../graphql/queries";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
-import "../Styles/modernTable.scss";
 
 const getStatusStyle = (status) => {
   switch (status) {
@@ -80,7 +62,7 @@ const getStatusStyle = (status) => {
 const WarehouseInShop = () => {
   const { language } = useAuth();
   const { t } = translateLauguage(language);
-  const [keyword,setKeyword] = useState('');
+ 
   const [productWarehouseKeyWord,setProductWarehouseKeyword] = useState("");
  
   const [tab, setTab] = useState("1");
@@ -168,6 +150,7 @@ const WarehouseInShop = () => {
           fullWidth
           alignItems="center"
           textAlign="start"
+          mb={2}
         >
           <Grid size={{ xs: 12, md: 6 }}>
             <Typography variant="body2" fontWeight={500} mb={0.5}>
@@ -235,7 +218,7 @@ const WarehouseInShop = () => {
 
             <TableContainer className="table-container">
               <Table className="table">
-                <TableHead className="table-header">
+                <TableHead >
                   <TableRow>
                     <TableCell>{t("no")}</TableCell>
                     <TableCell>{t("product")}</TableCell>
@@ -274,9 +257,9 @@ const WarehouseInShop = () => {
                             : row?.subProduct?.unitId?.nameEn}
                         </TableCell>
                         <TableCell>{row?.stock}</TableCell>
-                        <TableCell>{row?.minStock}</TableCell>
+                        <TableCell>{row?.subProduct?.minStock}</TableCell>
                         <TableCell>
-                          {row?.stock < row?.minStock ? (
+                          {row?.stock < row?.subProduct?.minStock ? (
                             <Chip
                               icon={<WarningAmberOutlinedIcon />}
                               label={t("low_stock")}
@@ -333,7 +316,7 @@ const WarehouseInShop = () => {
         <TabPanel value="3">
           <TableContainer className="table-container">
             <Table className="table">
-              <TableHead className="table-header">
+              <TableHead >
                 <TableRow>
                   <TableCell>{t("no")}</TableCell>
                   <TableCell>{t("category")}</TableCell>
@@ -406,7 +389,7 @@ const WarehouseInShop = () => {
           </TableContainer>
         </TabPanel>
 
-        {/* ===== TAB 4 ===== */}
+   
         <TabPanel value="4">
           <Typography>Request to warehouse</Typography>
         </TabPanel>

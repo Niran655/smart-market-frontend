@@ -34,6 +34,7 @@ export default function ThemeCustomizer() {
   };
 
   const primaryColors = [
+    { name: 'Info', value: '#1976d2' },
     { name: 'Blue', value: '#1D4592' },
     { name: 'Green', value: '#2e7d32' },
     { name: 'Orange', value: '#ed6c02' },

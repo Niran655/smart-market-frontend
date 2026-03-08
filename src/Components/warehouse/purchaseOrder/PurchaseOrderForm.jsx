@@ -225,6 +225,7 @@ export default function PurchaseOrderForm({
                                         <Autocomplete
                                             options={productWarehouseWithPagination}
                                             loading={productLoading}
+                                        
                                             value={
                                                 productWarehouseWithPagination.find(
                                                     (p) => p.subProduct?._id === item.subProductId
@@ -239,7 +240,11 @@ export default function PurchaseOrderForm({
                                                 updateItem(index, "subProductId", val?.subProduct?._id)
                                             }
                                             renderInput={(params) => (
-                                                <TextField {...params} size="small" />
+                                                <TextField {...params} size="small"
+                                                 error={touched.supplierId && Boolean(errors.supplierId)}
+                                            helperText={touched.supplierId && errors.supplierId} 
+                                                />
+                                                
                                             )}
                                         />
                                     </Grid>
@@ -258,7 +263,7 @@ export default function PurchaseOrderForm({
 
                                     <Grid size={{ xs: 12, md: 3 }}>
                                         <TextField
-                                            label={t("cost_price")}
+                                            label={t("price")}
                                             size="small"
                                             type="number"
                                             value={item.costPrice}

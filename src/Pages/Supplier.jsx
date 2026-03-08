@@ -1,24 +1,10 @@
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import { Link as RouterLink } from "react-router-dom";
-import {
-  Box,
-  Breadcrumbs,
-  Button,
-  Grid,
-  InputAdornment,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Breadcrumbs, Button, Grid, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Search } from "lucide-react";
 import { useState } from "react";
 
+import useGetSupplierWithPagination from "../Components/hook/useGetSupplierWithPagination";
 import SupplierAction from "../Components/supplier/SupplierAction";
 import SupplierForm from "../Components/supplier/SupplierForm";
 import FooterPagination from "../include/FooterPagination";
@@ -27,7 +13,6 @@ import { useAuth } from "../context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
-import useGetSupplierWithPagination from "../Components/hook/useGetSupplierWithPagination";
  
 const Supplier = () => {
   const { language } = useAuth();
@@ -120,9 +105,9 @@ const Supplier = () => {
       </Box>
 
  
-      <TableContainer className="table-container">
+      <TableContainer className="table-container" sx={{ mt: 2 }}>
         <Table className="table">
-          <TableHead className="table-header">
+          <TableHead   >
             <TableRow>
               <TableCell>{t("no")}</TableCell>
               <TableCell>{t("khmer_name")}</TableCell>

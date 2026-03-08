@@ -1,15 +1,13 @@
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import { useQuery } from "@apollo/client/react";
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Breadcrumbs, Button, Grid, InputAdornment, Stack, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Box, Breadcrumbs, Button, Grid, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Search } from "lucide-react";
 import { useState } from "react";
 
 import UpdateCategoryStatus from "../Components/category/UpdateCategoryStatus";
 import CategoryAction from "../Components/category/CategoryAction";
 import CategoryForm from "../Components/category/CategoryForm";
-import UpdateUnitStatus from "../Components/units/UpdateStatus";
-import UnitAction from "../Components/units/UnitAction";
 import FooterPagination from "../include/FooterPagination";
 import "../Styles/TableStyle.scss";
 import { useAuth } from "../context/AuthContext";
@@ -120,9 +118,9 @@ const Category = () => {
           />
         )}
       </Box>
-      <TableContainer className="table-container">
+      <TableContainer className="table-container" sx={{ mt: 2 }}>
         <Table className="table">
-          <TableHead className="table-header">
+          <TableHead  >
             <TableRow>
               <TableCell>{t(`no`)}</TableCell>
               <TableCell>{t(`khmer_name`)}</TableCell>
@@ -140,7 +138,7 @@ const Category = () => {
           ) : (
             <TableBody>
               {categoryData?.map((category, index) => (
-                <TableRow className="table-row">
+                <TableRow key={category._id} className="table-row">
                   <TableCell>{paginator.slNo + index}</TableCell>
                   <TableCell>{category?.nameKh}</TableCell>
                   <TableCell>{category?.nameEn}</TableCell>

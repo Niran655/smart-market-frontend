@@ -25,7 +25,7 @@ const User = () => {
   const [limit, setLimit] = useState(5);
   const [keyword, setKeyword] = useState("");
   const [role, setRole] = useState("All");
-  const { data, refetch, loading, error } = useQuery(GET_USER_WITH_PAGINATION, {
+  const { data, refetch, loading,  } = useQuery(GET_USER_WITH_PAGINATION, {
     variables: {
       page,
       limit,
@@ -107,10 +107,7 @@ const User = () => {
               variant="outlined"
               sx={{
                 width: "250px",
-
-                "& .MuiOutlinedInput-root": {
-                  // "& fieldset": { border: "none" },
-                },
+ 
               }}
               InputProps={{
                 startAdornment: (
@@ -132,9 +129,7 @@ const User = () => {
               value={role}
               sx={{
                 width: "200px",
-                "& .MuiOutlinedInput-root": {
-                  // "& fieldset": { border: "none" },
-                },
+         
               }}
               onChange={handleRoleChange}
             >
@@ -168,9 +163,9 @@ const User = () => {
           )}
         </Stack>
       </Stack>
-      <TableContainer className="table-container">
+      <TableContainer  className="table-container" sx={{ mt: 2 }}>
         <Table className="table">
-          <TableHead className="table-header">
+          <TableHead >
             <TableRow>
               <TableCell>{t(`no`)}</TableCell>
               <TableCell>{t(`khmer_name`)}</TableCell>

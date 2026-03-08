@@ -1,6 +1,5 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Box, Breadcrumbs, Grid, Paper, Stack, Typography } from "@mui/material";
-import React from "react";
 
 import Product from "../assets/Image/best-product.png";
 import Category from "../assets/Image/category.png";
