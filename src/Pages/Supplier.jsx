@@ -3,7 +3,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { Box, Breadcrumbs, Button, Grid, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Search } from "lucide-react";
 import { useState } from "react";
-
+import "../Styles/TableStyle.scss";
 import useGetSupplierWithPagination from "../Components/hook/useGetSupplierWithPagination";
 import SupplierAction from "../Components/supplier/SupplierAction";
 import SupplierForm from "../Components/supplier/SupplierForm";
@@ -33,7 +33,6 @@ const Supplier = () => {
 
   return (
     <Box>
-     
       <Stack direction="row" justifyContent="space-between">
         <Breadcrumbs separator="/">
           <Typography
@@ -49,14 +48,13 @@ const Supplier = () => {
           >
             {t("setting")}
           </Typography>
-
           <Typography variant="h6" fontWeight={600}>
-            {t("supplier")}
+            {t("suppliers")}
           </Typography>
         </Breadcrumbs>
       </Stack>
 
-      {/* ───────── Search + Create ───────── */}
+ 
       <Box
         sx={{ display: "flex", justifyContent: "space-between" }}
         mt={5}
@@ -113,7 +111,7 @@ const Supplier = () => {
               <TableCell>{t("khmer_name")}</TableCell>
               <TableCell>{t("english_name")}</TableCell>
               <TableCell>{t("remark")}</TableCell>
-              <TableCell />
+              <TableCell  >{t("action")}</TableCell>
             </TableRow>
           </TableHead>
 
@@ -124,7 +122,7 @@ const Supplier = () => {
           ) : (
             <TableBody>
               {suppliers.map((supplier, index) => (
-                <TableRow key={supplier._id}>
+                <TableRow key={supplier._id} className="table-row">
                   <TableCell>{paginator.slNo + index}</TableCell>
                   <TableCell>{supplier.nameKh}</TableCell>
                   <TableCell>{supplier.nameEn}</TableCell>

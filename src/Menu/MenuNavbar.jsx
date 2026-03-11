@@ -134,6 +134,7 @@ export default function MenuNavbar() {
                       backgroundColor: active
                         ? "rgba(255, 255, 255, 0.15)"
                         : "transparent",
+                
                       transition: "background-color 0.3s ease",
                       "&:hover": {
                         backgroundColor: active
@@ -141,6 +142,7 @@ export default function MenuNavbar() {
                           : "rgba(255, 255, 255, 0.1)",
                       },
                       borderRadius: "8px",
+                      border: active ? "1.5px solid rgba(255,255,255,0.1)" : "none",
                       
                     }}
                     onClick={() => {

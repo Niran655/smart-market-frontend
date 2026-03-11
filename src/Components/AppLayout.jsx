@@ -48,6 +48,7 @@ export default function AppLayout() {
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isExtraSmall = useMediaQuery(theme.breakpoints.down("sm"));
   const { t } = translateLauguage(language);
   const id = localStorage.getItem("activeShopId");
   const [activeTab, setActiveTab] = useState("orders");
@@ -60,7 +61,7 @@ export default function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userObject, setUserObject] = useState(null);
 
-  // Sidebar width based on layout mode
+
   const sidebarWidth = layoutMode === "compact" ? 70 : 250;
 
   useEffect(() => {
@@ -69,6 +70,18 @@ export default function AppLayout() {
       setUserObject(JSON.parse(storedUser));
     }
   }, []);
+
+
+  useEffect(() => {
+    if (isPosPage) {
+      const path = location.pathname;
+      if (path.includes("/pos/")) setActiveTab("pos");
+      else if (path.includes("/orders/")) setActiveTab("orders");
+      else if (path.includes("/kitchen/")) setActiveTab("kitchen");
+      else if (path.includes("/reservation/")) setActiveTab("reservation");
+      else if (path.includes("/table/")) setActiveTab("table");
+    }
+  }, [location, isPosPage]);
 
   const [selectedFlag, setSelectedFlag] = useState(
     language === "kh" ? CambodiaFlag : EnglishFlag
@@ -89,9 +102,16 @@ export default function AppLayout() {
     navigate("/profile");
   };
 
+
+
   const toggleLanguage = () => {
     const newLang = language === "kh" ? "en" : "kh";
+
     changeLanguage(newLang);
+
+
+    localStorage.setItem("language", newLang);
+
     setSelectedFlag(newLang === "kh" ? CambodiaFlag : EnglishFlag);
     setSelectedLanguage(newLang === "kh" ? "ភាសាខ្មែរ" : "English");
   };
@@ -99,27 +119,37 @@ export default function AppLayout() {
   const menuItems = [
     {
       icon: GridViewOutlinedIcon,
-      label: `${t(`dashboard`)}`,
+      label: `${t("dashboard")}`,
       path: "/dashboard",
     },
-    { icon: Store, label: `${t(`store`)}`, path: "/store" },
-    { icon: ReceiptLongOutlinedIcon, label: `${t(`report`)}`, path: "/report" },
-    { icon: SettingsOutlinedIcon, label: `${t(`setting`)}`, path: "/setting" },
+    { icon: Store, label: `${t("store")}`, path: "/store" },
+    {
+      icon: ReceiptLongOutlinedIcon,
+      label: `${t("report")}`,
+      path: "/report",
+    },
+    {
+      icon: SettingsOutlinedIcon,
+      label: `${t("setting")}`,
+      path: "/setting",
+    },
   ];
 
   const tabs = [
     { key: "pos", label: t("pos"), link: `/store/pos/${id}` },
     { key: "orders", label: t("orders"), link: `/store/orders/${id}` },
     { key: "kitchen", label: t("kitchen"), link: `/store/kitchen/${id}` },
-    { key: "reservation", label: t("reservation"), link: `/store/reservation/${id}` },
+    {
+      key: "reservation",
+      label: t("reservation"),
+      link: `/store/reservation/${id}`,
+    },
     { key: "table", label: t("table"), link: `/store/table/${id}` },
   ];
 
-
-
   return (
     <Box sx={{ minHeight: "100vh", width: "100vw", position: "relative" }}>
-      {/* Desktop fixed sidebar (not on POS page, not mobile) */}
+
       {!isPosPage && !isMobile && (
         <Box
           sx={{
@@ -132,14 +162,13 @@ export default function AppLayout() {
             color: "white",
             borderRight: "1px solid rgba(255,255,255,0.1)",
             zIndex: theme.zIndex.drawer,
-            overflow: "hidden", // MenuNavbar handles its own scrolling
+            overflow: "hidden",
           }}
         >
           <MenuNavbar />
         </Box>
       )}
 
-      {/* Mobile drawer */}
       {!isPosPage && isMobile && (
         <Drawer
           anchor="left"
@@ -161,7 +190,7 @@ export default function AppLayout() {
         </Drawer>
       )}
 
-      {/* Main content area */}
+
       <Box
         sx={{
           marginLeft: !isPosPage && !isMobile ? `${sidebarWidth}px` : 0,
@@ -174,55 +203,61 @@ export default function AppLayout() {
           }),
         }}
       >
-        {/* Topbar (hidden on POS page? Actually POS page has its own topbar) */}
+
         {!isPosPage && (
           <AppBar
             position="sticky"
             color="default"
             sx={{
               backgroundColor: topbarColor,
-              // borderBottom: "1px solid rgba(0,0,0,0.1)",
               borderBottom: "1px solid rgba(255,255,255,0.1)",
             }}
           >
             <Toolbar sx={{ justifyContent: "space-between" }}>
               {isMobile && (
-                <IconButton onClick={handleDrawerToggle}>
+                <IconButton onClick={handleDrawerToggle} edge="start">
                   <MenuIcon />
                 </IconButton>
               )}
 
-              <Box display="flex">
-                {menuItems.map((item, index) => {
-                  const IconComponent = item.icon;
-                  const isActive = location.pathname.startsWith(item.path);
 
-                  return (
-                    <Link
-                      key={index}
-                      to={item.path}
-                      style={{ textDecoration: "none" }}
-                    >
-                      <Button
-                        startIcon={<IconComponent />}
-                        sx={{
-                          borderRadius: 1,
-                          px: 2,
-                          color:
-                            topbarColor === "#FDFDFD" ? "black" : "white",
-                          backgroundColor: isActive
-                            ? topbarColor === "#FDFDFD"
-                              ? "rgba(0,0,0,0.1)"
-                              : "rgba(255,255,255,0.15)"
-                            : "transparent",
-                        }}
+              {!isMobile && (
+                <Box display="flex">
+                  {menuItems.map((item) => {
+                    const IconComponent = item.icon;
+                    const isActive = location.pathname.startsWith(item.path);
+
+                    return (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        style={{ textDecoration: "none" }}
                       >
-                        {item.label}
-                      </Button>
-                    </Link>
-                  );
-                })}
-              </Box>
+                        <Button
+                          startIcon={<IconComponent />}
+                          sx={{
+                            borderRadius: 1,
+                            border: isActive ? "1.5px solid rgba(255,255,255,0.1)" : "none",
+                            px: 2,
+                            color:
+                              topbarColor === "#FDFDFD" ? "black" : "white",
+                            backgroundColor: isActive
+                              ? topbarColor === "#FDFDFD"
+                                ? "rgba(0,0,0,0.1)"
+                                : "rgba(255,255,255,0.15)"
+                              : "transparent",
+                          }}
+                        >
+                          {item.label}
+                        </Button>
+                      </Link>
+                    );
+                  })}
+                </Box>
+              )}
+
+              {/* Spacer to push right items when nav is hidden on mobile */}
+              {isMobile && <Box flex={1} />}
 
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Tooltip title={selectedLanguage}>
@@ -238,14 +273,17 @@ export default function AppLayout() {
                       src={userObject?.image}
                       alt={userObject?.nameKh}
                     />
-                    <Typography
-                      sx={{
-                        color:
-                          topbarColor === "#FDFDFD" ? "black" : "white",
-                      }}
-                    >
-                      {userObject?.nameKh}
-                    </Typography>
+                    {/* Hide name on mobile to save space */}
+                    {!isExtraSmall && (
+                      <Typography
+                        sx={{
+                          color:
+                            topbarColor === "#FDFDFD" ? "black" : "white",
+                        }}
+                      >
+                        {userObject?.nameKh}
+                      </Typography>
+                    )}
                   </Stack>
                 </ButtonBase>
 
@@ -294,55 +332,66 @@ export default function AppLayout() {
                 borderBottom: "1px solid rgba(0,0,0,0.1)",
               }}
             >
-              <Toolbar sx={{ justifyContent: "space-between" }}>
-                <Stack direction={"row"} alignItems={"center"} spacing={2}>
+              <Toolbar
+                sx={{
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  rowGap: 1,
+                  py: { xs: 0.5, sm: 0 },
+                }}
+              >
+                {/* Left section: POS title and grid icon */}
+                <Stack direction="row" alignItems="center" spacing={1}>
                   <Link to={`/store/pos/${id}`}>
                     <Button>
-                      <Typography
-                        sx={{
-                          color:
-                            topbarColor === "#FDFDFD" ? "black" : "white",
-                          fontSize: 20,
-                          fontWeight: "bold",
-                        }}
-                      >
-                        POS System
-                      </Typography>
+                      {/* Hide title on extra small screens */}
+                      {!isExtraSmall && (
+                        <Typography
+                          sx={{
+                            color:
+                              topbarColor === "#FDFDFD" ? "black" : "white",
+                            fontSize: 20,
+                            fontWeight: "bold",
+                          }}
+                        >
+                          POS System
+                        </Typography>
+                      )}
                     </Button>
                   </Link>
-                  <Box display="flex" gap={3}>
-
-                    <IconButton
-                      onClick={handleOpen}
-                      sx={{
-                        borderRadius: 10,
-                        // px: 2,
-                        // py: 1,
-                        color: topbarColor === "#FDFDFD" ? "black" : "white",
-                        backgroundColor: "rgba(255,255,255,0.15)",
-                        cursor: "pointer",
-                        "&:hover": {
-                          backgroundColor: "rgba(255,255,255,0.25)",
-                        },
-                      }}
-                    >
-                      <GridViewOutlinedIcon fontSize="small" />
-                    </IconButton>
-
-                  </Box>
+                  <IconButton
+                    onClick={handleOpen}
+                    sx={{
+                      borderRadius: 10,
+                      color: topbarColor === "#FDFDFD" ? "black" : "white",
+                      backgroundColor: "rgba(255,255,255,0.15)",
+                      "&:hover": {
+                        backgroundColor: "rgba(255,255,255,0.25)",
+                      },
+                    }}
+                  >
+                    <GridViewOutlinedIcon fontSize="small" />
+                  </IconButton>
                 </Stack>
 
-                <Stack direction="row" alignItems="center" spacing={2}>
-                  <Box
+                {/* Center: scrollable tabs */}
+                <Box
+                  sx={{
+                    flex: { xs: "1 1 100%", sm: "0 1 auto" },
+                    order: { xs: 3, sm: 2 },
+                    overflowX: "auto",
+                    whiteSpace: "nowrap",
+                    scrollbarWidth: "none", // Firefox
+                    "&::-webkit-scrollbar": { display: "none" }, // Chrome/Safari
+                    maxWidth: "100%",
+                  }}
+                >
+                  <Stack
+                    direction="row"
+                    spacing={1}
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      gap: 1,
-                      mt: 2,
-                      // backgroundColor: "rgba(0, 0, 0, 0.64)",
-                      borderRadius: 0.5,
-                      p: 0.5,
+                      display: "inline-flex",
+                      px: 1,
                     }}
                   >
                     {tabs.map((tab) => (
@@ -354,23 +403,37 @@ export default function AppLayout() {
                         to={tab.link}
                         sx={{
                           borderRadius: 10,
-                          backgroundColor: activeTab === tab.key ? "#ffffff" : "transparent",
-                          color: activeTab === tab.key ? "#000" : "#fff",
-                          fontWeight:"bold",
+                          backgroundColor:
+                            activeTab === tab.key
+                              ? "#ffffff"
+                              : "transparent",
+                          color:
+                            activeTab === tab.key ? "#000" : "#fff",
+                          fontWeight: "bold",
+                          whiteSpace: "nowrap",
                           "&:hover": {
                             backgroundColor:
-                              activeTab === tab.key ? "#f0f0f0" : "rgba(255,255,255,0.1)",
+                              activeTab === tab.key
+                                ? "#f0f0f0"
+                                : "rgba(255,255,255,0.1)",
                           },
                         }}
                       >
                         {tab.label}
                       </Button>
                     ))}
-                  </Box>
-                </Stack>
+                  </Stack>
+                </Box>
 
-
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {/* Right section: language & profile */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    order: { xs: 2, sm: 3 },
+                  }}
+                >
                   <Tooltip title={selectedLanguage}>
                     <IconButton onClick={toggleLanguage}>
                       <Avatar
@@ -387,14 +450,17 @@ export default function AppLayout() {
                         src={userObject?.image}
                         alt={userObject?.nameKh}
                       />
-                      <Typography
-                        sx={{
-                          color:
-                            topbarColor === "#FDFDFD" ? "black" : "white",
-                        }}
-                      >
-                        {userObject?.nameKh}
-                      </Typography>
+                      {/* Hide name on extra small */}
+                      {!isExtraSmall && (
+                        <Typography
+                          sx={{
+                            color:
+                              topbarColor === "#FDFDFD" ? "black" : "white",
+                          }}
+                        >
+                          {userObject?.nameKh}
+                        </Typography>
+                      )}
                     </Stack>
                   </ButtonBase>
                 </Box>
@@ -409,7 +475,7 @@ export default function AppLayout() {
           sx={{
             flex: 1,
             overflow: "auto",
-            p: isPosPage ? 1 : 3,
+            p: isPosPage ? { xs: 0.5, sm: 1 } : { xs: 2, sm: 3 },
           }}
         >
           <Outlet />

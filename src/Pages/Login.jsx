@@ -1,9 +1,9 @@
 import { useMutation } from "@apollo/client/react";
-import { Avatar, Box, Button, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Button, Paper, Stack, TextField, Typography, InputAdornment, IconButton } from "@mui/material";
 import { Form, Formik } from "formik";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import * as Yup from "yup";
-
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import logo from "../assets/Image/logo.png";
 import { LOGIN } from "../../graphql/mutation";
 import { useAuth } from "../context/AuthContext";
@@ -17,6 +17,7 @@ const validationSchema = Yup.object({
 export default function Login() {
   const { login, user } = useAuth();
   const [loginMutation, { loading, client }] = useMutation(LOGIN);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
@@ -44,11 +45,15 @@ export default function Login() {
     <Box className="login-wrapper">
       <Paper elevation={4} className="login-card">
         <Stack alignItems="center" spacing={2} direction="column" sx={{ width: "100%" }}>
-          <Avatar src={logo} sx={{ width: 90, height: 90 }} />
-          <Typography variant="body2" color="text.secondary">
-            Login to your account
+          <Avatar src={logo} sx={{ width: 150, height: 70 }} />
+          <Typography
+             
+            color="text.primary"
+            sx={{ fontWeight: "bold", letterSpacing: 0.5 }}
+          >
+            Logic Integrated Kiosk Application
           </Typography>
-
+       
           <Formik
             initialValues={{ email: "", password: "" }}
             validationSchema={validationSchema}
@@ -71,14 +76,26 @@ export default function Login() {
                 <Typography className="input-label">Password</Typography>
                 <TextField
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   size="small"
                   value={values.password}
                   onChange={handleChange}
                   error={touched.password && !!errors.password}
                   helperText={touched.password && errors.password}
                   fullWidth
-                  className="input-field"
+                  sx={{ mb: 1 }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
 
                 <Typography className="forgot-text">ភ្លេចពាក្យសម្ងាត់?</Typography>
@@ -95,6 +112,16 @@ export default function Login() {
               </Form>
             )}
           </Formik>
+          <Typography
+            variant="caption"
+            sx={{
+              mt: 2,
+              color: "gray",
+              textAlign: "center",
+            }}
+          >
+            © {new Date().getFullYear()} Niran. All rights reserved.
+          </Typography>
         </Stack>
       </Paper>
     </Box>

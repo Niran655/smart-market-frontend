@@ -1031,7 +1031,7 @@ const POS = () => {
       />
 
       <Grid container spacing={2} sx={{ height: "90vh", overflow: "hidden" }}>
-        {/* Product List Section */}
+      
         <Grid size={{ xs: 8 }}>
           <Box sx={{ overflowY: "auto", height: "100vh", scrollbarWidth: "thin", padding: 2 }}>
             <RecentOrders

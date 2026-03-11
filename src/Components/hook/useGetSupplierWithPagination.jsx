@@ -11,7 +11,7 @@ const useGetSupplierWithPagination = (
         GET_SUPPLIERS_WITH_PAGINATION,
         {
             variables: { page, limit, pagination, keyword },
-            fetchPolicy: "cache-and-network",
+            // fetchPolicy: "cache-and-network",
         }
     );
 

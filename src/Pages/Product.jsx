@@ -52,8 +52,9 @@ const Product = () => {
     variables: { parentProductId: selectedParentId },
   });
 
+  
   const subProductData = subData?.getSubProducts || [];
-  console.log("subProductData", subProductData);
+ 
   const paginator = data?.getProductsWithPagination?.paginator || {};
   const handleExpand = (id) => {
     if (expandedRow === id) {
@@ -78,7 +79,7 @@ const Product = () => {
 
   return (
     <Box>
-      {/* =================== HEADER =================== */}
+ 
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Box textAlign="start">
           <Breadcrumbs aria-label="breadcrumb" separator="/">
@@ -176,7 +177,7 @@ const Product = () => {
           {loading ? (
             <CircularIndeterminate />
           ) : data?.getProductsWithPagination?.data?.length === 0 ? (
-            <EmptyData />
+            <EmptyData/>
           ) : (
             <TableBody>
               {data?.getProductsWithPagination?.data?.map((row, index) => (

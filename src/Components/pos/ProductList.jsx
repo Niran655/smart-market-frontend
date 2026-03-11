@@ -63,9 +63,10 @@ const ProductList = ({
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
               variant={selectedCategory === category.id ? "contained" : "outlined"}
-              className={`category-button ${
-                selectedCategory === category.id ? "category-button--active" : ""
-              }`}
+              // className={`category-button ${
+              //   selectedCategory === category.id ? "category-button--active" : ""
+              // }`}
+              sx={{borderRadius:0.7}}
             >
               <Box display="flex" alignItems="center" gap={1}>
                 <span>{name}</span>

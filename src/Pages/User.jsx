@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client/react";
 import { Link as RouterLink } from "react-router-dom";
 import { Box, Breadcrumbs, Button, Grid, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Search } from "lucide-react";
-import { useState } from "react";
+
 
 import UserAction from "../Components/user/UserAction";
 import AllowUser from "../Components/user/AllowUser";
@@ -15,6 +15,7 @@ import { GET_USER_WITH_PAGINATION } from "../../graphql/queries";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
+import { useState } from "react";
 const User = () => {
   const { language } = useAuth();
   const { t } = translateLauguage(language);
@@ -25,7 +26,9 @@ const User = () => {
   const [limit, setLimit] = useState(5);
   const [keyword, setKeyword] = useState("");
   const [role, setRole] = useState("All");
-  const { data, refetch, loading,  } = useQuery(GET_USER_WITH_PAGINATION, {
+
+
+  const { data, refetch, loading, } = useQuery(GET_USER_WITH_PAGINATION, {
     variables: {
       page,
       limit,
@@ -33,6 +36,7 @@ const User = () => {
       keyword,
       role: role === "All" ? "" : role,
     },
+
   });
 
   const userRow = data?.getUsersWithPagination?.data || [];
@@ -107,7 +111,7 @@ const User = () => {
               variant="outlined"
               sx={{
                 width: "250px",
- 
+
               }}
               InputProps={{
                 startAdornment: (
@@ -129,7 +133,7 @@ const User = () => {
               value={role}
               sx={{
                 width: "200px",
-         
+
               }}
               onChange={handleRoleChange}
             >
@@ -163,13 +167,13 @@ const User = () => {
           )}
         </Stack>
       </Stack>
-      <TableContainer  className="table-container" sx={{ mt: 2 }}>
+      <TableContainer className="table-container" sx={{ mt: 2 }}>
         <Table className="table">
           <TableHead >
             <TableRow>
               <TableCell>{t(`no`)}</TableCell>
               <TableCell>{t(`khmer_name`)}</TableCell>
-              <TableCell>{t(`gender`)}</TableCell>
+              <TableCell>{t`gender`}</TableCell>
               <TableCell>{t(`phone`)}</TableCell>
               <TableCell>{t(`email`)}</TableCell>
               <TableCell>{t(`role`)}</TableCell>
@@ -185,6 +189,7 @@ const User = () => {
             <EmptyData />
           ) : (
             <TableBody>
+
               {userRow.map((row, index) => (
                 <TableRow key={row._id} className="table-row">
                   <TableCell>{paginator.slNo + index}</TableCell>

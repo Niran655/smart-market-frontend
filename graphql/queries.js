@@ -27,6 +27,24 @@ query GetUnitWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyw
   }
 }
 `
+export  const GET_PROFIEL_BY_ID = gql`
+query GetProfileById($id: ID) {
+  getProfileById(_id: $id) {
+    _id
+    image
+    nameEn
+    nameKh
+    email
+    gender
+    phone
+    password
+    active
+    role
+    createdAt
+    updatedAt
+  }
+}
+`
 export const GET_UNIT = gql`
 query GetUnit {
   getUnit {

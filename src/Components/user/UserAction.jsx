@@ -1,12 +1,14 @@
 import { useMutation } from "@apollo/client/react";
 import { IconButton, Stack } from "@mui/material";
-import { SquarePen, Trash } from "lucide-react";
+import { SquarePen, Trash, ScanEye } from "lucide-react";
 import React, { useState } from "react";
 
 import { DELETE_USER } from "../../../graphql/mutation";
 import { useAuth } from "../../context/AuthContext";
 import UseDeleteForm from "../include/useDeleteForm";
 import UserForm from "./UserForm";
+import { useNavigate } from "react-router-dom";
+
 
 export default function UserAction({
   userData,
@@ -21,6 +23,10 @@ export default function UserAction({
   const [openDelete, setOpenDelete] = useState(false);
   const handleOpenDelete = () => setOpenDelete(true);
   const handleCloseDelete = () => setOpenDelete(false);
+
+  const navigate = useNavigate();
+
+
 
   const [loading, setLoading] = useState(false);
   const { setAlert } = useAuth();
@@ -59,6 +65,10 @@ export default function UserAction({
   return (
     <div>
       <Stack direction="row" spacing={2}>
+        <IconButton className="edit-icon" onClick={() => navigate(`${userId}/profile`)}
+        >
+          <ScanEye size="18px" color="#FFAF1F" />
+        </IconButton>
         <IconButton className="edit-icon" onClick={handleOpen}>
           <SquarePen size="18px" color="#36BBA7" />
         </IconButton>

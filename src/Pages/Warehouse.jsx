@@ -619,9 +619,9 @@ const Warehouse = () => {
             sx={{
               p: 2,
               // backgroundColor: "#f5f5f5",
-              height:"100vh",
+              height:"70vh",
               borderRadius: 1,
-              height: "100%",
+              // height: "100%",
             }}
           >
             <Stack direction="column" spacing={1}>

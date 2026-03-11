@@ -41,7 +41,7 @@
 //     return v === null ? true : v === 'true';
 //   });
 
- 
+
 //   useEffect(() => { localStorage.setItem('themeMode', mode); }, [mode]);
 //   useEffect(() => { localStorage.setItem('primaryColor', primaryColor); }, [primaryColor]);
 //   useEffect(() => { localStorage.setItem('sidebarColor', sidebarColor); }, [sidebarColor]);
@@ -51,7 +51,7 @@
 //   useEffect(() => { localStorage.setItem('mobileDrawerWidth', String(mobileDrawerWidth)); }, [mobileDrawerWidth]);
 //   useEffect(() => { localStorage.setItem('mobileShowLabels', String(mobileShowLabels)); }, [mobileShowLabels]);
 
- 
+
 //   useEffect(() => {
 //     const root = document.documentElement;
 //     root.style.setProperty('--table-bg', mode === 'dark' ? '#1e1e1e' : '#ffffff');
@@ -325,7 +325,7 @@ export const ThemeProvider = ({ children }) => {
 
   const [sidebarColor, setSidebarColor] = useState(() => {
     return localStorage.getItem('sidebarColor') || '#1e293b';
-  });                                                                                                                                                                                                                                                                                                                       
+  });
 
   const [layoutMode, setLayoutMode] = useState(() => {
     return localStorage.getItem('layoutMode') || 'default';
@@ -431,7 +431,7 @@ export const ThemeProvider = ({ children }) => {
           },
           divider: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.12)',
         },
-       typography: {
+        typography: {
           fontFamily: ["Siemreap", "Arial", "sans-serif"].join(","),
           fontSize: fontSize === "small" ? 12 : fontSize === "large" ? 16 : 14,
           h1: {
@@ -465,8 +465,8 @@ export const ThemeProvider = ({ children }) => {
               root: {
                 backgroundColor: mode === 'dark' ? topbarColor : '#ffffff',
                 color: mode === 'dark' ? '#f1f5f9' : '#1e293b',
-                boxShadow: mode === 'dark' 
-                  ? '0 1px 3px 0 rgba(0, 0, 0, 0.3)' 
+                boxShadow: mode === 'dark'
+                  ? '0 1px 3px 0 rgba(0, 0, 0, 0.3)'
                   : '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
                 backgroundImage: 'none',
               },
@@ -476,7 +476,7 @@ export const ThemeProvider = ({ children }) => {
             styleOverrides: {
               paper: {
                 backgroundColor: mode === 'dark' ? sidebarColor : '#ffffff',
-              
+
                 color: mode === 'dark' ? '#f1f5f9' : '#1e293b',
                 border: 'none',
                 backgroundImage: 'none',
@@ -488,7 +488,7 @@ export const ThemeProvider = ({ children }) => {
               root: {
                 backgroundColor: mode === 'dark' ? '#1e293b' : '#ffffff',
                 backgroundImage: 'none',
-                boxShadow: mode === 'dark' 
+                boxShadow: mode === 'dark'
                   ? '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)'
                   : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
                 border: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
@@ -499,10 +499,86 @@ export const ThemeProvider = ({ children }) => {
             styleOverrides: {
               root: {
                 backgroundImage: 'none',
-                boxShadow:"none"
+                boxShadow: "none",
+                border: mode === 'dark' ? '1.5px solid rgba(255, 255, 255, 0.05)' : 'none',
               },
             },
           },
+          // ===========
+          MuiMenu: {
+            styleOverrides: {
+              paper: {
+                boxShadow: "none",
+                padding: 5,
+                border: mode === "dark"
+                  ? "1px solid rgba(255,255,255,0.12)"
+                  : "1px solid rgba(0,0,0,0.12)",
+                borderRadius: 10,
+                overflow: "hidden",
+              },
+              list: {
+                borderRadius: 10,
+                overflow: "hidden",
+              },
+            },
+          },
+          MuiMenuItem: {
+            styleOverrides: {
+              root: {
+                borderRadius: 5,
+                margin: "2px 4px",
+              },
+            },
+          },
+          MuiPopover: {
+            styleOverrides: {
+              paper: {
+                boxShadow: "none",
+                // borderRadius: 10,
+              },
+            },
+          },
+
+
+          MuiAutocomplete: {
+            styleOverrides: {
+              paper: {
+                //  boxShadow: mode === "dark"
+                //     ? "0 8px 20px rgba(0,0,0,0.5)"
+                //     : "0 8px 20px rgba(0,0,0,0.08)",
+                padding: 5,
+                border: mode === "dark"
+                  ? "1px solid rgba(255,255,255,0.12)"
+                  : "1px solid rgba(0,0,0,0.12)",
+                borderRadius: 10,
+                overflow: "hidden",
+                marginTop: 6,
+              },
+
+              listbox: {
+                borderRadius: 10,
+                overflow: "hidden",
+                padding: "4px",
+              },
+
+              option: {
+                borderRadius: 5,
+                margin: "2px 4px",
+                padding: "8px 12px",
+                '&[aria-selected="true"]': {
+                  backgroundColor: mode === "dark"
+                    ? "rgba(255,255,255,0.08)"
+                    : "rgba(0,0,0,0.06)",
+                },
+                '&:hover': {
+                  backgroundColor: mode === "dark"
+                    ? "rgba(255,255,255,0.05)"
+                    : "rgba(0,0,0,0.04)",
+                },
+              },
+            },
+          },
+          // ===========
           MuiButton: {
             styleOverrides: {
               root: {
@@ -559,6 +635,9 @@ export const ThemeProvider = ({ children }) => {
                 overflow: 'hidden',
                 background: 'transparent',
                 boxShadow: 'none',
+                border: mode === "dark"
+                  ? "1px solid rgba(255,255,255,0.12)"
+                  : "1px solid rgba(0,0,0,0.12)",
               },
             },
           },
@@ -569,13 +648,14 @@ export const ThemeProvider = ({ children }) => {
                 borderSpacing: '0 2px',
                 fontFamily: '"Khmer OS Siemreap", sans-serif',
                 backgroundColor: 'transparent',
+                padding: 5,
               },
             },
           },
           MuiTableHead: {
             styleOverrides: {
               root: {
-                backgroundColor: mode === 'dark' ? '#1e293b' : '#f3f4f6',
+                // backgroundColor: mode === 'dark' ? '#1e293b' : '#f3f4f6',
                 '& .MuiTableCell-head': {
                   fontWeight: 600,
                   fontSize: '16px',
@@ -591,30 +671,52 @@ export const ThemeProvider = ({ children }) => {
               root: {
                 '& .MuiTableRow-root': {
                   backgroundColor: mode === 'dark' ? '#1e293b' : '#ffffff',
-                  borderRadius: '12px',
-                  // boxShadow: mode === 'dark' 
-                  //   ? '0 1px 3px rgba(0, 0, 0, 0.3)' 
-                  //   : '0 1px 3px rgba(0, 0, 0, 0.05)',
                   transition: 'all 0.2s ease-in-out',
+                  
                   '&:hover': {
                     backgroundColor: mode === 'dark' ? '#374151' : '#f1f5f9',
-                    // transform: 'translateY(-2px)',
                   },
-                  '& .MuiTableCell-body': {
-                    border: 'none',
-                    padding: '12px 16px',
-                    verticalAlign: 'middle',
-                    color: mode === 'dark' ? '#e2e8f0' : '#111827',
-                    fontSize: '15px',
+
+
+                  '& .MuiTableCell-root:first-of-type': {
+                    borderTopLeftRadius: 5,
+                    borderBottomLeftRadius: 5,
+                    
+                  },
+
+
+                  '& .MuiTableCell-root:last-of-type': {
+                    borderTopRightRadius: 5,
+                    borderBottomRightRadius: 5,
                   },
                 },
               },
             },
           },
+          // MuiTableCell: {
+          //   styleOverrides: {
+          //     root: {
+          //       border: 'none',
+          //     },
+          //   },
+          // },
           MuiTableCell: {
             styleOverrides: {
               root: {
-                border: 'none',
+                // border: `1px solid ${mode === 'dark' ? '#374151' : '#e5e7eb'}`,
+
+                padding: '12px 16px',
+                verticalAlign: 'middle',
+                fontSize: '15px',
+                color: mode === 'dark' ? '#e2e8f0' : '#111827',
+              },
+              head: {
+                borderBottom: `2px solid ${mode === 'dark' ? '#475569' : '#d1d5db'}`,
+                fontWeight: 600,
+                fontSize: '16px',
+              },
+              body: {
+                borderBottom: `1px solid ${mode === 'dark' ? '#475569' : '#d1d5db'}`,
               },
             },
           },
@@ -623,8 +725,8 @@ export const ThemeProvider = ({ children }) => {
               root: {
                 color: mode === 'dark' ? '#e2e8f0' : '#374151',
                 backgroundColor: mode === 'dark' ? '#1e293b' : '#ffffff',
-                borderTop: mode === 'dark' 
-                  ? '1px solid rgba(255, 255, 255, 0.1)' 
+                borderTop: mode === 'dark'
+                  ? '1px solid rgba(255, 255, 255, 0.1)'
                   : '1px solid rgba(0, 0, 0, 0.12)',
               },
               actions: {

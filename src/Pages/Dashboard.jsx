@@ -49,6 +49,7 @@ import { translateLauguage } from "../function/translate";
 import { useQuery } from "@apollo/client/react";
 import { DASHBOARD_STATS } from "../../graphql/queries";
 import Chart from "react-apexcharts";
+import ErrorPage from "../include/ErrorPage";
 
 const formatCurrency = (value) =>
   value != null ? `$${Number(value).toFixed(2)}` : "$0.00";
@@ -380,22 +381,12 @@ export default function Dashboard() {
   if (loading && !stats) {
     return (
       <Box sx={{ p: 3 }}>
-        <Typography>{t("loading") || "Loading dashboard..."}</Typography>
+        <Typography>{t("processing...")}</Typography>
       </Box>
     );
   }
-
   if (error) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Typography color="error">
-          {t("error_loading") || "Error loading dashboard:"} {error.message}
-        </Typography>
-        <Button onClick={() => refetch()} variant="outlined" sx={{ mt: 2 }}>
-          {t("retry") || "Retry"}
-        </Button>
-      </Box>
-    );
+    return <ErrorPage t={t} error={error} refetch={refetch} />;
   }
 
   return (
@@ -443,15 +434,7 @@ export default function Dashboard() {
                 variant="contained"
                 startIcon={<TableOfContents />}
                 onClick={exportToExcel}
-                sx={{
-                  bgcolor: "linear-gradient(90deg, #ff6b6b, #f06595)",
-                  color: "white",
 
-                  boxShadow: 2,
-                  "&:hover": {
-                    bgcolor: "linear-gradient(90deg, #f06595, #d6336c)",
-                  },
-                }}
               >
                 Export Excel
               </Button>
@@ -460,15 +443,7 @@ export default function Dashboard() {
                 variant="contained"
                 startIcon={<Download />}
                 onClick={exportToPDF}
-                sx={{
-                  bgcolor: "linear-gradient(90deg, #667eea, #764ba2)",
-                  color: "white",
 
-                  boxShadow: 2,
-                  "&:hover": {
-                    bgcolor: "linear-gradient(90deg, #5a67d8, #6b46c1)",
-                  },
-                }}
               >
                 Export Report
               </Button>
@@ -480,7 +455,7 @@ export default function Dashboard() {
           <Box mt={2}  >
 
             <Grid container spacing={3} alignItems="center">
-              <Grid size={{ xs: 12, md:2 }}>
+              <Grid size={{ xs: 12, md: 2 }}>
                 <TextField
                   select
                   fullWidth
@@ -508,7 +483,7 @@ export default function Dashboard() {
               </Grid>
               <Grid size={{ xs: 12, md: 2 }}>
                 <DatePicker
-                  label="Start Date"
+                 
                   value={customStart}
                   onChange={(newValue) => setCustomStart(newValue)}
                   slotProps={{ textField: { size: "small", fullWidth: true } }}
@@ -517,27 +492,33 @@ export default function Dashboard() {
               </Grid>
               <Grid size={{ xs: 12, md: 2 }}>
                 <DatePicker
-                  label="End Date"
+              
                   value={customEnd}
                   onChange={(newValue) => setCustomEnd(newValue)}
                   slotProps={{ textField: { size: "small", fullWidth: true } }}
                   disabled={filterType !== "custom"}
                 />
               </Grid>
-              
-            
+              <Grid size={{ xs: 12, md: 2 }}>
+                {filterType === "custom" && (
+                  <Stack direction="row" spacing={2} >
+                    <Button
+                      variant="contained"
+                      onClick={() => applyFilter("custom", customStart, customEnd)}
+                      disabled={!customStart || !customEnd}
+                    >
+                      Apply Custom Range
+                    </Button>
+                  </Stack>
+                )}
+
+              </Grid>
+
+
+
+
+
             </Grid>
-            {filterType === "custom" && (
-              <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-                <Button
-                  variant="contained"
-                  onClick={() => applyFilter("custom", customStart, customEnd)}
-                  disabled={!customStart || !customEnd}
-                >
-                  Apply Custom Range
-                </Button>
-              </Stack>
-            )}
 
           </Box>
         </Box>
