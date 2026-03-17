@@ -12,9 +12,11 @@ export default function ProductTransferAction({ editData, t, language }) {
   const handleClose = () => setOpen(false);
   const handleOpenview = () => setOpenView(true);
   const handleCloseView = () => setOpenView(false);
-  const [openDelete, setOpenDelete] = useState(false);
-  const handleOpenDelete = () => setOpenDelete(true);
-  const handleCloseDelete = () => setOpenDelete(false);
+ 
+  const [cancelTransfer,setCancelTransfer] = useState(false);
+  const handleOpenCancelTransfer = () => setCancelTransfer(true);
+  const handleCloseCancelTransfer = () =>setCancelTransfer(false);
+
 
   return (
     <div>
@@ -33,10 +35,12 @@ export default function ProductTransferAction({ editData, t, language }) {
         />
         
         <Tooltip title="Delete">
-          <IconButton className="delete-icon" onClick={handleOpenDelete}>
+          <IconButton className="delete-icon" onClick={handleOpenCancelTransfer}>
             <Trash size="18px" color="red" />
           </IconButton>
         </Tooltip>
+      
+        
      
       </Stack>
     </div>

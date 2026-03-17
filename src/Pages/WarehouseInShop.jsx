@@ -27,7 +27,7 @@ const getStatusStyle = (status) => {
       };
     case "accepted":
       return {
-        backgroundColor: "#E8F5E9",  
+        backgroundColor: "#E8F5E9",
         color: "#2E7D32",
         "& .MuiChip-icon": { color: "#2E7D32" },
         fontWeight: 500,
@@ -35,7 +35,7 @@ const getStatusStyle = (status) => {
       };
     case "rejected":
       return {
-        backgroundColor: "#FFEBEE",  
+        backgroundColor: "#FFEBEE",
         color: "#C62828",
         "& .MuiChip-icon": { color: "#C62828" },
         fontWeight: 500,
@@ -43,7 +43,7 @@ const getStatusStyle = (status) => {
       };
     case "partial_accepted":
       return {
-        backgroundColor: "#E3F2FD",  
+        backgroundColor: "#E3F2FD",
         color: "#1565C0",
         "& .MuiChip-icon": { color: "#1565C0" },
         fontWeight: 500,
@@ -51,7 +51,7 @@ const getStatusStyle = (status) => {
       };
     default:
       return {
-        backgroundColor: "#F5F5F5",  
+        backgroundColor: "#F5F5F5",
         color: "#616161",
         fontWeight: 500,
         borderRadius: "6px",
@@ -62,33 +62,36 @@ const getStatusStyle = (status) => {
 const WarehouseInShop = () => {
   const { language } = useAuth();
   const { t } = translateLauguage(language);
- 
-  const [productWarehouseKeyWord,setProductWarehouseKeyword] = useState("");
- 
+
+const [productWarehouseKeyword, setProductWarehouseKeyword] = useState("");
+
   const [tab, setTab] = useState("1");
   const handleTabChange = (e, newValue) => setTab(newValue);
 
   const savedStoreId = localStorage.getItem("activeShopId");
 
-  
+  const [status, setStatus] = useState("All");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
 
   const [transferPage, setTransferPage] = useState(1);
   const [transferLimit, setTransferLimit] = useState(5);
 
- 
+  const handleStatusChange = (event) => {
+    setStatus(event.target.value);
+  };
+
   const {
     producteWarehouseInShop,
     loading: productWarehouseLoading,
     paginator,
-    refetch:productWarehouseInShopRefetch
+    refetch: productWarehouseInShopRefetch
   } = useGetProductWarehouseInShopWithPagination({
     shopId: savedStoreId,
     page,
     limit,
     pagination: true,
-    keyword:productWarehouseKeyWord,
+    keyword: productWarehouseKeyword,
   });
 
   const {
@@ -104,9 +107,23 @@ const WarehouseInShop = () => {
     keyword: "",
   });
 
+  const filteredProducts = producteWarehouseInShop?.filter((item) => {
+    if (status === "All") return true;
+
+    if (status === "low_stock") {
+      return item.stock < item?.subProduct?.minStock;
+    }
+
+    if (status === "in_stock") {
+      return item.stock >= item?.subProduct?.minStock;
+    }
+
+    return true;
+  });
+
   return (
     <Box sx={{ width: "100%", p: 2 }}>
-  
+
       <Breadcrumbs separator="/">
         <Typography
           variant="h6"
@@ -119,7 +136,7 @@ const WarehouseInShop = () => {
           {t("warehouse_in_shop")}
         </Typography>
       </Breadcrumbs>
- 
+
       <TabContext value={tab}>
         <Box sx={{ borderBottom: 1, borderColor: "divider", mt: 4 }}>
           <TabList
@@ -140,179 +157,179 @@ const WarehouseInShop = () => {
             <Tab label={t("request_to_warehouse")} value="4" />
           </TabList>
         </Box>
-  
+
 
         <TabPanel value="1">
-       <Stack direction={"row"} justifyContent={"space-between"} mt={1}>
-        <Grid
-          container
-          spacing={5}
-          fullWidth
-          alignItems="center"
-          textAlign="start"
-          mb={2}
-        >
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Typography variant="body2" fontWeight={500} mb={0.5}>
-              {t("search")}
-            </Typography>
-            <TextField
-              type="search"
-              size="small"
-              placeholder={t("search") + "..."}
-              value={productWarehouseKeyWord}
-              onChange={(e) => setProductWarehouseKeyword(e.target.value)}
+          <Stack direction={"row"} justifyContent={"space-between"} mt={1}>
+            <Grid
+              container
+              spacing={5}
               fullWidth
-              variant="outlined"
-              sx={{
-                width: "250px",
-
-                "& .MuiOutlinedInput-root": {
-                  // "& fieldset": { border: "none" },
-                },
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Typography className="search-head-title">{t("status")}</Typography>
-            <TextField
-              className="select-text-field"
-              select
-              fullWidth
-              placeholder="Select"
-              size="small"
-              // value={role}
-              sx={{
-                width: "200px",
-                
-              }}
-              // onChange={handleRoleChange}
+              alignItems="center"
+              textAlign="start"
+              mb={2}
             >
-              <MenuItem value="All">
-                {t("all")}
-              </MenuItem>
-              <MenuItem value="low_stock">
-                {t("low_stock")}
-              </MenuItem>
-              <MenuItem value="in_stock">
-                {t("in_enough")}
-              </MenuItem>
-         
-            </TextField>
-          </Grid>
-        </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Typography variant="body2" fontWeight={500} mb={0.5}>
+                  {t("search")}
+                </Typography>
+                <TextField
+                  type="search"
+                  size="small"
+                  placeholder={t("search") + "..."}
+                    value={productWarehouseKeyword}
+  onChange={(e) => setProductWarehouseKeyword(e.target.value)}
+                  fullWidth
+                  variant="outlined"
+                  sx={{
+                    width: "250px",
 
-        <Stack direction="row" spacing={2} mt={3}>
-       
-         
-        </Stack>
-      </Stack>
-
-            <TableContainer className="table-container">
-              <Table className="table">
-                <TableHead >
-                  <TableRow>
-                    <TableCell>{t("no")}</TableCell>
-                    <TableCell>{t("product")}</TableCell>
-                    <TableCell>{t("unit")}</TableCell>
-                    <TableCell>{t("current_stock")}</TableCell>
-                    <TableCell>{t("min_stock")}</TableCell>
-                    <TableCell>{t("status")}</TableCell>
-                  </TableRow>
-                </TableHead>
-
-                {productWarehouseLoading ? (
-                  <CircularIndeterminate />
-                ) : producteWarehouseInShop?.length === 0 ? (
-                  <EmptyData />
-                ) : (
-                  <TableBody>
-                    {producteWarehouseInShop.map((row, index) => (
-                      <TableRow className="table-row" key={row._id}>
-                        <TableCell>{paginator.slNo + index}</TableCell>
-                        <TableCell>
-                          <Stack direction="row" spacing={1} alignItems="center">
-                            <img
-                              src={row?.subProduct?.productImg}
-                              width={36}
-                              height={36}
-                              style={{ borderRadius: "50%" }}
-                            />
-                            {language === "kh"
-                              ? row?.subProduct?.parentProductId?.nameKh
-                              : row?.subProduct?.parentProductId?.nameEn}
-                          </Stack>
-                        </TableCell>
-                        <TableCell>
-                          {language === "kh"
-                            ? row?.subProduct?.unitId?.nameKh
-                            : row?.subProduct?.unitId?.nameEn}
-                        </TableCell>
-                        <TableCell>{row?.stock}</TableCell>
-                        <TableCell>{row?.subProduct?.minStock}</TableCell>
-                        <TableCell>
-                          {row?.stock < row?.subProduct?.minStock ? (
-                            <Chip
-                              icon={<WarningAmberOutlinedIcon />}
-                              label={t("low_stock")}
-                              color="error"
-                              size="small"
-                            />
-                          ) : (
-                            <Chip
-                              icon={<CheckOutlinedIcon />}
-                              label={t("in_stock")}
-                              size="small"
-                              sx={{
-                                backgroundColor: "#E8F5E9",
-                                color: "#2E7D32",
-                                fontWeight: 500,
-                                borderRadius: "6px",
-                                "& .MuiChip-icon": {
-                                  color: "#2E7D32",
-                                },
-                                "&:hover": {
-                                  backgroundColor: "#C8E6C9",
-                                },
-                              }}
-                            />
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                )}
-              </Table>
-
-              <Stack alignItems="flex-end" p={2}>
-                <FooterPagination
-                  page={page}
-                  limit={limit}
-                  setPage={setPage}
-                  handleLimit={(e) => setLimit(+e.target.value)}
-                  totalDocs={paginator?.totalDocs}
-                  totalPages={paginator?.totalPages}
+                    "& .MuiOutlinedInput-root": {
+                      // "& fieldset": { border: "none" },
+                    },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
-              </Stack>
-            </TableContainer>
-   
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Typography className="search-head-title">{t("status")}</Typography>
+                <TextField
+                  className="select-text-field"
+                  select
+                  fullWidth
+                  placeholder="Select"
+                  size="small"
+                  value={status}
+                  sx={{
+                    width: "200px",
+
+                  }}
+                  onChange={handleStatusChange}
+                >
+                  <MenuItem value="All">
+                    {t("all")}
+                  </MenuItem>
+                  <MenuItem value="low_stock">
+                    {t("low_stock")}
+                  </MenuItem>
+                  <MenuItem value="in_stock">
+                    {t("in_enough")}
+                  </MenuItem>
+
+                </TextField>
+              </Grid>
+            </Grid>
+
+            <Stack direction="row" spacing={2} mt={3}>
+
+
+            </Stack>
+          </Stack>
+
+          <TableContainer className="table-container">
+            <Table className="table">
+              <TableHead >
+                <TableRow>
+                  <TableCell>{t("no")}</TableCell>
+                  <TableCell>{t("product")}</TableCell>
+                  <TableCell>{t("unit")}</TableCell>
+                  <TableCell>{t("current_stock")}</TableCell>
+                  <TableCell>{t("min_stock")}</TableCell>
+                  <TableCell>{t("status")}</TableCell>
+                </TableRow>
+              </TableHead>
+
+              {productWarehouseLoading ? (
+                <CircularIndeterminate />
+              ) : producteWarehouseInShop?.length === 0 ? (
+                <EmptyData />
+              ) : (
+                <TableBody>
+                  {filteredProducts.map((row, index) => (
+                    <TableRow className="table-row" key={row._id}>
+                      <TableCell>{paginator.slNo + index}</TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <img
+                            src={row?.subProduct?.productImg}
+                            width={36}
+                            height={36}
+                            style={{ borderRadius: "50%" }}
+                          />
+                          {language === "kh"
+                            ? row?.subProduct?.parentProductId?.nameKh
+                            : row?.subProduct?.parentProductId?.nameEn}
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        {language === "kh"
+                          ? row?.subProduct?.unitId?.nameKh
+                          : row?.subProduct?.unitId?.nameEn}
+                      </TableCell>
+                      <TableCell>{row?.stock}</TableCell>
+                      <TableCell>{row?.subProduct?.minStock}</TableCell>
+                      <TableCell>
+                        {row?.stock < row?.subProduct?.minStock ? (
+                          <Chip
+                            icon={<WarningAmberOutlinedIcon />}
+                            label={t("low_stock")}
+                            color="error"
+                            size="small"
+                          />
+                        ) : (
+                          <Chip
+                            icon={<CheckOutlinedIcon />}
+                            label={t("in_stock")}
+                            size="small"
+                            sx={{
+                              backgroundColor: "#E8F5E9",
+                              color: "#2E7D32",
+                              fontWeight: 500,
+                              borderRadius: "6px",
+                              "& .MuiChip-icon": {
+                                color: "#2E7D32",
+                              },
+                              "&:hover": {
+                                backgroundColor: "#C8E6C9",
+                              },
+                            }}
+                          />
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              )}
+            </Table>
+
+            <Stack alignItems="flex-end" p={2}>
+              <FooterPagination
+                page={page}
+                limit={limit}
+                setPage={setPage}
+                handleLimit={(e) => setLimit(+e.target.value)}
+                totalDocs={paginator?.totalDocs}
+                totalPages={paginator?.totalPages}
+              />
+            </Stack>
+          </TableContainer>
+
 
         </TabPanel>
 
-        
+
         <TabPanel value="2">
           <Typography>Orders Content</Typography>
         </TabPanel>
 
-        
+
         <TabPanel value="3">
           <TableContainer className="table-container">
             <Table className="table">
@@ -389,7 +406,7 @@ const WarehouseInShop = () => {
           </TableContainer>
         </TabPanel>
 
-   
+
         <TabPanel value="4">
           <Typography>Request to warehouse</Typography>
         </TabPanel>

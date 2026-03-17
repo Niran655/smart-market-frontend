@@ -89,7 +89,7 @@ export default function AddUser({
   });
 
   const existingUsers = shopData?.getShopByShopId?.user || [];
-  console.log("exitting user",existingUsers)
+ 
   const existingUserIds = existingUsers.map((user) => user._id || user.id);
 
   const handleChange = (event) => {
@@ -128,7 +128,7 @@ export default function AddUser({
   };
 
   const handleDeleteUser = (userIdToDelete) => {
-    console.log("userIdToDelete", userIdToDelete);
+    
     if (!shopId || !userIdToDelete) {
       setAlert(true, "error", "Missing shop or user ID");
       return;

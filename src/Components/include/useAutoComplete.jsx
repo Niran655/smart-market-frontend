@@ -2,20 +2,21 @@ import { useQuery } from "@apollo/client/react";
 import { Autocomplete, TextField, Typography } from "@mui/material";
 import { useFormikContext } from "formik";
 
- 
+import { translateLauguage } from "../../function/translate";
+import { useAuth } from "../../context/AuthContext";
+
 export default function UseAutocomplete({
   name,
   label,
   placeholder,
   query,
-  dataKey,          
-  valueKey = "_id", 
+  dataKey,
+  valueKey = "_id",
   getOptionLabel,
 }) {
-
   const { values, errors, touched, setFieldValue } = useFormikContext();
-
   const { data, loading } = useQuery(query);
+  const { language } = useAuth();
 
   const options = data?.[dataKey] || [];
 
@@ -29,7 +30,12 @@ export default function UseAutocomplete({
         options={options}
         loading={loading}
         value={selectedValue}
-        getOptionLabel={getOptionLabel}
+        getOptionLabel={(item) => {
+          if (!item) return "";
+          return language === "en"
+            ? item?.nameEn || item?.nameKh || ""
+            : item?.nameKh || item?.nameEn || "";
+        }}
         isOptionEqualToValue={(option, value) =>
           option[valueKey] === value[valueKey]
         }

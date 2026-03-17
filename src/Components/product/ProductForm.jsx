@@ -36,8 +36,9 @@ export default function ProductForm({
   dialogTitle,
   productData,
   setRefetch,
+  language
 }) {
-  console.log("productData", productData);
+ 
   const [loading, setLoading] = React.useState(false);
   const { setAlert } = useAuth();
   const { data: CategoryData } = useQuery(GET_CATEGORY);
@@ -46,7 +47,7 @@ export default function ProductForm({
 
   const [createProduct] = useMutation(CREATE_PRODUCT, {
     onCompleted: ({ createProduct }) => {
-      console.log("createProduct", createProduct);
+     
       if (createProduct?.isSuccess) {
         setLoading(false);
         setRefetch();
@@ -305,8 +306,8 @@ export default function ProductForm({
               {loading
                 ? `${t(`processing...`)}`
                 : dialogTitle === "Create"
-                ? `${t(`create`)}`
-                : `${t(`update`)}`}
+                  ? `${t(`create`)}`
+                  : `${t(`update`)}`}
             </Button>
           </DialogActions>
         </Form>

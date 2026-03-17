@@ -35,7 +35,7 @@ export default function UnitForm({
   unitData,
   setRefetch,
 }) {
-  console.log("Dialogtitle", dialogTitle);
+   
   const [loading, setLoading] = React.useState(false);
   const { setAlert } = useAuth();
   const [userObject, setUserObject] = useState(null);

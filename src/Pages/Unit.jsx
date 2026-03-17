@@ -31,6 +31,7 @@ const Unit = () => {
       pagination: true,
       keyword,
     },
+    
   });
   const unitDatas = data?.getUnitWithPagination?.data || [];
   const paginator = data?.getUnitWithPagination?.paginator;
@@ -64,16 +65,16 @@ const Unit = () => {
               {t("setting")}
             </Typography>
 
-            <Typography variant="h6"        sx={{
-                textDecoration: "none",
-                fontWeight: 600,
-              }} color="text.primary">
+            <Typography variant="h6" sx={{
+              textDecoration: "none",
+              fontWeight: 600,
+            }} color="text.primary">
               {t("unit")}
             </Typography>
           </Breadcrumbs>
         </Box>
       </Stack>
-      <Box sx={{display:"flex",justifyContent:"space-between",alignItems:"center"}} mt={5}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }} mt={5}>
         <Grid container spacing={2} alignItems="center" textAlign={"start"}>
           <Grid size={{ xs: 12 }}>
             <Typography variant="body2" fontWeight={500} mb={0.5}>
@@ -84,10 +85,10 @@ const Unit = () => {
               size="small"
               placeholder={t("search") + "..."}
               value={keyword}
-              onChange={(e)=>setKeyword(e.target.value)}
+              onChange={(e) => setKeyword(e.target.value)}
               fullWidth
               variant="outlined"
-               
+
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -118,7 +119,7 @@ const Unit = () => {
           />
         )}
       </Box>
-      <TableContainer className="table-container"  sx={{ mt: 2 }}>
+      <TableContainer className="table-container" sx={{ mt: 2 }}>
         <Table className="table">
           <TableHead  >
             <TableRow>
@@ -146,14 +147,18 @@ const Unit = () => {
                   <TableCell>
                     <UpdateUnitStatus editData={unit} refetch={refetch} />
                   </TableCell>
-                  <TableCell className="flex-end">
-                    <UnitAction
-                      t={t}
-                      unitId={unit?._id}
-                      unitName={unit?.nameEn}
-                      setRefetch={refetch}
-                      unitData={unit}
-                    />
+                  <TableCell >
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                      <UnitAction
+                        t={t}
+                        unitId={unit?._id}
+                        unitName={unit?.nameEn}
+                        setRefetch={refetch}
+                        unitData={unit}
+                      />
+
+                    </Stack>
+
                   </TableCell>
                 </TableRow>
               ))}

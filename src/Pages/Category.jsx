@@ -146,14 +146,18 @@ const Category = () => {
                   <TableCell>
                     <UpdateCategoryStatus editData={category} refetch={refetch} />
                   </TableCell>
-                  <TableCell className="flex-end">
-                    <CategoryAction
+                  <TableCell   >
+                               <Stack direction="row" spacing={1} justifyContent="flex-end">
+ <CategoryAction
                       t={t}
                       categoryId={category?._id}
                       categoryName={category?.nameEn}
                       setRefetch={refetch}
                       categoryData={category}
                     />
+
+                               </Stack>
+                   
                   </TableCell>
                 </TableRow>
               ))}

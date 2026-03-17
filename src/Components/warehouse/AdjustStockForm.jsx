@@ -34,7 +34,7 @@ export default function AdjustStockForm({
   subProductId,
   unit
 }) {
-  console.log("subProductId",subProductId)
+ 
   const [loading, setLoading] = React.useState(false);
   const { setAlert } = useAuth();
   const  {language} = useAuth()

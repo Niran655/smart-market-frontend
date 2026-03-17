@@ -1,9 +1,9 @@
 import React from "react";
 import { Box, Typography, Button, Container } from "@mui/material";
- 
 
-const ErrorPage = ({ error, refetch,t }) => {
- 
+
+const ErrorPage = ({ error, refetch, t }) => {
+
 
   return (
     <Container maxWidth="sm">
@@ -19,18 +19,34 @@ const ErrorPage = ({ error, refetch,t }) => {
         }}
       >
         <Typography variant="h5" color="error" gutterBottom>
-          {t("error_loading") || "Error loading dashboard"}
+          {t("error_loading")}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          {error?.message || t("unknown_error")}
+          {(() => {
+            try {
+              const parsed = JSON.parse(
+                error?.message?.substring(error.message.indexOf("{"))
+              );
+              return parsed?.message?.messageKh || t("unknown_error");
+            } catch {
+              return t("unknown_error");
+            }
+          })()}
         </Typography>
         <Button
-          onClick={refetch}
+          onClick={() =>
+            refetch({
+              shopId: savedStoreId,
+              filter: type === "custom" ? "customRange" : type,
+              dayStart: type === "custom" && start ? start.format("YYYY-MM-DD") : null,
+              dayEnd: type === "custom" && end ? end.format("YYYY-MM-DD") : null,
+            })
+          }
           variant="outlined"
           color="error"
           sx={{ mt: 3 }}
         >
-          {t("retry") || "Retry"}
+          {t("retry")}
         </Button>
       </Box>
     </Container>

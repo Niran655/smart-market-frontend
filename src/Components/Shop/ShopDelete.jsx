@@ -15,7 +15,7 @@ export default function ShopDelete({
   setRefetch,
   t, 
 }) {
-  console.log("shopName",shopName)
+ 
   const [confirmationText, setConfirmationText] = useState("");
   const { setAlert } = useAuth();
   const [loading, setLoading] = useState(false);

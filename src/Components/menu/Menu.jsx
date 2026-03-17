@@ -9,6 +9,7 @@ import {
   IconButton,
   Fade,
   Backdrop,
+  Paper,
 } from "@mui/material";
 
 import { Link as RouterLink } from "react-router-dom";
@@ -42,42 +43,42 @@ export default function MenuModal({ open, onClose }) {
     {
       title: t("exit_the_shop"),
       description: "Back to shop selection",
-      icon: <CornerUpLeft size={32} />,
+      icon: <CornerUpLeft size={32} color="#FF4C61" />,
       to: "/store",
       onClick: handleLogout,
-      bgColor: "#FF4C61",
+      // bgColor: "#FF4C61",
       textColor: "#fff",
     },
     {
       title: t("pos"),
       description: "Open POS system",
-      icon: <ShoppingCart size={32} />,
+      icon: <ShoppingCart size={32} color="#00C896" />,
       to: `/store/pos/${id}`,
-      bgColor: "#00C896",
+      // bgColor: "#00C896",
       textColor: "#fff",
     },
     {
       title: t("warehouse"),
       description: "Manage inventory",
-      icon: <Warehouse size={32} />,
+      icon: <Warehouse size={32} color="#FFC107"/>,
       to: `/store/pos/${id}/warehouse-in-shop`,
-      bgColor: "#FFC107",
+      // bgColor: "#FFC107",
       textColor: "#ffffff",
     },
     {
       title: t("report"),
       description: "View reports",
-      icon: <ScrollText size={32} />,
+      icon: <ScrollText size={32} color="#03A9F4" />,
       to: `/store/pos/${id}/report`,
-      bgColor: "#03A9F4",
+      // bgColor: "#03A9F4",
       textColor: "#fff",
     },
     {
       title: t("staff"),
       description: "Manage staff",
-      icon: <Users size={32} />,
+      icon: <Users size={32} color="#3F51B5" />,
       to: `/store/pos/${id}/staff`,
-      bgColor: "#3F51B5",
+      // bgColor: "#3F51B5",
       textColor: "#fff",
     },
   ];
@@ -112,7 +113,8 @@ export default function MenuModal({ open, onClose }) {
         <Grid container spacing={3} mt={1}>
           {menuItems.map((item, index) => (
             <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
-              <Button
+              <Paper>
+                    <Button
                 component={RouterLink}
                 to={item.to}
                 onClick={item.onClick || onClose}
@@ -144,6 +146,8 @@ export default function MenuModal({ open, onClose }) {
                   </Typography>
                 </Box>
               </Button>
+              </Paper>
+          
             </Grid>
           ))}
         </Grid>

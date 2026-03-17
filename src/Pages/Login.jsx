@@ -120,7 +120,7 @@ export default function Login() {
               textAlign: "center",
             }}
           >
-            © {new Date().getFullYear()} Niran. All rights reserved.
+            © {new Date().getFullYear()} LIKA. All rights reserved.
           </Typography>
         </Stack>
       </Paper>

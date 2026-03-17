@@ -152,6 +152,7 @@ query GetAllShops($id: ID!) {
       name
       url
     }
+ 
     user {
       nameEn
       nameKh
@@ -315,6 +316,7 @@ query GetProductWareHouseWithPagination($page: Int, $limit: Int, $pagination: Bo
       subProduct {
         _id
         qty
+        costPrice
         unitId {
           nameEn
           nameKh
@@ -359,7 +361,10 @@ query GetProductWareHouseInShopoWithPagination($shopId: ID, $page: Int, $limit: 
       priceImg
       productDes
       productImg
-        
+      parentProductId {
+          nameKh
+          nameEn
+        }
       qty
       salePrice
       saleType
@@ -774,3 +779,81 @@ query GetPurchaseOrdersWithPagination($supplierId: ID, $status: PurchaseOrderSta
     }
   }
 }`
+
+
+
+export const GET_SHIFT_SESSIONS = gql`
+query GetShiftSessions($shopId: ID) {
+  getShiftSessions(shopId: $shopId) {
+    _id
+    user {
+      _id
+      email
+      nameEn
+      nameKh
+    }
+    shop {
+      nameEn
+      nameKh
+      _id
+    }
+    shiftName
+    startTime
+    endTime
+    openingCash
+    closingCash
+    totalSales
+    totalOrders
+    status
+    createdAt
+    closedAt
+  }
+}
+`
+export const GET_CURRENT_SHIFT = gql`
+query GetCurrentShift($userId: ID) {
+  getCurrentShift(userId: $userId) {
+    _id
+    user {
+      _id
+      image
+      nameEn
+      nameKh
+      email
+      gender
+      phone
+      password
+      active
+      role
+      createdAt
+      updatedAt
+    }
+    
+    shiftName
+    startTime
+    endTime
+    openingCash
+    closingCash
+    totalSales
+    totalOrders
+    status
+    createdAt
+    closedAt
+  }
+}
+`
+
+export const GET_OPEN_SHIFT = gql`
+query GetOpenShift($shopId: ID!, $userId: ID) {
+  getOpenShift(shopId: $shopId, userId: $userId) {
+    status
+    startTime
+    openingCash
+    user {
+      _id
+      nameEn
+      nameKh
+    }
+  }
+}
+`

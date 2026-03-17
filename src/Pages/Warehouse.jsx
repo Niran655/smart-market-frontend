@@ -543,18 +543,18 @@ const Warehouse = () => {
   });
 
   const {
-      purchaseOrders,
-      loading: purchaseOrderLoading,
-      refetch: purchaseOrderRefetch,
-      paginator: purchaseOrderPaginator,
-  }=useGetPurchaseOrdersWithPagination({
+    purchaseOrders,
+    loading: purchaseOrderLoading,
+    refetch: purchaseOrderRefetch,
+    paginator: purchaseOrderPaginator,
+  } = useGetPurchaseOrdersWithPagination({
     page: purchaseOrderPage,
     limit: purchaseOrderLimit,
     pagination: true,
     keyword: purchaseOrderKeyword,
   });
 
- 
+
 
   const handleLimit = (e) => {
     const newLimit = parseInt(e.target.value, 10);
@@ -591,7 +591,7 @@ const Warehouse = () => {
 
   return (
     <Box>
- 
+
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Box textAlign="start">
           <Breadcrumbs aria-label="breadcrumb" separator="/">
@@ -610,16 +610,16 @@ const Warehouse = () => {
         </Box>
       </Stack>
 
-      
+
       <Grid container spacing={2} sx={{ mt: 2 }}>
-      
-        <Grid   size={{xs:12,sm:3,md:2}}>
+
+        <Grid size={{ xs: 12, sm: 3, md: 2 }}>
           <Paper
             elevation={0}
             sx={{
               p: 2,
               // backgroundColor: "#f5f5f5",
-              height:"70vh",
+              height: "70vh",
               borderRadius: 1,
               // height: "100%",
             }}
@@ -669,13 +669,13 @@ const Warehouse = () => {
           </Paper>
         </Grid>
 
- 
-        <Grid   size={{xs:12,sm:9,md:10}}>
+
+        <Grid size={{ xs: 12, sm: 9, md: 10 }}>
           <Box>
             {activeTab === "1" && (
               <Box>
                 <TableContainer className="table-container">
-                  <Table className="table" sx={{ mt: 3 }}>
+                  <Table className="table"  >
                     <TableHead  >
                       <TableRow>
                         <TableCell>{t("no")}</TableCell>
@@ -684,7 +684,7 @@ const Warehouse = () => {
                         <TableCell>{t("stock")}</TableCell>
                         <TableCell>{t("min_stock")}</TableCell>
                         <TableCell >{t("status")}</TableCell>
-                         <TableCell className="flex-center">{t("action")}</TableCell>
+                        <TableCell className="flex-center">{t("action")}</TableCell>
                       </TableRow>
                     </TableHead>
                     {productWarehouseLoading ? (
@@ -798,7 +798,7 @@ const Warehouse = () => {
                     alignItems: "center",
                     flexWrap: "wrap",
                     gap: 2,
-                    mb : 2,
+                    mb: 2,
                   }}
                 >
                   <Grid
@@ -896,7 +896,7 @@ const Warehouse = () => {
                               <TableCell>
                                 {dayjs(row.createdAt).format("DD/MM/YYYY")}
                               </TableCell>
-                              <TableCell className="flex-end" >
+                              <TableCell className="flex-end">
                                 <ProductTransferAction
                                   language={language}
                                   editData={row}
@@ -928,7 +928,7 @@ const Warehouse = () => {
               </Box>
             )}
             {activeTab === "2" &&
-                    <Box>
+              <Box>
                 <Box
                   sx={{
                     display: "flex",
@@ -936,7 +936,7 @@ const Warehouse = () => {
                     alignItems: "center",
                     flexWrap: "wrap",
                     gap: 2,
-                    mb : 2,
+                    mb: 2,
                   }}
                 >
                   <Grid
@@ -1035,7 +1035,7 @@ const Warehouse = () => {
                                 {dayjs(row.createdAt).format("DD/MM/YYYY")}
                               </TableCell>
                               <TableCell className="flex-end" >
-                                <PurchaseOrderAction language={language} setRefetch={purchaseOrderRefetch} purchaseOrder={row} t={t}/>
+                                <PurchaseOrderAction language={language} setRefetch={purchaseOrderRefetch} purchaseOrder={row} t={t} />
                               </TableCell>
                             </TableRow>
                           );
@@ -1059,7 +1059,7 @@ const Warehouse = () => {
                     />
                   </Stack>
                 </TableContainer>
-              </Box> 
+              </Box>
             }
             {activeTab === "3" && <Typography> Reports Content</Typography>}
             {activeTab === "4" && <Typography> 4</Typography>}

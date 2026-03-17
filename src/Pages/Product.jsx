@@ -52,9 +52,9 @@ const Product = () => {
     variables: { parentProductId: selectedParentId },
   });
 
-  
+
   const subProductData = subData?.getSubProducts || [];
- 
+
   const paginator = data?.getProductsWithPagination?.paginator || {};
   const handleExpand = (id) => {
     if (expandedRow === id) {
@@ -79,7 +79,7 @@ const Product = () => {
 
   return (
     <Box>
- 
+
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Box textAlign="start">
           <Breadcrumbs aria-label="breadcrumb" separator="/">
@@ -104,7 +104,7 @@ const Product = () => {
         </Box>
       </Stack>
 
-   
+
       <Box
         sx={{
           display: "flex",
@@ -127,7 +127,7 @@ const Product = () => {
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               variant="outlined"
-       
+
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -160,7 +160,7 @@ const Product = () => {
         </Stack>
       </Box>
 
- 
+
       <TableContainer className="table-container" sx={{ mt: 2 }} >
         <Table className="table">
           <TableHead  >
@@ -177,12 +177,12 @@ const Product = () => {
           {loading ? (
             <CircularIndeterminate />
           ) : data?.getProductsWithPagination?.data?.length === 0 ? (
-            <EmptyData/>
+            <EmptyData />
           ) : (
             <TableBody>
               {data?.getProductsWithPagination?.data?.map((row, index) => (
                 <>
-  
+
                   <TableRow key={row._id} className="table-row">
                     <TableCell>{paginator.slNo + index}</TableCell>
 
@@ -215,23 +215,22 @@ const Product = () => {
 
                     <TableCell>{row?.remark}</TableCell>
 
-                    <TableCell className="flex-end">
-                      <Stack direction="row" spacing={1}>
+                    <TableCell>
+                      <Stack direction="row" spacing={1} justifyContent="flex-end">
                         <ProductAction
                           t={t}
                           productData={row}
                           productId={row._id}
                           productName={row?.nameEn}
                           setRefetch={refetch}
+                          language={language}
                         />
 
                         <IconButton onClick={() => handleExpand(row._id)}>
                           <ExpandMoreIcon
                             sx={{
                               transform:
-                                expandedRow === row._id
-                                  ? "rotate(180deg)"
-                                  : "rotate(0deg)",
+                                expandedRow === row._id ? "rotate(180deg)" : "rotate(0deg)",
                               transition: "0.3s",
                               color: "#36BBA7",
                             }}
@@ -266,10 +265,13 @@ const Product = () => {
                                   <TableCell>{t("service")}</TableCell>
                                   <TableCell>{t("total_price")}</TableCell>
                                   <TableCell>{t("minimun_unit")}</TableCell>
-                                  <TableCell className="flex-end">
-                                    <IconButton onClick={handleOpenSub}>
-                                      <CopyPlus color="#36BBA7" size={20} />
-                                    </IconButton>
+                                  <TableCell  >
+                                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                                      <IconButton onClick={handleOpenSub}>
+                                        <CopyPlus color="#36BBA7" size={20} />
+                                      </IconButton>
+                                    </Stack>
+
 
                                     {openSub && (
                                       <SubProductForm

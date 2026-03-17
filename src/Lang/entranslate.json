@@ -239,5 +239,15 @@
   "total_qty":"Total Quantity",
   "ordered":"Ordered",
   "remaining":"Remaining",
-  "confirm_receive":"Confirm Receive"
+  "confirm_receive":"Confirm Receive",
+  "shift_sessions":"Shift Sessions",
+  "error_loading":"Error loading dashboard",
+  "retry":"Retry",
+
+  "shift_name":"Shift Name",
+  "start_time":"Start Time",
+  "end_time":"End Time",
+ 
+  "reject_transfer":"Reject Transfer",
+  "save":"Save"
 }

@@ -3,12 +3,13 @@ import { Box, Breadcrumbs, Grid, Paper, Stack, Typography } from "@mui/material"
 
 import Product from "../assets/Image/best-product.png";
 import Category from "../assets/Image/category.png";
+import Supplier from "../assets/Image/supplier.png";
 import Unit from "../assets/Image/unit.png";
 import User from "../assets/Image/man.png";
 import { useAuth } from "../context/AuthContext";
 import "../Styles/setting.scss";
 import { translateLauguage } from "../function/translate";
-import Customer from "./Customer";
+ 
  
 
 export default function Settings() {
@@ -127,7 +128,7 @@ export default function Settings() {
             sx={{ cursor: "pointer", textDecoration: "none" }}
           >
             <Box>
-              <img src={Product} className="image" alt="Product" />
+              <img src={Supplier} className="image" alt="Supplier" />
             </Box>
             <Stack textAlign="start"  spacing={1}>
               <Typography className="text-title" variant="h5">
@@ -139,26 +140,7 @@ export default function Settings() {
             </Stack>
           </Paper>
         </Grid>
-         <Grid size={{ xs: 12, md: 3 }}>
-          <Paper
-            className="setting-box"
-            component={RouterLink}
-            to="/setting/customer"
-            sx={{ cursor: "pointer", textDecoration: "none" }}
-          >
-            <Box>
-              <img src={Product} className="image" alt="Product" />
-            </Box>
-            <Stack textAlign="start"  spacing={1}>
-              <Typography className="text-title" variant="h5">
-                {t(`customers`)}
-              </Typography>
-              <Typography className="text-body">
-                {t(`create_update_delete`)} {t(`customers`)}
-              </Typography>
-            </Stack>
-          </Paper>
-        </Grid>
+         
       </Grid>
     </Box>
   );

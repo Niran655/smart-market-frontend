@@ -9,7 +9,7 @@ const useGetProductWarehouseInShopWithPagination = ({
     page = 1,
     limit = 10,
     pagination = true,
-    keyword = "",
+    keyword,
 })=>{
     const [producteWarehouseInShop,setProductWarehouseInShop] = useState([]);
     const [paginator, setPaginator] = useState(true);

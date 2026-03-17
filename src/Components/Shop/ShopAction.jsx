@@ -6,8 +6,11 @@ import React, { useState } from "react";
 import ShopDelete from "./ShopDelete";
 import ShopForm from "./ShopForm";
 import AddUser from "./AddUser";
+import { useNavigate } from "react-router-dom";
 
 const ShopAction = ({ t, shopData, setRefetch,shopName,shopId,userId }) => {
+ 
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -39,7 +42,7 @@ const ShopAction = ({ t, shopData, setRefetch,shopName,shopId,userId }) => {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem>
+        <MenuItem onClick={() => navigate(`/store-setting/${shopId}`)}>
           <Stack direction="row" spacing={2} alignItems="center">
             <Settings size={16} />
             <span>{t("setting")}</span>

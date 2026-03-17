@@ -435,3 +435,39 @@ mutation ReceivePurchaseOrder($purchaseOrderId: ID, $items: [AcceptPurchaseOrder
     }
   }
 }`
+
+export const CREATE_SHIFT_SESSION = gql`
+mutation CreateShiftSession($input: ShiftSessionInput) {
+  createShiftSession(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const UPDATE_SHIFT_SEESION = gql`
+mutation UpdateShiftSession($id: ID!, $input: ShiftSessionInput) {
+  updateShiftSession(_id: $id, input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const DELETE_SHIFT_SESSION = gql`
+mutation DeleteShiftSession($id: ID!) {
+  deleteShiftSession(_id: $id) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`

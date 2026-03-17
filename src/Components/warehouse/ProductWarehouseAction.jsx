@@ -33,11 +33,7 @@ export default function ProductWarehouseAction({
           </IconButton>
         </Tooltip>
 
-        <Tooltip title={t(`transfer`)}>
-          <IconButton className="shuffle-icon" onClick={handleOpenDelete}>
-            <Shuffle size="18px" color="orange" />
-          </IconButton>
-        </Tooltip>
+     
         {open && (
           <AdjustStockForm
             open={open}

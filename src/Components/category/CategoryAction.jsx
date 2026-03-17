@@ -1,4 +1,4 @@
-import { IconButton, Stack } from "@mui/material";
+import { IconButton, Stack,Box } from "@mui/material";
 import { SquarePen, Trash } from "lucide-react";
 import React, { useState } from "react";
 
@@ -21,7 +21,7 @@ export default function CategoryAction({
   const handleCloseDelete = () => setOpenDelete(false);
 
   return (
-    <div>
+    <Box>
       <Stack direction="row" spacing={2}>
         <IconButton className="edit-icon" onClick={handleOpen}>
           <SquarePen  size="18px" color="#36BBA7" />
@@ -47,6 +47,6 @@ export default function CategoryAction({
         categoryId={categoryId}
         categoryName={categoryName}
       />
-    </div>
+    </Box>
   );
 }

@@ -12,6 +12,7 @@ import {
   IconButton,
   Button,
   Tooltip,
+  Paper,
 } from "@mui/material";
 import { Trash2 } from "lucide-react";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -164,7 +165,7 @@ const CartPanel = ({
 
         <Box className="cart-items-container">
           {cart.map((item, idx) => (
-            <Box key={idx} className="cart-item">
+            <Paper key={idx} className="cart-item">
               <img
                 src={item.img || "/placeholder-food.jpg"}
                 className="cart-item-image"
@@ -211,7 +212,7 @@ const CartPanel = ({
                   <Trash2 size={16} />
                 </IconButton>
               </Box>
-            </Box>
+            </Paper>
           ))}
           {cart.length === 0 && (
             <Typography className="empty-cart-message">{t(`cart_empty`)}</Typography>

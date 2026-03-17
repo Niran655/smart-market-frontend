@@ -18,15 +18,12 @@ import User from './Pages/User';
 import Pos from './Pages/Pos';
 import Supplier from './Pages/Supplier';
 import Profile from './Pages/Profile';
+import StoreSetting from './Pages/StoreSetting';
  
 export default function Router() {
   const { isAuthenticated } = useAuth();
 
-    const [user, setUser] = useState(() => {
-      const saved = localStorage.getItem("user");
-      return saved ? JSON.parse(saved) : null;
-    });
-    const userId = user?._id || ""
+ 
 
 
   const LoginPage = useRoutes([
@@ -50,6 +47,7 @@ export default function Router() {
         { path: 'profile', element:<Profile/>},
         { path: "setting/user/:userId/profile", element: <Profile /> },
         { path: '/setting/user', element: <User/> },
+        { path: '/store-setting/:shopId', element: <StoreSetting/>},
         { path: '/setting/category', element: <Category/> },
         { path: '/setting/product', element: <Product/>},
         { path: '/store/pos/:shopId', element: <Pos/>},

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 
 import SubProductDelete from "./SubProductDelete";
 import SubProductForm from "./SubProductForm";
+import SubProductBarcode from "./SubProductBarcode";
 
 export default function SubProductAction({
   subProductData,
@@ -13,7 +14,7 @@ export default function SubProductAction({
   supProductName,
   parentProductId,
   unit
-  
+
 }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -23,10 +24,13 @@ export default function SubProductAction({
   const handleOpenDelete = () => setOpenDelete(true);
   const handleCloseDelete = () => setOpenDelete(false);
 
+  const [openBarcode, setOpenBarcode] = useState(false);
+  const handleOpenBarcode = () => setOpenBarcode(true);
+  const handleCloseBarcode = () => setOpenBarcode(false);
   return (
     <div>
       <Stack direction="row" justifyContent={"flex-end"} spacing={1}>
-        <IconButton sx={{ backgroundColor: "#E0F7FA", color: "#21BCFF" }}>
+        <IconButton onClick={handleOpenBarcode} sx={{ backgroundColor: "#E0F7FA", color: "#21BCFF" }}>
           <QrCode size="18px" />
         </IconButton>
         <IconButton sx={{ backgroundColor: "#FFF3E0", color: "orange" }}>
@@ -66,6 +70,13 @@ export default function SubProductAction({
         onClose={handleCloseDelete}
         subProductId={subProductId}
         supProductName={supProductName}
+      />
+
+      <SubProductBarcode
+        open={openBarcode}
+        onClose={handleCloseBarcode}
+        subProductId={subProductId}
+        t={t}
       />
     </div>
   );

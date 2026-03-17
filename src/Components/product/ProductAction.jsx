@@ -12,6 +12,7 @@ export default function ProductAction({
   productId,
   t,
   productName,
+  language
 }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -39,6 +40,7 @@ export default function ProductAction({
         productData={productData}
         setRefetch={setRefetch}
         t={t}
+        language={language}
       />
 
       <ProductDelete

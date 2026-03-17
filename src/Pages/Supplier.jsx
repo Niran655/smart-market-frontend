@@ -13,7 +13,7 @@ import { useAuth } from "../context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
- 
+
 const Supplier = () => {
   const { language } = useAuth();
   const { t } = translateLauguage(language);
@@ -54,13 +54,13 @@ const Supplier = () => {
         </Breadcrumbs>
       </Stack>
 
- 
+
       <Box
         sx={{ display: "flex", justifyContent: "space-between" }}
         mt={5}
       >
         <Grid container spacing={2}>
-          <Grid size={{xs:12}} textAlign={"start"}>
+          <Grid size={{ xs: 12 }} textAlign={"start"}>
             <Typography variant="body2" fontWeight={500} mb={0.5}>
               {t("search")}
             </Typography>
@@ -102,7 +102,7 @@ const Supplier = () => {
         )}
       </Box>
 
- 
+
       <TableContainer className="table-container" sx={{ mt: 2 }}>
         <Table className="table">
           <TableHead   >
@@ -111,7 +111,7 @@ const Supplier = () => {
               <TableCell>{t("khmer_name")}</TableCell>
               <TableCell>{t("english_name")}</TableCell>
               <TableCell>{t("remark")}</TableCell>
-              <TableCell  >{t("action")}</TableCell>
+              <TableCell  > </TableCell>
             </TableRow>
           </TableHead>
 
@@ -127,13 +127,16 @@ const Supplier = () => {
                   <TableCell>{supplier.nameKh}</TableCell>
                   <TableCell>{supplier.nameEn}</TableCell>
                   <TableCell>{supplier.remark}</TableCell>
-                  <TableCell className="flex-end">
-                    <SupplierAction
-                      t={t}
-                      supplierId={supplier._id}
-                      supplierData={supplier}
-                      setRefetch={refetch}
-                    />
+                  <TableCell  >
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                      <SupplierAction
+                        t={t}
+                        supplierId={supplier._id}
+                        supplierData={supplier}
+                        setRefetch={refetch}
+                      />
+                    </Stack>
+
                   </TableCell>
                 </TableRow>
               ))}
@@ -141,7 +144,7 @@ const Supplier = () => {
           )}
         </Table>
 
- 
+
         <Stack direction="row" justifyContent="flex-end" p={2}>
           <FooterPagination
             page={page}

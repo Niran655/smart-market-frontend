@@ -89,7 +89,7 @@ const User = () => {
           </Breadcrumbs>
         </Box>
       </Stack>
-      <Stack direction={"row"} justifyContent={"space-between"} mt={5}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }} mt={5}>
         <Grid
           container
           spacing={5}
@@ -97,7 +97,7 @@ const User = () => {
           alignItems="center"
           textAlign="start"
         >
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 6, md: 6 }}>
             <Typography variant="body2" fontWeight={500} mb={0.5}>
               {t("search")}
             </Typography>
@@ -123,7 +123,7 @@ const User = () => {
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 6, md: 6 }}>
             <Typography className="search-head-title">{t("status")}</Typography>
             <TextField
               className="select-text-field"
@@ -166,10 +166,10 @@ const User = () => {
             />
           )}
         </Stack>
-      </Stack>
+      </Box>
       <TableContainer className="table-container" sx={{ mt: 2 }}>
         <Table className="table">
-          <TableHead >
+          <TableHead>
             <TableRow>
               <TableCell>{t(`no`)}</TableCell>
               <TableCell>{t(`khmer_name`)}</TableCell>
@@ -223,7 +223,7 @@ const User = () => {
                   <TableCell align="center">
                     <AllowUser editData={row} refetch={refetch} />
                   </TableCell>
-                  <TableCell>
+                  <TableCell  >
                     <UserAction
                       userData={row}
                       setRefetch={refetch}

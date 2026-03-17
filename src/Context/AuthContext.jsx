@@ -77,6 +77,20 @@ export const AuthProvider = ({ children }) => {
       return { open: open, status: alertStatus, message: messageAlert };
     };
 
+    const quickAlert = (status, messageEn, messageKh) => {
+    setOpen(true);
+    setAlertStatus(status);
+    setMessageAlert({
+      messageEn,
+      messageKh,
+    });
+
+    // auto close after 3 seconds
+    setTimeout(() => {
+      setOpen(false);
+    }, 3000);
+  };
+
   
 
   useEffect(() => {
@@ -119,6 +133,7 @@ export const AuthProvider = ({ children }) => {
         changeLanguage,
         alert,
         setAlert,
+        quickAlert,
         userRole
       }}
     >

@@ -59,8 +59,6 @@ export default function Dashboard() {
   const { language } = useAuth();
   const { t } = translateLauguage(language);
   const savedStoreId = localStorage.getItem("activeShopId");
-
-
   const [filterType, setFilterType] = useState("today");
   const [customStart, setCustomStart] = useState(null);
   const [customEnd, setCustomEnd] = useState(null);
@@ -68,7 +66,7 @@ export default function Dashboard() {
   const [customPopoverAnchor, setCustomPopoverAnchor] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const open = Boolean(anchorEl);
+ 
 
   const getQueryVars = () => {
     if (filterType === "today") return { filter: "today", dayStart: null, dayEnd: null };
@@ -524,60 +522,94 @@ export default function Dashboard() {
         </Box>
 
 
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          {summaryCards.map((card, index) => (
-            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
-              <Card
-                sx={{
-                  borderRadius: 1,
-
-                  height: "100%",
-                }}
+ <Grid container spacing={3} sx={{ mb: 4 }}>
+  {summaryCards.map((card, index) => (
+    <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+      <Card
+        sx={{
+          borderRadius: 1,
+          height: "100%",
+          // boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+          transition: "all 0.25s ease",
+          position: "relative",
+          overflow: "hidden",
+ 
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            inset: 0,
+            background: `linear-gradient(135deg, ${card.color}10, transparent)`,
+          },
+        }}
+      >
+        <CardContent sx={{ position: "relative" }}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+          >
+          
+            <Box>
+              <Typography
+                variant="h6"
+                color="text.secondary"
+                sx={{ mb: 0.5 }}
               >
-                <CardContent>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="flex-start"
-                  >
-                    <Box>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        {card.title}
-                      </Typography>
-                      <Typography
-                        variant="h4"
-                        fontWeight="700"
-                        color={card.color}
-                        gutterBottom
-                      >
-                        {card.value}
-                      </Typography>
-                      <Stack direction="row" alignItems="center" spacing={0.5}>
-                        {card.trend === "up" ? (
-                          <ArrowUpward sx={{ fontSize: 16, color: "#4CAF50" }} />
-                        ) : (
-                          <ArrowDownward sx={{ fontSize: 16, color: "#f44336" }} />
-                        )}
-                        <Typography
-                          variant="body2"
-                          sx={{ color: card.trend === "up" ? "#4CAF50" : "#f44336" }}
-                        >
-                          {card.change}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          from last period
-                        </Typography>
-                      </Stack>
-                    </Box>
-                    <Box sx={{ bgcolor: `${card.color}15`, p: 1.5, borderRadius: 2 }}>
-                      {card.icon}
-                    </Box>
-                  </Stack>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                {card.title}
+              </Typography>
+
+              <Typography
+                variant="h4"
+                fontWeight={700}
+                sx={{ color: card.color, mb: 1 }}
+              >
+                {card.value}
+              </Typography>
+
+              <Stack direction="row" alignItems="center" spacing={0.5}>
+                {card.trend === "up" ? (
+                  <ArrowUpward sx={{ fontSize: 16, color: "#22c55e" }} />
+                ) : (
+                  <ArrowDownward sx={{ fontSize: 16, color: "#ef4444" }} />
+                )}
+
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 600,
+                    color: card.trend === "up" ? "#22c55e" : "#ef4444",
+                  }}
+                >
+                  {card.change}
+                </Typography>
+
+                <Typography variant="body2" color="text.secondary">
+                  vs last period
+                </Typography>
+              </Stack>
+            </Box>
+
+            {/* ICON */}
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "14px",
+                background: `linear-gradient(135deg, ${card.color}30, ${card.color}10)`,
+                color: card.color,
+              }}
+            >
+              {card.icon}
+            </Box>
+          </Stack>
+        </CardContent>
+      </Card>
+    </Grid>
+  ))}
+</Grid>
 
 
         <Grid container spacing={3} sx={{ mb: 4 }}>

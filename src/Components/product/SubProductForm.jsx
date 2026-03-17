@@ -168,7 +168,7 @@ export default function SubProductForm({
             variables: { parentProductId: parentProductId, input: input },
           });
         } else {
-          console.log("subProductDataid", subProductData?._id);
+   
           await updateSubProduct({
             variables: { id: subProductData?._id, input: input },
           });

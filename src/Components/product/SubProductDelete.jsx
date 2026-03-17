@@ -15,7 +15,7 @@ export default function SubProductDelete({
   supProductName,
   setRefetch,
 }) {
-  console.log("subProductId",subProductId)
+  
   const [confirmationText, setConfirmationText] = useState("");
   const { setAlert } = useAuth();
   const [loading, setLoading] = useState(false);

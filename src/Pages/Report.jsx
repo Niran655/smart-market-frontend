@@ -69,7 +69,7 @@ const ReportPage = ({ shopId = null }) => {
   });
 
   const reportStat = data?.getReportStats;
-  console.log("Report Stat Data:", reportStat);
+ 
 
  
   const handlePrint = () => window.print();

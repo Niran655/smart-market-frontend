@@ -44,7 +44,7 @@ export default function ViewProductTransfer({
     0
   );
 
-  /* ================= PRINT ================= */
+   
   const handlePrint = () => {
     const win = window.open("", "", "width=900,height=700");
 
@@ -225,7 +225,7 @@ export default function ViewProductTransfer({
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Box sx={{ height: "100vh", p: 2, width: 900 }}>
-        {/* HEADER */}
+   
         <Stack direction="row" justifyContent="space-between" mb={2}>
           <Typography variant="h6" fontWeight={600}>
             {t("view_product_transfer")}
@@ -244,13 +244,17 @@ export default function ViewProductTransfer({
         <Divider sx={{ mb: 2 }} />
 
         <Stack direction="row" spacing={2} height="calc(100% - 70px)">
-          {/* LEFT INFO */}
+         
           <Paper sx={{ width: 320, p: 2 }}>
             <InfoRow label="Shop (KH)" value={toShop?.nameKh} />
             <InfoRow label="Shop (EN)" value={toShop?.nameEn} />
             <InfoRow
               label="Status"
               value={<Chip size="small" label={status} color="primary" />}
+            />
+            <InfoRow
+              label="Reason"
+              // value={reason}
             />
             <InfoRow
               label="Requested By"
@@ -260,6 +264,7 @@ export default function ViewProductTransfer({
               label="Accepted By"
               value={acceptedBy?.nameEn || "-"}
             />
+            
             <InfoRow
               label="Created At"
               value={new Date(createdAt).toLocaleString()}
@@ -280,8 +285,7 @@ export default function ViewProductTransfer({
               {remark || "-"}
             </Typography>
           </Paper>
-
-          {/* TABLE */}
+ 
           <Box flex={1} overflow="hidden">
             <TableContainer sx={{ height: "100%" }}>
               <Table stickyHeader size="small">
