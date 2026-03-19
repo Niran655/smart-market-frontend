@@ -69,7 +69,7 @@ export default function MenuModal({ open, onClose }) {
       title: t("report"),
       description: "View reports",
       icon: <ScrollText size={32} color="#03A9F4" />,
-      to: `/store/pos/${id}/report`,
+      to: `/store/pos/${id}/report-in-shop`,
       // bgColor: "#03A9F4",
       textColor: "#fff",
     },

@@ -34,7 +34,7 @@ const ShopAction = ({ t, shopData, setRefetch,shopName,shopId,userId }) => {
   return (
     <>
       <IconButton onClick={handleMenuClick}>
-        <MoreVertIcon color="info" />
+        <Settings size={20} />
       </IconButton>
 
       <Menu

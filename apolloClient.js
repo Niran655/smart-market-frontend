@@ -3,8 +3,8 @@ import { setContext } from "@apollo/client/link/context";
 import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client/core";
 const httpLink = createHttpLink({
   // uri: "http://localhost:4000/",
-  // uri:"http://192.168.169.1:4000/graphql" 
-  uri:"https://zlgv95d6-4000.asse.devtunnels.ms/"
+  uri:"http://192.168.169.1:4000/graphql" 
+  // uri:"https://zlgv95d6-4000.asse.devtunnels.ms/"
 });
 
 const authLink = setContext((_, { headers }) => {

@@ -63,7 +63,7 @@ const WarehouseInShop = () => {
   const { language } = useAuth();
   const { t } = translateLauguage(language);
 
-const [productWarehouseKeyword, setProductWarehouseKeyword] = useState("");
+  const [productWarehouseKeyword, setProductWarehouseKeyword] = useState("");
 
   const [tab, setTab] = useState("1");
   const handleTabChange = (e, newValue) => setTab(newValue);
@@ -177,8 +177,8 @@ const [productWarehouseKeyword, setProductWarehouseKeyword] = useState("");
                   type="search"
                   size="small"
                   placeholder={t("search") + "..."}
-                    value={productWarehouseKeyword}
-  onChange={(e) => setProductWarehouseKeyword(e.target.value)}
+                  value={productWarehouseKeyword}
+                  onChange={(e) => setProductWarehouseKeyword(e.target.value)}
                   fullWidth
                   variant="outlined"
                   sx={{
@@ -235,13 +235,16 @@ const [productWarehouseKeyword, setProductWarehouseKeyword] = useState("");
 
           <TableContainer className="table-container">
             <Table className="table">
-              <TableHead >
+              <TableHead>
                 <TableRow>
                   <TableCell>{t("no")}</TableCell>
                   <TableCell>{t("product")}</TableCell>
+                  <TableCell>{t("barcode")}</TableCell>
                   <TableCell>{t("unit")}</TableCell>
-                  <TableCell>{t("current_stock")}</TableCell>
-                  <TableCell>{t("min_stock")}</TableCell>
+                  <TableCell align="right">{t("stock")}</TableCell>
+                  <TableCell align="right">{t("min_stock")}</TableCell>
+                  <TableCell align="right">{t("cost")}</TableCell>
+                  <TableCell align="right">{t("total_price")}</TableCell>
                   <TableCell>{t("status")}</TableCell>
                 </TableRow>
               </TableHead>
@@ -252,59 +255,87 @@ const [productWarehouseKeyword, setProductWarehouseKeyword] = useState("");
                 <EmptyData />
               ) : (
                 <TableBody>
-                  {filteredProducts.map((row, index) => (
-                    <TableRow className="table-row" key={row._id}>
-                      <TableCell>{paginator.slNo + index}</TableCell>
-                      <TableCell>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <img
-                            src={row?.subProduct?.productImg}
-                            width={36}
-                            height={36}
-                            style={{ borderRadius: "50%" }}
-                          />
+                  {filteredProducts.map((row, index) => {
+                    const stock = row?.stock || 0;
+                    const minStock = row?.subProduct?.minStock || 0;
+                    const cost = row?.subProduct?.costPrice || 0;
+
+                    const totalValue = stock * cost;
+                    const isLow = stock < minStock;
+
+                    return (
+                      <TableRow key={row._id} className="table-row">
+
+
+                        <TableCell>{paginator.slNo + index}</TableCell>
+
+
+                        <TableCell>
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <img
+                              src={row?.subProduct?.productImg}
+                              width={36}
+                              height={36}
+                              style={{ borderRadius: "50%" }}
+                            />
+                            {language === "kh"
+                              ? row?.subProduct?.parentProductId?.nameKh
+                              : row?.subProduct?.parentProductId?.nameEn}
+                          </Stack>
+                        </TableCell>
+
+
+                        <TableCell>{row?.subProduct?.barCode}</TableCell>
+
+
+                        <TableCell>
                           {language === "kh"
-                            ? row?.subProduct?.parentProductId?.nameKh
-                            : row?.subProduct?.parentProductId?.nameEn}
-                        </Stack>
-                      </TableCell>
-                      <TableCell>
-                        {language === "kh"
-                          ? row?.subProduct?.unitId?.nameKh
-                          : row?.subProduct?.unitId?.nameEn}
-                      </TableCell>
-                      <TableCell>{row?.stock}</TableCell>
-                      <TableCell>{row?.subProduct?.minStock}</TableCell>
-                      <TableCell>
-                        {row?.stock < row?.subProduct?.minStock ? (
-                          <Chip
-                            icon={<WarningAmberOutlinedIcon />}
-                            label={t("low_stock")}
-                            color="error"
-                            size="small"
-                          />
-                        ) : (
-                          <Chip
-                            icon={<CheckOutlinedIcon />}
-                            label={t("in_stock")}
-                            size="small"
-                            sx={{
-                              backgroundColor: "#E8F5E9",
-                              color: "#2E7D32",
-                              fontWeight: 500,
-                              borderRadius: "6px",
-                              "& .MuiChip-icon": {
+                            ? row?.subProduct?.unitId?.nameKh
+                            : row?.subProduct?.unitId?.nameEn}
+                        </TableCell>
+
+
+                        <TableCell align="right">{stock}</TableCell>
+
+
+                        <TableCell align="right">{minStock}</TableCell>
+
+
+                        <TableCell align="right">
+                          ${cost.toFixed(2)}
+                        </TableCell>
+
+
+                        <TableCell align="right">
+                          <strong>${totalValue.toFixed(2)}</strong>
+                        </TableCell>
+
+
+                        <TableCell>
+                          {isLow ? (
+                            <Chip
+                              icon={<WarningAmberOutlinedIcon />}
+                              label={`${t("low_stock")} (${minStock - stock})`}
+                              color="error"
+                              size="small"
+                            />
+                          ) : (
+                            <Chip
+                              icon={<CheckOutlinedIcon />}
+                              label={t("in_stock")}
+                              size="small"
+                              sx={{
+                                backgroundColor: "#E8F5E9",
                                 color: "#2E7D32",
-                              },
-                              "&:hover": {
-                                backgroundColor: "#C8E6C9",
-                              },
-                            }}
-                          />
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                                fontWeight: 500,
+                              }}
+                            />
+                          )}
+                        </TableCell>
+
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               )}
             </Table>
@@ -333,14 +364,17 @@ const [productWarehouseKeyword, setProductWarehouseKeyword] = useState("");
         <TabPanel value="3">
           <TableContainer className="table-container">
             <Table className="table">
-              <TableHead >
+              <TableHead>
                 <TableRow>
                   <TableCell>{t("no")}</TableCell>
-                  <TableCell>{t("category")}</TableCell>
-                  <TableCell>{t("items_count")}</TableCell>
+                  <TableCell>{t("shop")}</TableCell>
+                  <TableCell>{t("items")}</TableCell>
+                  <TableCell>{t("total_qty")}</TableCell>
+                  <TableCell>{t("total_price")}</TableCell>
+                  <TableCell>{t("requested_by")}</TableCell>
                   <TableCell>{t("accepted_by")}</TableCell>
                   <TableCell>{t("status")}</TableCell>
-                  <TableCell>{t("date_sent")}</TableCell>
+                  <TableCell>{t("date")}</TableCell>
                   <TableCell>{t("action")}</TableCell>
                 </TableRow>
               </TableHead>
@@ -351,44 +385,91 @@ const [productWarehouseKeyword, setProductWarehouseKeyword] = useState("");
                 <EmptyData />
               ) : (
                 <TableBody>
-                  {productsWarehouseTransfer.map((row, index) => (
-                    <TableRow className="table-row" key={row._id}>
-                      <TableCell>{transferPaginator.slNo + index}</TableCell>
-                      <TableCell>{row?.items?.length}</TableCell>
-                      <TableCell>
-                        {language === "kh"
-                          ? row?.requestedBy?.nameKh
-                          : row?.requestedBy?.nameEn}
-                      </TableCell>
-                      <TableCell>
-                        {language === "kh"
-                          ? row?.acceptedBy?.nameKh
-                          : row?.acceptedBy?.nameEn}
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={t(row?.status)}
-                          size="small"
-                          icon={row?.status === "accepted" ? <CheckOutlinedIcon /> : undefined}
-                          sx={getStatusStyle(row?.status)}
-                        />
+                  {productsWarehouseTransfer.map((row, index) => {
+
+                    const totalQty = row.items.reduce(
+                      (sum, item) => sum + item.quantity,
+                      0
+                    );
+
+                    const totalPrice = row.items.reduce(
+                      (sum, item) =>
+                        sum + item.quantity * (item.subProduct?.costPrice || 0),
+                      0
+                    );
+
+                    return (
+                      <TableRow className="table-row" key={row._id}>
 
 
-                      </TableCell>
-                      <TableCell>
-                        {new Date(row?.createdAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <GetProductInShopAction
-                          t={t}
-                          language={language}
-                          editData={row}
-                          refetch={transferRefetch}
-                          productWarehouseInShopRefetch={productWarehouseInShopRefetch}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        <TableCell>
+                          {transferPaginator.slNo + index}
+                        </TableCell>
+
+
+                        <TableCell>
+                          {language === "kh"
+                            ? row?.toShop?.nameKh
+                            : row?.toShop?.nameEn}
+                        </TableCell>
+
+
+                        <TableCell>{row.items.length}</TableCell>
+
+
+                        <TableCell>{totalQty}</TableCell>
+
+
+                        <TableCell>${totalPrice.toFixed(2)}</TableCell>
+
+
+                        <TableCell>
+                          {language === "kh"
+                            ? row?.requestedBy?.nameKh
+                            : row?.requestedBy?.nameEn}
+                        </TableCell>
+
+
+                        <TableCell>
+                          {row?.acceptedBy
+                            ? language === "kh"
+                              ? row?.acceptedBy?.nameKh
+                              : row?.acceptedBy?.nameEn
+                            : "-"}
+                        </TableCell>
+
+
+                        <TableCell>
+                          <Chip
+                            label={t(row?.status)}
+                            size="small"
+                            icon={
+                              row?.status === "accepted"
+                                ? <CheckOutlinedIcon />
+                                : undefined
+                            }
+                            sx={getStatusStyle(row?.status)}
+                          />
+                        </TableCell>
+
+                        {/* Date */}
+                        <TableCell>
+                          {new Date(row?.createdAt).toLocaleDateString()}
+                        </TableCell>
+
+                        {/* Action */}
+                        <TableCell>
+                          <GetProductInShopAction
+                            t={t}
+                            language={language}
+                            editData={row}
+                            refetch={transferRefetch}
+                            productWarehouseInShopRefetch={productWarehouseInShopRefetch}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               )}
             </Table>

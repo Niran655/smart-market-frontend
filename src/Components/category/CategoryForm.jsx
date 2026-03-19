@@ -33,7 +33,7 @@ export default function CategoryForm({
   categoryData,
   setRefetch,
 }) {
-  console.log("Dialogtitle", dialogTitle);
+ 
   const [loading, setLoading] = React.useState(false);
   const { setAlert } = useAuth();
   const [createCategory] = useMutation(CREATE_CATEGORY, {

@@ -20,6 +20,7 @@ import {
 import { X } from "lucide-react";
 import { Form, FormikProvider, useFormik } from "formik";
 import * as Yup from "yup";
+import { useMemo } from "react";
 
 import useGetAllShopAutoComplete from "../../include/includeAutoComplete";
 import { CREATE_WAREHOUSE_TRANSFER } from "../../../../graphql/mutation";
@@ -35,34 +36,45 @@ const emptyItem = {
   subProductId: "",
   quantity: "",
   costPrice: "",
-  total: 0,
 };
 
-export default function ProductTransferForm({ open, onClose, t, language, setRefetch }) {
-  const { options: shopOptions, loading: shopLoading, refetch } = useGetAllShopAutoComplete();
+export default function ProductTransferForm({
+  open,
+  onClose,
+  t,
+  language,
+  setRefetch,
+}) {
+  const { options: shopOptions, loading: shopLoading, refetch } =
+    useGetAllShopAutoComplete();
+
   const { setAlert } = useAuth();
 
-  const { productWarehouseWithPagination, loading: productLoading } = useGetProductWarehouseWithPagination({
-    page: 1,
-    limit: 20,
-    pagination: false,
-  });
+  const { productWarehouseWithPagination, loading: productLoading } =
+    useGetProductWarehouseWithPagination({
+      page: 1,
+      limit: 20,
+      pagination: false,
+    });
 
-  const [createWarehouseTransfer, { loading }] = useMutation(CREATE_WAREHOUSE_TRANSFER, {
-    onCompleted: ({ createWarehouseTransfer }) => {
-      if (createWarehouseTransfer?.isSuccess) {
-        onClose();
-        refetch();
-        setRefetch();
-        setAlert(true, "success", createWarehouseTransfer?.message);
-      } else {
-        setAlert(true, "error", createWarehouseTransfer?.message);
-      }
-    },
-    onError: (error) => {
-      setAlert(true, "error", createWarehouseTransfer?.message);
-    },
-  });
+  const [createWarehouseTransfer, { loading }] = useMutation(
+    CREATE_WAREHOUSE_TRANSFER,
+    {
+      onCompleted: ({ createWarehouseTransfer }) => {
+        if (createWarehouseTransfer?.isSuccess) {
+          onClose();
+          refetch();
+          setRefetch();
+          setAlert(true, "success", createWarehouseTransfer?.message);
+        } else {
+          setAlert(true, "error", createWarehouseTransfer?.message);
+        }
+      },
+      onError: () => {
+        setAlert(true, "error", "Something went wrong");
+      },
+    }
+  );
 
   const formik = useFormik({
     initialValues: {
@@ -75,8 +87,14 @@ export default function ProductTransferForm({ open, onClose, t, language, setRef
       items: Yup.array().of(
         Yup.object({
           subProductId: Yup.string().required(t("require")),
-          quantity: Yup.number().typeError(t("require")).required(t("require")).min(1),
-          costPrice: Yup.number().typeError(t("require")).required(t("require")).min(0),
+          quantity: Yup.number()
+            .typeError(t("require"))
+            .required(t("require"))
+            .min(1),
+          costPrice: Yup.number()
+            .typeError(t("require"))
+            .required(t("require"))
+            .min(0),
         })
       ),
     }),
@@ -99,6 +117,7 @@ export default function ProductTransferForm({ open, onClose, t, language, setRef
 
   const { values, errors, touched, handleSubmit, setValues } = formik;
 
+
   const addItem = () => {
     setValues({
       ...values,
@@ -108,8 +127,10 @@ export default function ProductTransferForm({ open, onClose, t, language, setRef
 
   const deleteItem = (index) => {
     if (values.items.length === 1) return;
-    const newItems = values.items.filter((_, i) => i !== index);
-    setValues({ ...values, items: newItems });
+    setValues({
+      ...values,
+      items: values.items.filter((_, i) => i !== index),
+    });
   };
 
   const updateItem = (index, field, value) => {
@@ -117,22 +138,29 @@ export default function ProductTransferForm({ open, onClose, t, language, setRef
     newItems[index] = {
       ...newItems[index],
       [field]: value,
-      total:
-        field === "quantity" || field === "costPrice"
-          ? Number(newItems[index].quantity || 0) * Number(newItems[index].costPrice || 0)
-          : newItems[index].total,
     };
     setValues({ ...values, items: newItems });
   };
 
-  // Calculate footer total
-  const footerTotal = values.items.reduce((acc, i) => acc + Number(i.total || 0), 0);
+
+  const footerTotal = useMemo(() => {
+    return values.items.reduce(
+      (acc, i) =>
+        acc + Number(i.quantity || 0) * Number(i.costPrice || 0),
+      0
+    );
+  }, [values.items]);
+
+
 
   return (
     <BootstrapDialog open={open} fullWidth maxWidth="md">
       <DialogTitle>
         {t("create_transfer")}
-        <IconButton onClick={onClose} sx={{ position: "absolute", right: 8, top: 8 }}>
+        <IconButton
+          onClick={onClose}
+          sx={{ position: "absolute", right: 8, top: 8 }}
+        >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -143,25 +171,33 @@ export default function ProductTransferForm({ open, onClose, t, language, setRef
         <Form onSubmit={handleSubmit}>
           <DialogContent dividers>
             <Grid container spacing={2}>
-              {/* To Shop */}
+
               <Grid size={{ xs: 12, md: 6 }}>
                 <Typography>{t("to_shop")}</Typography>
                 <Autocomplete
                   multiple
-                  placeholder={t(`select_shop`)}
                   options={shopOptions}
                   loading={shopLoading}
-                  value={shopOptions.filter((o) => values.toShopIds.includes(o.value))}
+                  value={shopOptions.filter((o) =>
+                    values.toShopIds.includes(o.value)
+                  )}
                   getOptionLabel={(o) => o.label}
                   onChange={(e, selected) =>
-                    setValues({ ...values, toShopIds: selected.map((s) => s.value) })
+                    setValues({
+                      ...values,
+                      toShopIds: selected.map((s) => s.value),
+                    })
                   }
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       size="small"
-                      error={Boolean(touched.toShopIds && errors.toShopIds)}
-                      helperText={touched.toShopIds && errors.toShopIds}
+                      error={Boolean(
+                        touched.toShopIds && errors.toShopIds
+                      )}
+                      helperText={
+                        touched.toShopIds && errors.toShopIds
+                      }
                     />
                   )}
                 />
@@ -173,16 +209,21 @@ export default function ProductTransferForm({ open, onClose, t, language, setRef
                 <TextField
                   fullWidth
                   multiline
-                  placeholder={t(`remark`)}
                   size="small"
                   value={values.note}
-                  onChange={(e) => setValues({ ...values, note: e.target.value })}
+                  onChange={(e) =>
+                    setValues({ ...values, note: e.target.value })
+                  }
                 />
               </Grid>
 
-              {/* Product List Header */}
+
               <Grid size={{ xs: 12 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
                   <Typography>{t("product_list")}</Typography>
                   <IconButton onClick={addItem}>
                     <AddBoxOutlinedIcon />
@@ -190,9 +231,9 @@ export default function ProductTransferForm({ open, onClose, t, language, setRef
                 </Stack>
               </Grid>
 
-              {/* Product Items */}
+
               {values.items.map((item, index) => (
-                <Grid container spacing={2} key={index} alignItems="center">
+                <Grid container spacing={2} key={index}>
                   {/* Product */}
                   <Grid size={{ xs: 12, md: 4 }}>
                     <Typography>{t("product")}</Typography>
@@ -201,53 +242,80 @@ export default function ProductTransferForm({ open, onClose, t, language, setRef
                       loading={productLoading}
                       value={
                         productWarehouseWithPagination.find(
-                          (p) => p.subProduct?._id === item.subProductId
+                          (p) =>
+                            p.subProduct?._id === item.subProductId
                         ) || null
                       }
-                      isOptionEqualToValue={(option, value) =>
-                        option.subProduct?._id === value.subProduct?._id
+                      isOptionEqualToValue={(o, v) =>
+                        o.subProduct?._id === v.subProduct?._id
                       }
                       getOptionLabel={(p) => {
-                        const productName =
+                        if (!p) return "";
+                        const name =
                           language === "en"
                             ? p?.subProduct?.parentProductId?.nameEn || "Unnamed"
                             : p?.subProduct?.parentProductId?.nameKh || "គ្មានឈ្មោះ";
+                        const unit = language === "en"
+                          ? p?.subProduct?.unitId?.nameEn
+                          : p?.subProduct?.unitId?.nameKh
 
-                        const unitKh = p?.subProduct?.unitId?.nameKh || "គ្មានឯកតា";
-                        const unitEn = p?.subProduct?.unitId?.nameEn || "No Unit";
 
-                        return `${productName} (${unitKh} / ${unitEn})`;
+
+                        return `${name} (${unit})`;
                       }}
-                      onChange={(e, val) =>
-                        updateItem(index, "subProductId", val?.subProduct?._id || "")
-                      }
-                      renderInput={(params) => <TextField {...params} size="small" />}
+                      onChange={(e, val) => {
+                        const newItems = [...values.items];
+
+                        newItems[index] = {
+                          ...newItems[index],
+                          subProductId: val?.subProduct?._id || "",
+                          costPrice: val?.subProduct?.costPrice || "",
+                        };
+
+                        setValues({
+                          ...values,
+                          items: newItems,
+                        });
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          size="small"
+
+                          placeholder={t("select_product")}
+                          error={Boolean(
+                            touched.toShopIds && errors.toShopIds
+                          )}
+                          helperText={
+                            touched.toShopIds && errors.toShopIds
+                          }
+                        />
+                      )}
                     />
                   </Grid>
 
-                  {/* Quantity */}
                   <Grid size={{ xs: 12, md: 2 }}>
                     <Typography>{t("quantity")}</Typography>
                     <TextField
                       size="small"
                       type="number"
                       value={item.quantity}
-                      onChange={(e) => updateItem(index, "quantity", e.target.value)}
-                      error={Boolean(touched.items?.[index]?.quantity && errors.items?.[index]?.quantity)}
-                      helperText={touched.items?.[index]?.quantity && errors.items?.[index]?.quantity}
+                      onChange={(e) =>
+                        updateItem(index, "quantity", e.target.value)
+                      }
                     />
                   </Grid>
 
-                  {/* Cost Price */}
+
                   <Grid size={{ xs: 12, md: 2 }}>
                     <Typography>{t("cost")}</Typography>
                     <TextField
                       size="small"
                       type="number"
                       value={item.costPrice}
-                      onChange={(e) => updateItem(index, "costPrice", e.target.value)}
-                      error={Boolean(touched.items?.[index]?.costPrice && errors.items?.[index]?.costPrice)}
-                      helperText={touched.items?.[index]?.costPrice && errors.items?.[index]?.costPrice}
+                      onChange={(e) =>
+                        updateItem(index, "costPrice", e.target.value)
+                      }
                     />
                   </Grid>
 
@@ -256,15 +324,16 @@ export default function ProductTransferForm({ open, onClose, t, language, setRef
                     <Typography>{t("total_price")}</Typography>
                     <TextField
                       size="small"
-                      value={(
-                        (Number(item.quantity) || 0) * (Number(item.costPrice) || 0)
-                      ).toFixed(2)}
                       disabled
+                      value={(
+                        Number(item.quantity || 0) *
+                        Number(item.costPrice || 0)
+                      ).toFixed(2)}
                     />
                   </Grid>
 
 
-                  <Grid size={{ xs: 12, md: 1 }} textAlign="center">
+                  <Grid size={{ xs: 12, md: 1 }}>
                     <Typography>{t("delete")}</Typography>
                     <IconButton onClick={() => deleteItem(index)}>
                       <X color="red" />
@@ -273,11 +342,15 @@ export default function ProductTransferForm({ open, onClose, t, language, setRef
                 </Grid>
               ))}
 
-              {/* Footer Total */}
-              <Grid item xs={12}>
-                <Box display="flex" justifyContent="flex-end" mt={2}>
-                  <Typography variant="subtitle1" fontWeight={600}>
-                    {t("total_all_products")}: {footerTotal.toFixed(2)}
+
+              <Grid size={{ xs: 12 }}>
+                <Box display="flex" justifyContent="flex-end">
+                  <Typography fontWeight={600}>
+                    {t("total_all_products")}:{" "}
+                    {footerTotal.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </Typography>
                 </Box>
               </Grid>
@@ -285,7 +358,12 @@ export default function ProductTransferForm({ open, onClose, t, language, setRef
           </DialogContent>
 
           <DialogActions>
-            <Button type="submit" fullWidth variant="contained" disabled={loading}>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={loading}
+            >
               {loading ? t("processing...") : t("create")}
             </Button>
           </DialogActions>

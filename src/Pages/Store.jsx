@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { BookmarkX, ChartBarStacked, LogIn, Search } from "lucide-react";
+import { BookmarkX, ChartBarStacked, LogIn, Search,Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import ShopAction from "../Components/Shop/ShopAction";
@@ -204,7 +204,7 @@ const Store = () => {
                 alignItems="start"
                 justifyContent="space-between"
               >
-                {/* Shop Info */}
+                
 
                 <Stack direction={"row"} spacing={2} alignItems={"center"}>
                   <img
@@ -242,7 +242,7 @@ const Store = () => {
                   </Box>
                 </Stack>
 
-                {/* Right Actions */}
+   
 
                 <Stack direction={"row"} spacing={2}>
                   <Button

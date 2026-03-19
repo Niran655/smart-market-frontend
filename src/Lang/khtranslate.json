@@ -244,7 +244,10 @@
   "shift_name": "ឈ្មោះវេន",
   "start_time": "ម៉ោងចូលធ្វើការ",
   "end_time": "ម៉ោងចេញធ្វើការ",
-   
-  "reject_transfer":"បដិសេធការផ្ទេរ",
-  "save":"រក្សាទុក"
+  "reject_transfer": "បដិសេធការផ្ទេរ",
+  "save": "រក្សាទុក",
+  "total_all_products": "សរុបផលិតផលទាំងអស់",
+  "requested_by": "ស្នើសុំដោយ",
+  "accepted_by": "បានទទួលយក ដោយ",
+  "barcode":"បារកូដ"
 }

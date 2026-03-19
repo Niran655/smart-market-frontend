@@ -39,9 +39,6 @@ export default function ProductTransferAction({ editData, t, language }) {
             <Trash size="18px" color="red" />
           </IconButton>
         </Tooltip>
-      
-        
-     
       </Stack>
     </div>
   );

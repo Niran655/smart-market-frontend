@@ -35,18 +35,21 @@ import {
 import { useState } from "react";
 import { useQuery } from "@apollo/client/react";
 import { GET_REPORT_STATS } from "../../graphql/queries";
+import { useAuth } from "../context/AuthContext";
+import { translateLauguage } from "../function/translate";
 
- 
+
 const formatCurrency = (value) =>
   value == null
     ? "$0.00"
     : `$${value.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`;
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
 
 const ReportPage = ({ shopId = null }) => {
- 
+  const { language } = useAuth();
+  const { t } = translateLauguage(language)
   const today = new Date();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(today.getDate() - 30);
@@ -58,7 +61,7 @@ const ReportPage = ({ shopId = null }) => {
   const [reportType, setReportType] = useState("sales");
   const [searchQuery, setSearchQuery] = useState("");
 
- 
+
   const { data, loading, error, refetch } = useQuery(GET_REPORT_STATS, {
     variables: {
       type: reportType.toUpperCase(),
@@ -69,13 +72,13 @@ const ReportPage = ({ shopId = null }) => {
   });
 
   const reportStat = data?.getReportStats;
- 
 
- 
+
+
   const handlePrint = () => window.print();
   const handleExport = (format) => {
     console.log(`Exporting ${reportType} report in ${format} format`);
-    
+
   };
 
   const filterData = (items, field) => {
@@ -85,7 +88,7 @@ const ReportPage = ({ shopId = null }) => {
     );
   };
 
- 
+
   const renderReportContent = () => {
     if (loading) {
       return (
@@ -112,7 +115,7 @@ const ReportPage = ({ shopId = null }) => {
         if (!sales) return <Typography>No sales data available</Typography>;
         return (
           <>
-           
+
             <Grid container spacing={3} sx={{ mb: 4 }}>
               <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Paper sx={{ p: 3, textAlign: "center", borderRadius: 1 }}>
@@ -139,7 +142,7 @@ const ReportPage = ({ shopId = null }) => {
                 </Paper>
               </Grid>
             </Grid>
- 
+
             <Typography variant="h6" fontWeight="600" sx={{ mt: 4, mb: 2 }}>
               Top Selling Products
             </Typography>
@@ -154,7 +157,7 @@ const ReportPage = ({ shopId = null }) => {
                 </TableHead>
                 <TableBody>
                   {filterData(sales.topProducts, "name").map((product) => (
-                    <TableRow sx={{borderSpacing:"none"}} key={product.id}>
+                    <TableRow sx={{ borderSpacing: "none" }} key={product.id}>
                       <TableCell>
                         <Typography variant="body2" fontWeight="500">{product.name}</Typography>
                         <Typography variant="caption" color="text.secondary">{product.category}</Typography>
@@ -169,7 +172,7 @@ const ReportPage = ({ shopId = null }) => {
               </Table>
             </TableContainer>
 
-             
+
             <Typography variant="h6" fontWeight="600" sx={{ mt: 4, mb: 2 }}>
               Recent Transactions
             </Typography>
@@ -371,8 +374,8 @@ const ReportPage = ({ shopId = null }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Box sx={{ maxWidth: 1400, mx: "auto" }}>
-        {/* Header */}
+      <Box sx={{ maxWidth: 1400, mx: "auto",mt:2 }}>
+
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
           <Breadcrumbs aria-label="breadcrumb" separator="/">
             <Typography
@@ -384,7 +387,7 @@ const ReportPage = ({ shopId = null }) => {
                 fontWeight: 600,
               }}
             >
-              Report
+              {t(`report`)}
             </Typography>
           </Breadcrumbs>
           <Stack direction="row" spacing={2}>
@@ -404,7 +407,7 @@ const ReportPage = ({ shopId = null }) => {
           </Stack>
         </Stack>
 
-      
+
         <Box sx={{ mb: 4, borderRadius: 1 }}>
           <Grid container spacing={3} alignItems="center">
             <Grid size={{ xs: 12, md: 2 }}>
@@ -422,7 +425,7 @@ const ReportPage = ({ shopId = null }) => {
               </FormControl>
             </Grid>
 
-           
+
             <Grid size={{ xs: 12, md: 2 }}>
               <Typography>Start Date</Typography>
               <DatePicker
