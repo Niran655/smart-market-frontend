@@ -736,12 +736,12 @@
 // export default POS;
 
 
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
 import { Navigate, useParams } from "react-router-dom";
 import { Box, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { GET_PRODUCT_FOR_SALE_WITH_PAGINATION } from "../../graphql/queries";
+import { GET_PRODUCT_FOR_SALE_WITH_PAGINATION, GET_SUPPRODUCT_BY_ID } from "../../graphql/queries";
 import { CREATE_SALE } from "../../graphql/mutation";
 import { translateLauguage } from "../function/translate";
 import ProductDialog from "../Components/pos/ProductDialog";
@@ -750,6 +750,7 @@ import ProductList from "../Components/pos/ProductList";
 import CartPanel from "../Components/pos/CartPanel";
 import RecentOrders from "../Components/pos/RecentOrders";
 import "../Styles/pos.scss";
+import BarcodeScanner from "../Components/pos/BarcodeScanner";
 
 const POS = () => {
   const { shopId } = useParams();
@@ -763,6 +764,8 @@ const POS = () => {
   const [openPaymentDialog, setOpenPaymentDialog] = useState(false);
   const [openPendingDialog, setOpenPendingDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
   
   // Existing dialog states
   const [openHistory, setOpenHistory] = useState(false);
@@ -797,6 +800,7 @@ const POS = () => {
     onCompleted: ({ createSale }) => {
       if (createSale?.isSuccess) {
         setAlert(true, "success", createSale?.message);
+        console.log("CreateSale",createSale);
         setCart([]);
         setOpenPaymentDialog(false);
         setOpenPendingDialog(false);
@@ -833,6 +837,32 @@ const POS = () => {
       ]);
     }
   }, [data, language]);
+
+  
+  const handleScan = async (barcode) => {
+  try {
+    console.log("Scanned:", barcode);
+
+    const res = await getSubProduct({
+      variables: { subProductId: barcode },
+    });
+
+    const item = res?.data?.getSubProductById;
+
+    if (!item) {
+      setAlert(true, "error", "Product not found");
+      return;
+    }
+
+    // 🔥 AUTO ADD TO CART
+    addToCart(item);
+
+    // 🔊 optional sound
+    new Audio("/beep.mp3").play();
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   // Dialog handlers
   const handleOpenProductDialog = (product) => {
@@ -998,7 +1028,7 @@ const POS = () => {
 
   return (
     <Box className="pos-container">
-     
+     {/* <BarcodeScanner onScan={handleScan} />  */}
       <ProductDialog
         open={openProductDialog}
         onClose={handleCloseProductDialog}

@@ -290,6 +290,13 @@ mutation CreateSale($input: SaleInput) {
       messageEn
       messageKh
     }
+    data {
+      saleId
+      saleNumber
+      total
+      status
+      qrImage
+    }
   }
 }
 `;
@@ -463,6 +470,30 @@ mutation UpdateShiftSession($id: ID!, $input: ShiftSessionInput) {
 export const DELETE_SHIFT_SESSION = gql`
 mutation DeleteShiftSession($id: ID!) {
   deleteShiftSession(_id: $id) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const DELETE_PRODUCT_FORM_WAREHOUSE = gql`
+mutation DeleteFromWarehouse($id: ID) {
+  deleteFromWarehouse(_id: $id) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const REFUND_SALE = gql`
+mutation RefundSale($id: ID!, $reason: String) {
+  refundSale(_id: $id, reason: $reason) {
     isSuccess
     message {
       messageEn

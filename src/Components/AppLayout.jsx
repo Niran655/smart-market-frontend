@@ -4,6 +4,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import MenuIcon from "@mui/icons-material/Menu";
+import { Shrink } from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   AppBar,
@@ -56,7 +57,6 @@ export default function AppLayout() {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userObject, setUserObject] = useState(null);
@@ -102,16 +102,19 @@ export default function AppLayout() {
     navigate("/profile");
   };
 
+  const handleToggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
 
 
   const toggleLanguage = () => {
     const newLang = language === "kh" ? "en" : "kh";
-
     changeLanguage(newLang);
-
-
     localStorage.setItem("language", newLang);
-
     setSelectedFlag(newLang === "kh" ? CambodiaFlag : EnglishFlag);
     setSelectedLanguage(newLang === "kh" ? "ភាសាខ្មែរ" : "English");
   };
@@ -260,6 +263,9 @@ export default function AppLayout() {
               {isMobile && <Box flex={1} />}
 
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <IconButton onClick={handleToggleFullscreen}>
+                  <Shrink className="link-icon" />
+                </IconButton>
                 <Tooltip title={selectedLanguage}>
                   <IconButton onClick={toggleLanguage}>
                     <Avatar src={selectedFlag} sx={{ width: 30, height: 30 }} />
@@ -273,7 +279,7 @@ export default function AppLayout() {
                       src={userObject?.image}
                       alt={userObject?.nameKh}
                     />
-                    {/* Hide name on mobile to save space */}
+
                     {!isExtraSmall && (
                       <Typography
                         sx={{
@@ -424,6 +430,9 @@ export default function AppLayout() {
                     ))}
                   </Stack>
                 </Box>
+
+
+
 
                 {/* Right section: language & profile */}
                 <Box

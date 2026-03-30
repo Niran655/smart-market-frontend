@@ -41,8 +41,7 @@ export default function ProductForm({
  
   const [loading, setLoading] = React.useState(false);
   const { setAlert } = useAuth();
-  const { data: CategoryData } = useQuery(GET_CATEGORY);
-  const { data: UnitData } = useQuery(GET_UNIT);
+ 
   const [uploadedFilePath, setUploadedFilePath] = React.useState(null);
 
   const [createProduct] = useMutation(CREATE_PRODUCT, {

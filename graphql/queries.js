@@ -307,6 +307,38 @@ query GetProductForSaleWithPagination($shopId: ID, $page: Int, $limit: Int, $pag
 }
 `
 
+export const GET_SUPPRODUCT_BY_ID = gql`
+query GetSubProductById($subProductId: ID!) {
+  getSubProductById(subProductId: $subProductId) {
+     _id
+      qty
+      stock
+      parentProductId {
+        _id
+        nameKh
+        nameEn
+        
+        categoryId {
+          nameEn
+          nameKh
+          image
+          _id
+        }
+      }
+      unitId {
+        _id
+        nameKh
+        nameEn
+      }
+      productImg
+      
+      taxRate
+      salePrice
+    barCode
+  }
+}
+`
+
 export const GET_PRDUCT_WAREHOUSE_WITH_PAGINATION = gql`
 query GetProductWareHouseWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
   getProductWareHouseWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
@@ -653,7 +685,8 @@ query GetReportStats($type: ReportType, $shopId: ID, $endDate: Date, $startDate:
       salesPerStaff
       performance {
         id
-        name
+        nameKh
+        nameEn
         role
         hours
         sales
@@ -853,6 +886,48 @@ query GetOpenShift($shopId: ID!, $userId: ID) {
       _id
       nameEn
       nameKh
+    }
+  }
+}
+`
+
+export const GET_STOCK_MOVMENT_WITH_PAGINATION = gql`
+query GetStockMovementWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $shopId: ID) {
+  getStockMovementWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, shopId: $shopId) {
+    data {
+      type
+      quantity
+      reason
+      reference
+      previousStock
+      newStock
+      createdAt
+      user {
+        nameKh
+        nameEn
+      }
+      product {
+        nameKh
+        nameEn
+      }
+      subProduct {
+        unitId {
+          nameKh
+          nameEn
+        }
+      }
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
     }
   }
 }

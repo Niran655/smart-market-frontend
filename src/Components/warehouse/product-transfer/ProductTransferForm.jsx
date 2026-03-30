@@ -57,6 +57,8 @@ export default function ProductTransferForm({
       pagination: false,
     });
 
+    console.log("productWarehouseWithPagination",productWarehouseWithPagination)
+
   const [createWarehouseTransfer, { loading }] = useMutation(
     CREATE_WAREHOUSE_TRANSFER,
     {
@@ -192,6 +194,7 @@ export default function ProductTransferForm({
                     <TextField
                       {...params}
                       size="small"
+                      placeholder={t("select_shop")}
                       error={Boolean(
                         touched.toShopIds && errors.toShopIds
                       )}
@@ -209,6 +212,7 @@ export default function ProductTransferForm({
                 <TextField
                   fullWidth
                   multiline
+                  placeholder={t("remark")}
                   size="small"
                   value={values.note}
                   onChange={(e) =>
@@ -234,10 +238,11 @@ export default function ProductTransferForm({
 
               {values.items.map((item, index) => (
                 <Grid container spacing={2} key={index}>
-                  {/* Product */}
+                  
                   <Grid size={{ xs: 12, md: 4 }}>
                     <Typography>{t("product")}</Typography>
                     <Autocomplete
+                       
                       options={productWarehouseWithPagination}
                       loading={productLoading}
                       value={
@@ -258,9 +263,6 @@ export default function ProductTransferForm({
                         const unit = language === "en"
                           ? p?.subProduct?.unitId?.nameEn
                           : p?.subProduct?.unitId?.nameKh
-
-
-
                         return `${name} (${unit})`;
                       }}
                       onChange={(e, val) => {
@@ -299,6 +301,7 @@ export default function ProductTransferForm({
                     <TextField
                       size="small"
                       type="number"
+                      placeholder={t("quantity")}
                       value={item.quantity}
                       onChange={(e) =>
                         updateItem(index, "quantity", e.target.value)
@@ -312,6 +315,7 @@ export default function ProductTransferForm({
                     <TextField
                       size="small"
                       type="number"
+                      placeholder={t("cost")}
                       value={item.costPrice}
                       onChange={(e) =>
                         updateItem(index, "costPrice", e.target.value)
@@ -333,7 +337,7 @@ export default function ProductTransferForm({
                   </Grid>
 
 
-                  <Grid size={{ xs: 12, md: 1 }}>
+                  <Grid size={{ xs: 12, md: 1 }} sx={{textAlign:"end"}} >
                     <Typography>{t("delete")}</Typography>
                     <IconButton onClick={() => deleteItem(index)}>
                       <X color="red" />

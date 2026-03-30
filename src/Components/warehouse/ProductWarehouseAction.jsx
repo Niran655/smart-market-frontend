@@ -1,14 +1,19 @@
 import { IconButton, Stack, Tooltip } from "@mui/material";
-import { Shrink, Shuffle, SquarePen, Trash } from "lucide-react";
+import { Shrink, Trash } from "lucide-react";
 import React, { useState } from "react";
 
 import AdjustStockForm from "./AdjustStockForm";
+ 
+import { DELETE_PRODUCT_FORM_WAREHOUSE } from "../../../graphql/mutation";
+import { useMutation } from "@apollo/client/react";
+import UseDeleteForm from "../include/useDeleteForm";
 
 export default function ProductWarehouseAction({
   subProductId,
   t,
   setRefetch,
-  unit
+  unit,
+  warehouseData
 }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -17,6 +22,28 @@ export default function ProductWarehouseAction({
   const [openDelete, setOpenDelete] = useState(false);
   const handleOpenDelete = () => setOpenDelete(true);
   const handleCloseDelete = () => setOpenDelete(false);
+
+  // GraphQL mutation hook
+  const [deleteProduct, { loading }] = useMutation(
+    DELETE_PRODUCT_FORM_WAREHOUSE,
+    {
+      onCompleted: () => {
+        setRefetch((prev) => !prev); // trigger refetch
+        handleCloseDelete();
+      },
+      onError: (err) => {
+        console.error("Delete failed:", err);
+      },
+    }
+  );
+
+  const handleDelete = () => {
+    deleteProduct({
+      variables: {
+        id: warehouseData?._id,  
+      },
+    });
+  };
 
   return (
     <div>
@@ -27,13 +54,12 @@ export default function ProductWarehouseAction({
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Delete">
+        <Tooltip title={t("delete")}>
           <IconButton className="delete-icon" onClick={handleOpenDelete}>
             <Trash size="18px" color="red" />
           </IconButton>
         </Tooltip>
 
-     
         {open && (
           <AdjustStockForm
             open={open}
@@ -42,6 +68,15 @@ export default function ProductWarehouseAction({
             subProductId={subProductId}
             setRefetch={setRefetch}
             t={t}
+          />
+        )}
+
+        {openDelete && (
+          <UseDeleteForm
+            open={openDelete}
+            onClose={handleCloseDelete}
+            handleDelete={handleDelete}
+            loading={loading}
           />
         )}
       </Stack>

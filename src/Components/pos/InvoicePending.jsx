@@ -54,12 +54,12 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
   const [updateSaleStatus, { loading: updating }] = useMutation(UPDATE_SALE_STATUS, {
     onCompleted: (data) => {
       if (data?.updateSaleStatus?.isSuccess) {
-        setAlert(true, "success", data.updateSaleStatus.message.messageEn);
+        setAlert(true, "success", data.updateSaleStatus.messag);
         setOpenPaymentDialog(false);
         setSelectedSale(null);
         refetch();
       } else {
-        setAlert(true, "error", data?.updateSaleStatus?.message?.messageEn || "Failed to update sale");
+        setAlert(true, "error", data?.updateSaleStatus?.message );
       }
       setCreating(false);
     },
@@ -76,7 +76,7 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
     if (open) {
       refetch();
     }
-  }, [open]);
+  }, [open, refetch]);
 
   const handleContinuePayment = (sale) => {
     setSelectedSale(sale);
@@ -84,22 +84,57 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
     setOpenPaymentDialog(true);
   };
 
+ 
+  const getItemDisplayName = (item) => {
+    const subProduct = item.subProductId;
+    const product = item.product;
+    if (subProduct && typeof subProduct === 'object') {
+      return subProduct.productDes || (language === "kh" ? product?.nameKh : product?.nameEn) || item.name;
+    }
+    if (product && typeof product === 'object') {
+      return language === "kh" ? product.nameKh : product.nameEn;
+    }
+    return item.name;
+  };
+
+ 
+  const getItemImage = (item) => {
+    const subProduct = item.subProductId;
+    const product = item.product;
+    if (subProduct && typeof subProduct === 'object' && subProduct.productImg) {
+      return subProduct.productImg;
+    }
+    if (product && typeof product === 'object' && product.image) {
+      return product.image;
+    }
+ 
+    return null;
+  };
+
+ 
   const handleLoadToCart = (sale) => {
     if (onLoadToCart) {
-      const cartItems = sale.items.map(item => ({
-        id: item.subProductId?._id || item.product?._id,
-        subProductId: item.subProductId?._id || item.product?._id,
-        productId: item.product?._id,
-        name: language === "kh"
-          ? item.product?.nameKh || item.name
-          : item.product?.nameEn || item.name,
-        nameEn: item.product?.nameEn || item.name,
-        nameKh: item.product?.nameKh || item.name,
-        price: item.price,
-        qty: item.quantity,
-        img: item.product?.image || item.subProductId?.productImg,
-        variant: "Original",
-      }));
+      const cartItems = sale.items.map(item => {
+        const subProduct = item.subProductId;  
+        const product = item.product;
+        const displayName = getItemDisplayName(item);
+        const displayNameEn = subProduct?.productDes || product?.nameEn || item.name;
+        const displayNameKh = subProduct?.productDes || product?.nameKh || item.name;
+        const imageUrl = getItemImage(item);
+
+        return {
+          id: subProduct?._id || product?._id || item.subProductId, 
+          subProductId: subProduct?._id || item.subProductId,  
+          productId: product?._id,
+          name: displayName,
+          nameEn: displayNameEn,
+          nameKh: displayNameKh,
+          price: item.price,
+          qty: item.quantity,
+          img: imageUrl,
+          variant: subProduct?.productDes || "Original",
+        };
+      });
 
       onLoadToCart(cartItems, sale.total || 0);
       onClose();
@@ -143,17 +178,12 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
   const confirmDelete = async () => {
     if (!saleToDelete) return;
 
-    try {
-      // Add your delete mutation here when ready
-      // await deleteSaleMutation({ variables: { id: saleToDelete._id } });
-      
-      setAlert(true, "info", language === "kh" ? "លុបវិក័យប័ត្របណ្ដោះអាសន្ន" : "Delete pending invoice");
-      setDeleteConfirmOpen(false);
-      setSaleToDelete(null);
-      refetch();
-    } catch (error) {
-      console.error("Delete error:", error);
-    }
+ 
+    
+    setAlert(true, "info", language === "kh" ? "លុបវិក័យប័ត្របណ្ដោះអាសន្ន" : "Delete pending invoice");
+    setDeleteConfirmOpen(false);
+    setSaleToDelete(null);
+    refetch();
   };
 
   const formatDate = (dateString) => {
@@ -186,12 +216,10 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
               <LinearProgress />
             ) : error ? (
               <Typography color="error" align="center">
-               
                 {t(`error_fetching_data`)}
               </Typography>
             ) : sales.length === 0 ? (
               <Typography align="center" color="text.secondary" sx={{ mt: 4 }}>
-                
                 {t(`no_pending_invoices`)}
               </Typography>
             ) : (
@@ -237,7 +265,6 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
                           onClick={() => handleLoadToCart(sale)}
                           sx={{ flex: 1 }}
                         >
-                    
                           {t(`load_to_cart`)}
                         </Button>
                         <Button
@@ -247,11 +274,9 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
                           onClick={() => handleContinuePayment(sale)}
                           sx={{ flex: 1 }}
                         >
-                          
                           {t(`continue_payment`)}
                         </Button>
-                        <Stack>
-                           <IconButton
+                        <IconButton
                           size="small"
                           color="error"
                           onClick={() => handleDeletePending(sale)}
@@ -259,8 +284,6 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
                         >
                           <Trash2 size={16} />
                         </IconButton>
-                        </Stack>
-                       
                       </Stack>
 
                       {sale.items?.length > 0 && (
@@ -271,7 +294,7 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
                           <Stack spacing={0.5}>
                             {sale.items.slice(0, 2).map((item, index) => (
                               <Typography key={index} variant="body2">
-                                • {item.name} × {item.quantity}
+                                • {getItemDisplayName(item)} × {item.quantity}
                               </Typography>
                             ))}
                             {sale.items.length > 2 && (
@@ -290,6 +313,7 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
           </Box>
         </Box>
       </Drawer>
+
       <Dialog open={openPaymentDialog} onClose={() => setOpenPaymentDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>
           <Typography variant="h6" fontWeight="bold">
@@ -466,7 +490,6 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Delete Confirm Dialog */}
       <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)} maxWidth="xs" fullWidth>
         <DialogTitle>
           <Typography variant="h6" fontWeight="bold">

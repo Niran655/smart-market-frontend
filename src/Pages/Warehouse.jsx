@@ -476,6 +476,7 @@ import CircularIndeterminate from "../include/Loading";
 import useGetPurchaseOrdersWithPagination from "../Components/hook/useGetPurchaseOrdersWithPagination";
 import PurchaseOrderAction from "../Components/warehouse/purchaseOrder/PurchaseOrderAction";
 import PurchaseOrderForm from "../Components/warehouse/purchaseOrder/PurchaseOrderForm";
+import useGetStockMovementWithPagination from "../Components/hook/useGetStockMovementWithPagination";
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -503,12 +504,13 @@ const Warehouse = () => {
   const [productWarehouseLimit, setProductWarehouseLimit] = useState(5);
   const [productWarehouseKeyword, setProductWarehouseKeyword] = useState("");
 
-  const [productWarehouseTransferPage, setProductWarehouseTransferPage] =
-    useState(1);
-  const [productWarehouseTransferLimit, setProductWarehouseTransferLimit] =
-    useState(5);
-  const [productWarehouseTransferKeyword, setProductWarehouseTransferKeyword] =
-    useState("");
+  const [productWarehouseTransferPage, setProductWarehouseTransferPage] = useState(1);
+  const [productWarehouseTransferLimit, setProductWarehouseTransferLimit] = useState(5);
+  const [productWarehouseTransferKeyword, setProductWarehouseTransferKeyword] = useState("");
+
+  const [stockMovementPage, setStockMovementPage] = useState(1);
+  const [stockMovementLimit, setStockMovementLimit] = useState(5);
+  const [stockMovementKeyword, setStockMovementKeyword] = useState("");
 
   const [purchaseOrderPage, setPurchaseOrderPage] = useState(1);
   const [purchaseOrderLimit, setPurchaseOrderLimit] = useState(5);
@@ -541,6 +543,20 @@ const Warehouse = () => {
     pagination: true,
     keyword: productWarehouseTransferKeyword,
   });
+
+  const {
+    stockMovement,
+    loading: stockMovementLoading,
+    refetch: sotckMovementRefetch,
+    paginator: stockMovementPaginator,
+  } = useGetStockMovementWithPagination({
+    page: stockMovementPage,
+    limit: stockMovementLimit,
+    pagination: true,
+    keyword: stockMovementKeyword,
+  });
+
+
 
   const {
     purchaseOrders,
@@ -583,7 +599,15 @@ const Warehouse = () => {
   };
   const handlePurchaseOrderPageChange = (newPage) => {
     setPurchaseOrderPage(newPage);
+  };
 
+  const handleLimitStockMovement = (e) => {
+    const newLimit = parseInt(e.target.value, 10);
+    setStockMovementLimit(newLimit);
+    setStockMovementPage(1);
+  };
+  const handleStockMovementPageChange = (newPage) => {
+    setStockMovementPage(newPage);
   };
 
   const theme = useTheme();
@@ -655,7 +679,7 @@ const Warehouse = () => {
                 onClick={() => setActiveTab("3")}
                 sx={{ justifyContent: "flex-start", textTransform: "none" }}
               >
-                {t("get_product")}
+                {t("stock_movement")}
               </Button>
               <Button
                 fullWidth
@@ -764,6 +788,7 @@ const Warehouse = () => {
                                 setRefetch={productWarehouseRefetch}
                                 subProductId={row?.subProduct?._id}
                                 t={t}
+                                warehouseData={row}
                               />
                             </TableCell>
                           </TableRow>
@@ -1061,7 +1086,109 @@ const Warehouse = () => {
                 </TableContainer>
               </Box>
             }
-            {activeTab === "3" && <Typography> Reports Content</Typography>}
+            {activeTab === "3" && <Box>
+              <TableContainer className="table-container">
+                <Table className="table"  >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>{t("no")}</TableCell>
+                      <TableCell>{t("date")}</TableCell>
+                      <TableCell>{t("product")}</TableCell>
+                      <TableCell>{t("type")}</TableCell>
+                      <TableCell>{t("quantity")}</TableCell>
+                      <TableCell>{t("previous_stock")}</TableCell>
+                      <TableCell>{t("new_stock")}</TableCell>
+                      <TableCell>{t("reason")}</TableCell>
+      
+                    </TableRow>
+                  </TableHead>
+                  {stockMovementLoading ? (
+                    <CircularIndeterminate />
+                  ) : stockMovement?.length === 0 ? (
+                    <EmptyData />
+                  ) : (
+                    <TableBody>
+                      {stockMovement?.map((row, index) => (
+                        <TableRow className="table-row" key={index}>
+
+                          {/* No */}
+                          <TableCell>
+                            {stockMovementPaginator?.slNo + index}
+                          </TableCell>
+
+                          {/* Date */}
+                          <TableCell>
+                            {new Date(row?.createdAt).toLocaleString()}
+                          </TableCell>
+
+                          {/* Product */}
+                          <TableCell>
+                            {language === "kh"
+                              ? row?.product?.nameKh
+                              : row?.product?.nameEn}
+                          </TableCell>
+
+                          {/* Type */}
+                          <TableCell>
+                            <Chip
+                              label={row?.type}
+                              size="small"
+                              sx={{
+                                width:50,
+                                bgcolor:
+                                  row?.type === "in"
+                                    ? "#4CAF50"
+                                    : row?.type === "out"
+                                      ? "#F44336"
+                                      : "#FF9800",
+                                color: "#fff",
+                                fontWeight: 600,
+                              }}
+                            />
+                          </TableCell>
+
+                          {/* Quantity */}
+                          <TableCell>
+                            {row?.quantity}{" "}
+                            {language === "kh"
+                              ? row?.subProduct?.unitId?.nameKh
+                              : row?.subProduct?.unitId?.nameEn}
+                          </TableCell>
+
+                          {/* Previous Stock */}
+                          <TableCell>{row?.previousStock}</TableCell>
+
+                          {/* New Stock */}
+                          <TableCell>{row?.newStock}</TableCell>
+
+                          {/* Reason */}
+                          <TableCell>{row?.reason || "-"}</TableCell>
+
+                     
+ 
+
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  )}
+                </Table>
+                <Stack
+                  direction="row"
+                  justifyContent="flex-end"
+                  alignItems="center"
+                  sx={{ padding: 2 }}
+                >
+                  <FooterPagination
+                    page={stockMovementPage}
+                    limit={stockMovementLimit}
+                    setPage={handleStockMovementPageChange}
+                    handleLimit={handleLimitStockMovement}
+                    totalDocs={stockMovementPaginator?.totalDocs}
+                    totalPages={stockMovementPaginator?.totalPages}
+                  />
+                </Stack>
+              </TableContainer>
+            </Box>}
             {activeTab === "4" && <Typography> 4</Typography>}
           </Box>
         </Grid>

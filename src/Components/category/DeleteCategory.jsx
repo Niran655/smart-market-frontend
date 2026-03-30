@@ -37,7 +37,7 @@ export default function DeleteCategory({
     onError: (error) => {
       setLoading(false);
       console.error("Error", error);
-      setAlert(true, "error", t("delete_failed"));
+      setAlert(true, "error", deleteCategory?.message);
     },
   });
 

@@ -3,6 +3,7 @@ import Drawer from "@mui/material/Drawer";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
 import {
   Divider,
   IconButton,
@@ -22,28 +23,49 @@ import {
   Tooltip,
 } from "@mui/material";
 import { X, CheckCircle, RefreshCw, MoreVertical, Eye } from 'lucide-react';
-import { useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import { useAuth } from "../../context/AuthContext";
 import { translateLauguage } from "../../function/translate";
 import { GET_SALES } from "../../../graphql/queries";
+import { REFUND_SALE } from "../../../graphql/mutation";
 
 const SaleHistory = ({ open, onClose, t, shopId, onViewDetails }) => {
-  const { language } = useAuth();
+  const { language, setAlert } = useAuth();
   const { t: translate } = translateLauguage(language);
   const [tabValue, setTabValue] = useState(0);
   const [selectedSale, setSelectedSale] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const [openRefundSaleDialog, setOpenRefundSaleDialog] = useState(false);
 
-  // Query to fetch sales (only completed and refunded)
   const { data, loading, error, refetch } = useQuery(GET_SALES, {
     variables: {
       shopId: shopId,
       status: tabValue === 0 ? "completed" : "refunded",
       pagination: false,
-      limit: 50
+      limit: 50,
     },
     skip: !open || !shopId,
+  });
+
+  
+  const [refundSaleMutation, { loading: refundLoading }] = useMutation(REFUND_SALE, {
+    onCompleted: ({ refundSale }) => {
+      if (refundSale?.isSuccess) {
+        setAlert(true, "success", refundSale?.message);
+       
+        setOpenRefundSaleDialog(false);
+        refetch();
+      } else {
+        setAlert(true, "error", refundSale?.message);
+      }
+    },
+    onError: (error) => {
+      console.error("Refund error:", error);
+      setAlert(true, "error", error.message);
+    },
   });
 
   const sales = data?.getSales?.data || [];
@@ -75,8 +97,209 @@ const SaleHistory = ({ open, onClose, t, shopId, onViewDetails }) => {
     }
   };
 
+  const handleOpenRefundSale = (sale) => {
+    setSelectedSale(sale);
+    setOpenRefundSaleDialog(true);
+  };
+
+ 
+  const refundValidationSchema = Yup.object({
+    reason: Yup.string().required(t("require")),
+  });
+
+ 
+  const formik = useFormik({
+    initialValues: {
+      reason: "",
+    },
+    validationSchema: refundValidationSchema,
+    onSubmit: (values) => {
+      if (selectedSale) {
+        refundSaleMutation({
+          variables: {
+            id: selectedSale._id,
+            reason: values.reason,
+          },
+        });
+      }
+    },
+  });
+
+  // Print receipt function (unchanged)
   const handlePrintReceipt = (sale) => {
-    console.log("Print receipt for:", sale);
+    if (!sale) return;
+
+    const formatReceiptDate = (dateString) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString(language === "kh" ? 'km-KH' : 'en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    };
+
+    const invoiceHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${t("receipt")} #${sale.saleNumber}</title>
+        <style>
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+          }
+          .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+          }
+          .header h1 {
+            margin: 0;
+            font-size: 24px;
+          }
+          .header p {
+            margin: 5px 0;
+            color: #666;
+          }
+          .sale-info {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+          }
+          .sale-info div {
+            font-size: 14px;
+          }
+          .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          .items-table th, .items-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+          }
+          .items-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+          }
+          .items-table td:last-child, .items-table th:last-child {
+            text-align: right;
+          }
+          .totals {
+            text-align: right;
+            margin-top: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+          }
+          .totals p {
+            margin: 5px 0;
+          }
+          .totals .grand-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c7da0;
+          }
+          .payment-info {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+          }
+          .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #888;
+          }
+          @media print {
+            body {
+              margin: 0;
+              padding: 0;
+            }
+            .invoice-container {
+              border: none;
+              padding: 0;
+            }
+            .no-print {
+              display: none;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="invoice-container">
+          <div class="header">
+            <h1>${t("receipt")}</h1>
+            <p>${t("invoice")} #${sale.saleNumber}</p>
+          </div>
+          <div class="sale-info">
+            <div><strong>${t("date")}:</strong> ${formatReceiptDate(sale.createdAt)}</div>
+            <div><strong>${t("status")}:</strong> ${sale.status === "completed" ? t("completed") : t("refunded")}</div>
+          </div>
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>${t("items")}</th>
+                <th>${t("quantity")}</th>
+                <th>${t("price")}</th>
+                <th>${t("total")}</th>
+               </tr>
+            </thead>
+            <tbody>
+              ${sale.items?.map(item => `
+                <tr>
+                  <td>${item.name}</td>
+                  <td>${item.quantity}</td>
+                  <td>$${item.price?.toFixed(2)}</td>
+                  <td>$${(item.quantity * item.price)?.toFixed(2)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div class="totals">
+            <p><strong>${t("subtotal")}:</strong> $${sale.subtotal?.toFixed(2)}</p>
+            <p><strong>${t("tax")} (10%):</strong> $${sale.tax?.toFixed(2)}</p>
+            <p><strong>${t("discount")}:</strong> -$${sale.discount?.toFixed(2)}</p>
+            <p class="grand-total"><strong>${t("total_price")}:</strong> $${sale.total?.toFixed(2)}</p>
+          </div>
+          <div class="payment-info">
+            <p><strong>${t("payment_method")}:</strong> ${sale.paymentMethod?.toUpperCase()}</p>
+            <p><strong>${t("amount_paid")}:</strong> $${sale.amountPaid?.toFixed(2)}</p>
+            ${sale.change > 0 ? `<p><strong>${t("money_change")}:</strong> $${sale.change?.toFixed(2)}</p>` : ''}
+          </div>
+          <div class="footer">
+            <p>${t("thank_you")}</p>
+          </div>
+        </div>
+        <div class="no-print" style="text-align:center; margin-top:20px;">
+          <button onclick="window.print(); setTimeout(() => window.close(), 500);" style="padding:8px 16px;">${t("print")}</button>
+        </div>
+        <script>
+          window.onload = () => {
+            window.print();
+            setTimeout(() => window.close(), 500);
+          };
+        </script>
+      </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    printWindow.document.write(invoiceHtml);
+    printWindow.document.close();
   };
 
   const formatDate = (dateString) => {
@@ -126,6 +349,7 @@ const SaleHistory = ({ open, onClose, t, shopId, onViewDetails }) => {
         return "💰";
     }
   };
+
   return (
     <>
       <Drawer
@@ -158,7 +382,6 @@ const SaleHistory = ({ open, onClose, t, shopId, onViewDetails }) => {
               <LinearProgress />
             ) : error ? (
               <Typography color="error" align="center">
-
                 {t(`error_fetching_data`)}
               </Typography>
             ) : sales.length === 0 ? (
@@ -188,7 +411,7 @@ const SaleHistory = ({ open, onClose, t, shopId, onViewDetails }) => {
                               {sale.items?.length || 0} {language === "kh" ? "ទំនិញ" : "items"}
                             </Typography>
                             <Typography variant="body2" fontWeight="bold">
-                              {t(`total`)}: ${sale.total?.toFixed(2) || "0.00"}
+                              {t(`total_price`)}: ${sale.total?.toFixed(2) || "0.00"}
                             </Typography>
                           </Stack>
 
@@ -231,7 +454,6 @@ const SaleHistory = ({ open, onClose, t, shopId, onViewDetails }) => {
           handleMenuClose();
         }}>
           <Eye size={16} style={{ marginRight: 8 }} />
-
           {t(`view_details`)}
         </MenuItem>
         <MenuItem onClick={() => {
@@ -241,7 +463,18 @@ const SaleHistory = ({ open, onClose, t, shopId, onViewDetails }) => {
           <CheckCircle size={16} style={{ marginRight: 8 }} />
           {t(`print_receipt`)}
         </MenuItem>
+        {/* Only show refund option for completed sales */}
+        {selectedSale?.status === "completed" && (
+          <MenuItem onClick={() => {
+            handleOpenRefundSale(selectedSale);
+            handleMenuClose();
+          }}>
+            <RefreshCw size={16} style={{ marginRight: 8 }} />
+            {t(`sale_refund`)}
+          </MenuItem>
+        )}
       </Menu>
+
       {/* Details Dialog */}
       <Dialog
         open={openDetailsDialog}
@@ -251,17 +484,13 @@ const SaleHistory = ({ open, onClose, t, shopId, onViewDetails }) => {
       >
         <DialogTitle>
           <Typography variant="h6" fontWeight="bold">
-
             {t(`sale_details`)}
           </Typography>
         </DialogTitle>
-        <DialogContent sx={{
-          scrollbarWidth: "none",
-        }}>
+        <DialogContent sx={{ scrollbarWidth: "none" }}>
           {selectedSale && (
             <Box sx={{ mt: 2 }}>
               <Stack spacing={2}>
-
                 <Box sx={{ p: 2, borderRadius: 1 }}>
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <Box>
@@ -275,7 +504,6 @@ const SaleHistory = ({ open, onClose, t, shopId, onViewDetails }) => {
                     {getStatusChip(selectedSale.status)}
                   </Stack>
                 </Box>
-
 
                 <Box>
                   <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
@@ -297,7 +525,6 @@ const SaleHistory = ({ open, onClose, t, shopId, onViewDetails }) => {
                     </Box>
                   ))}
                 </Box>
-
 
                 <Box sx={{ p: 2, borderRadius: 1 }}>
                   <Stack spacing={1}>
@@ -322,6 +549,7 @@ const SaleHistory = ({ open, onClose, t, shopId, onViewDetails }) => {
                     </Box>
                   </Stack>
                 </Box>
+
                 <Box>
                   <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                     {t(`payment_information`)}
@@ -372,10 +600,62 @@ const SaleHistory = ({ open, onClose, t, shopId, onViewDetails }) => {
             onClick={() => handlePrintReceipt(selectedSale)}
             variant="outlined"
           >
-
             {t(`print`)}
           </Button>
         </DialogActions>
+      </Dialog>
+ 
+      <Dialog
+        open={openRefundSaleDialog}
+        onClose={() => setOpenRefundSaleDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography variant="h6" fontWeight="bold">
+            {t(`create_refund`)}
+          </Typography>
+        </DialogTitle>
+        <form onSubmit={formik.handleSubmit}>
+          <DialogContent sx={{ scrollbarWidth: "none" }}>
+            <Typography fontWeight="bold">
+            {t(`reason`)}
+          </Typography>
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              id="reason"
+              name="reason"
+         
+              value={formik.values.reason}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.reason && Boolean(formik.errors.reason)}
+              helperText={formik.touched.reason && formik.errors.reason}
+              disabled={refundLoading}
+              required
+            />
+          </DialogContent>
+          <DialogActions >
+            {/* <Button
+              onClick={() => setOpenRefundSaleDialog(false)}
+              color="inherit"
+              disabled={refundLoading}
+            >
+              {t(`cancel`)}
+            </Button> */}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              disabled={refundLoading}
+            >
+              {refundLoading ? t("processing...") : t("create")}
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </>
   );

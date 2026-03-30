@@ -14,6 +14,7 @@ import { useAuth } from "../context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
+import useGetStockMovementWithPagination from "../Components/hook/useGetStockMovementWithPagination";
 
 const getStatusStyle = (status) => {
   switch (status) {
@@ -74,6 +75,10 @@ const WarehouseInShop = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
 
+    const [stockMovementPage, setStockMovementPage] = useState(1);
+    const [stockMovementLimit, setStockMovementLimit] = useState(5);
+    const [stockMovementKeyword, setStockMovementKeyword] = useState("");
+
   const [transferPage, setTransferPage] = useState(1);
   const [transferLimit, setTransferLimit] = useState(5);
 
@@ -106,6 +111,29 @@ const WarehouseInShop = () => {
     pagination: true,
     keyword: "",
   });
+
+    const {
+    stockMovement,
+    loading: stockMovementLoading,
+    refetch: sotckMovementRefetch,
+    paginator: stockMovementPaginator,
+  } = useGetStockMovementWithPagination({
+    page: stockMovementPage,
+    limit: stockMovementLimit,
+    pagination: true,
+    keyword: stockMovementKeyword,
+    shopId:savedStoreId
+  });
+
+  
+  const handleLimitStockMovement = (e) => {
+    const newLimit = parseInt(e.target.value, 10);
+    setStockMovementLimit(newLimit);
+    setStockMovementPage(1);
+  };
+  const handleStockMovementPageChange = (newPage) => {
+    setStockMovementPage(newPage);
+  };
 
   const filteredProducts = producteWarehouseInShop?.filter((item) => {
     if (status === "All") return true;
@@ -155,6 +183,7 @@ const WarehouseInShop = () => {
             <Tab label={t("purchase_order")} value="2" />
             <Tab label={t("get_product")} value="3" />
             <Tab label={t("request_to_warehouse")} value="4" />
+              <Tab label={t("stock_movement")} value="5" />
           </TabList>
         </Box>
 
@@ -371,7 +400,7 @@ const WarehouseInShop = () => {
                   <TableCell>{t("items")}</TableCell>
                   <TableCell>{t("total_qty")}</TableCell>
                   <TableCell>{t("total_price")}</TableCell>
-                  <TableCell>{t("requested_by")}</TableCell>
+                  <TableCell>{t("send_by")}</TableCell>
                   <TableCell>{t("accepted_by")}</TableCell>
                   <TableCell>{t("status")}</TableCell>
                   <TableCell>{t("date")}</TableCell>
@@ -490,6 +519,111 @@ const WarehouseInShop = () => {
 
         <TabPanel value="4">
           <Typography>Request to warehouse</Typography>
+        </TabPanel>
+          <TabPanel value="5">
+         <Box>
+                       <TableContainer className="table-container">
+                         <Table className="table"  >
+                           <TableHead>
+                             <TableRow>
+                               <TableCell>{t("no")}</TableCell>
+                               <TableCell>{t("date")}</TableCell>
+                               <TableCell>{t("product")}</TableCell>
+                               <TableCell>{t("type")}</TableCell>
+                               <TableCell>{t("quantity")}</TableCell>
+                               <TableCell>{t("previous_stock")}</TableCell>
+                               <TableCell>{t("new_stock")}</TableCell>
+                               <TableCell>{t("reason")}</TableCell>
+               
+                             </TableRow>
+                           </TableHead>
+                           {stockMovementLoading ? (
+                             <CircularIndeterminate />
+                           ) : stockMovement?.length === 0 ? (
+                             <EmptyData />
+                           ) : (
+                             <TableBody>
+                               {stockMovement?.map((row, index) => (
+                                 <TableRow className="table-row" key={index}>
+         
+                                   {/* No */}
+                                   <TableCell>
+                                     {stockMovementPaginator?.slNo + index}
+                                   </TableCell>
+         
+                                   {/* Date */}
+                                   <TableCell>
+                                     {new Date(row?.createdAt).toLocaleString()}
+                                   </TableCell>
+         
+                                   {/* Product */}
+                                   <TableCell>
+                                     {language === "kh"
+                                       ? row?.product?.nameKh
+                                       : row?.product?.nameEn}
+                                   </TableCell>
+         
+                                   {/* Type */}
+                                   <TableCell>
+                                     <Chip
+                                       label={row?.type}
+                                       size="small"
+                                       sx={{
+                                         width:50,
+                                         bgcolor:
+                                           row?.type === "in"
+                                             ? "#4CAF50"
+                                             : row?.type === "out"
+                                               ? "#F44336"
+                                               : "#FF9800",
+                                         color: "#fff",
+                                         fontWeight: 600,
+                                       }}
+                                     />
+                                   </TableCell>
+         
+                                   {/* Quantity */}
+                                   <TableCell>
+                                     {row?.quantity}{" "}
+                                     {language === "kh"
+                                       ? row?.subProduct?.unitId?.nameKh
+                                       : row?.subProduct?.unitId?.nameEn}
+                                   </TableCell>
+         
+                                   {/* Previous Stock */}
+                                   <TableCell>{row?.previousStock}</TableCell>
+         
+                                   {/* New Stock */}
+                                   <TableCell>{row?.newStock}</TableCell>
+         
+                                   {/* Reason */}
+                                   <TableCell>{row?.reason || "-"}</TableCell>
+         
+                              
+          
+         
+                                 </TableRow>
+                               ))}
+                             </TableBody>
+                           )}
+                         </Table>
+                         <Stack
+                           direction="row"
+                           justifyContent="flex-end"
+                           alignItems="center"
+                           sx={{ padding: 2 }}
+                         >
+                           <FooterPagination
+                             page={stockMovementPage}
+                             limit={stockMovementLimit}
+                             setPage={handleStockMovementPageChange}
+                             handleLimit={handleLimitStockMovement}
+                             totalDocs={stockMovementPaginator?.totalDocs}
+                             totalPages={stockMovementPaginator?.totalPages}
+                           />
+                         </Stack>
+                       </TableContainer>
+                     </Box>
         </TabPanel>
       </TabContext>
     </Box>

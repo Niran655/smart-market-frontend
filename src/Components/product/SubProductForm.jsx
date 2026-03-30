@@ -107,7 +107,7 @@ export default function SubProductForm({
       saleType: subProductData?.saleType || "retail",
       unitId: subProductData?.unitId?._id || subProductData?.unitId || "",
       qty: subProductData?.qty ?? 0,
-      stock: subProductData?.stock || 0,
+      // stock: subProductData?.stock || 0,
       minStock: subProductData?.minStock || 0,
       barCode: subProductData?.barCode || "",
       productDes: subProductData?.productDes || "",
@@ -203,7 +203,7 @@ export default function SubProductForm({
           productDes: subProductData?.productDes || "",
           productImg: subProductData?.productImg || "",
           using: subProductData?.using ?? false,
-          stock: subProductData?.stock,
+          // stock: subProductData?.stock,
           minStock: subProductData?.minStock,
           check: subProductData?.check ?? false,
           sell: subProductData?.sell ?? false,
@@ -366,7 +366,7 @@ export default function SubProductForm({
                     />
                   </Grid>
 
-                  {values.check && (
+                  {/* {values.check && (
                     <Grid size={{ xs: 12, md: 3 }}>
                       <Typography variant="body2">
                         {t("current_stock")}
@@ -381,7 +381,7 @@ export default function SubProductForm({
                         helperText={touched.stock && errors.stock}
                       />
                     </Grid>
-                  )}
+                  )} */}
 
                   {values.check && (
                     <Grid size={{ xs: 12, md: 3 }}>

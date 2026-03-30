@@ -8,6 +8,8 @@ import { useState } from "react";
 import logo from "../assets/Image/logo.png";
 import { useThemeContext } from "../Context/ThemeContext";
 import "./menuNavbar.scss";
+import { useAuth } from "../context/AuthContext";
+import { translateLauguage } from "../function/translate";
 
  
 function getContrastText(hexColor) {
@@ -22,44 +24,48 @@ function getContrastText(hexColor) {
 export default function MenuNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const {language} = useAuth();
+  const {t} = translateLauguage(language);
+
   const { sidebarColor, layoutMode } = useThemeContext();
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const menuData = [
     {
-      pageTitle: "Dashboard",
+      pageTitle: t(`dashboard`),
       routeTo: "/dashboard",
       pageIcon: <Category className="icon" />,
     },
     {
-      pageTitle: "Warehouse",
+      pageTitle: t(`warehouse`),
       routeTo: "/warehouse",
       pageIcon: <HomeHashtag className="icon" />,
     },
     {
-      pageTitle: "Order",
+      pageTitle: t(`orders`),
       routeTo: "/order",
       pageIcon: <Tag className="icon" />,
       matchPaths: ["/order", "/order/view-order-detail"],
     },
     {
-      pageTitle: "Chat",
+      pageTitle: t(`message`),
       routeTo: "/chat",
       pageIcon: <Messages2 className="icon" />,
     },
     {
-      pageTitle: "On Sale",
+      pageTitle: t(`sale`),
       routeTo: "/on-sale",
       pageIcon: <Bag2 className="icon" />,
     },
     {
-      pageTitle: "Customer",
+      pageTitle: t(`customer`),
       routeTo: "/customer",
       pageIcon: <UserOctagon className="icon" />,
       matchPaths: ["/customer", "/customer/customer-detail"],
     },
     {
-      pageTitle: "Reports",
+      pageTitle: t(`report`),
       routeTo: "/report",
       pageIcon: <DocumentText1 className="icon" />,
     },
@@ -281,12 +287,13 @@ export default function MenuNavbar() {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
+                    borderRadius: "50%",
                   }}
                 >
                   <IoSettingsOutline size={25} className="icon" />
                 </ListItemIcon>
                 {layoutMode !== "compact" && (
-                  <Typography sx={{ ml: 1, color: textColor }}>Setting</Typography>
+                  <Typography sx={{ ml: 1, color: textColor }}>{t(`setting`)}</Typography>
                 )}
               </Stack>
             </ListItemButton>

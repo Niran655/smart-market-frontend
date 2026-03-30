@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { BookmarkX, ChartBarStacked, LogIn, Search,Settings } from "lucide-react";
+import { BookmarkX, ChartBarStacked, LogIn, Search, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import ShopAction from "../Components/Shop/ShopAction";
@@ -193,20 +193,27 @@ const Store = () => {
       </Box>
 
       {/* Shops List */}
-
       <Grid container spacing={3} mt={4}>
         {filteredShops?.map((shop, index) => (
-          <Grid size={{ xs: 12, md: 6 }} key={index}>
-            <Card sx={{ p: 2 }}>
+          <Grid size={{ xs: 12, md: 4 }} key={index}>
+            <Card
+              sx={{
+                p: 2,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                height: "100%",
+              }}
+            >
+              {/* Top Section: Logo + Report */}
               <Stack
                 direction="row"
                 spacing={2}
                 alignItems="start"
                 justifyContent="space-between"
               >
-                
-
-                <Stack direction={"row"} spacing={2} alignItems={"center"}>
+              
+                <Stack direction="row" spacing={2} alignItems="start">
                   <img
                     src={shop.image}
                     alt={shop.nameKh}
@@ -214,45 +221,44 @@ const Store = () => {
                     height={80}
                     style={{ borderRadius: "5px" }}
                   />
-
-                  <Box>
-                    <Typography variant="subtitle1" fontWeight={600}>
-                      {language === "en" ? shop.nameEn : shop.nameKh}
-                    </Typography>
-
-                    <Stack direction={"column"} spacing={1} mt={2}>
-                      <Button
-                        startIcon={<LogIn size={16} />}
-                        size="small"
-                        variant="contained"
-                        onClick={() => handleJoinShop(shop._id)}
-                      >
-                        {t("join_in_shop")}
-                      </Button>
-
-                      <Button
-                        size="small"
-                        variant="contained"
-                        sx={{ bgcolor: "red" }}
-                        startIcon={<BookmarkX size={16} />}
-                      >
-                        {t("close_shop")}
-                      </Button>
-                    </Stack>
-                  </Box>
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    {language === "en" ? shop.nameEn : shop.nameKh}
+                  </Typography>
                 </Stack>
 
-   
+              
+                <Button
+                  size="small"
+                  variant="contained"
+                  startIcon={<ChartBarStacked size={16} />}
+                >
+                  {t("report")}
+                </Button>
+              </Stack>
 
-                <Stack direction={"row"} spacing={2}>
-                  <Button
-                    size="small"
-                    variant="contained"
-                    startIcon={<ChartBarStacked size={16} />}
-                  >
-                    {t("report")}
-                  </Button>
+          
+              <Stack direction="row" spacing={2} mt={3}>
+                <Button
+                  fullWidth
+                  startIcon={<LogIn size={16} />}
+                  size="small"
+                  variant="contained"
+                  onClick={() => handleJoinShop(shop._id)}
+                >
+                  {t("join_in_shop")}
+                </Button>
 
+                <Button
+                  fullWidth
+                  size="small"
+                  variant="contained"
+                  sx={{ bgcolor: "red" }}
+                  startIcon={<BookmarkX size={16} />}
+                >
+                  {t("close_shop")}
+                </Button>
+ 
+                <Box mt={2}>
                   <ShopAction
                     setRefetch={refetch}
                     t={t}
@@ -261,8 +267,10 @@ const Store = () => {
                     shopName={shop?.nameEn}
                     userId={userObject?._id}
                   />
-                </Stack>
+                </Box>
               </Stack>
+
+
             </Card>
           </Grid>
         ))}

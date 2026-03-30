@@ -70,6 +70,8 @@ export default function GetProductIntoWarehouseInShop({
     items = [],
   } = editData;
 
+  console.log("editData",editData)
+
   const isPending = status === "pending";
   const isPartialAccepted = status === "partial_accepted";
   const isFinalStatus = ["accepted", "rejected", "cancelled"].includes(status);

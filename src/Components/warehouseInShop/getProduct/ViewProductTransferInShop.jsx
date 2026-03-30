@@ -72,7 +72,7 @@ export default function ViewProductTransferInShop({
               startIcon={<Printer size={16} />}
               onClick={handlePrint}
             >
-              Print
+              {t(`print`)}
             </Button>
 
             <IconButton onClick={onClose}>
@@ -101,31 +101,31 @@ export default function ViewProductTransferInShop({
               {t("transfer_information")}
             </Typography>
 
-            <InfoRow label="Shop (KH)" value={toShop?.nameKh} />
-            <InfoRow label="Shop (EN)" value={toShop?.nameEn} />
+            <InfoRow label={t("shop_kh")} value={toShop?.nameKh} />
+            <InfoRow label={t("shop_en")} value={toShop?.nameEn} />
 
             <InfoRow
-              label="Status"
+              label={t("status")}
               value={<Chip size="small" label={status} />}
             />
 
             <InfoRow
-              label="Requested By"
+              label={t(`send_by`)}  
               value={requestedBy?.nameEn || requestedBy?.nameKh}
             />
 
             <InfoRow
-              label="Accepted By"
+              label={t("accepted_by")}
               value={acceptedBy?.nameEn || "-"}
             />
 
             <InfoRow
-              label="Created At"
+              label={t("create_at")}
               value={new Date(createdAt).toLocaleString()}
             />
 
             <InfoRow
-              label="Accepted At"
+              label={t("accepted_at")}
               value={
                 acceptedAt
                   ? new Date(acceptedAt).toLocaleString()
@@ -176,16 +176,16 @@ export default function ViewProductTransferInShop({
               >
                 <Box>
                   <Typography fontWeight={700}>
-                    My Company
+                    {t("my_company")}
                   </Typography>
                   <Typography variant="body2">
-                    Phnom Penh
+                    {t("phnom_penh")}
                   </Typography>
                 </Box>
 
                 <Box textAlign="right">
                   <Typography variant="h5" fontWeight={700}>
-                    INVOICE
+                    {t("invoice")}
                   </Typography>
                   <Typography variant="body2">
                     {new Date(createdAt).toLocaleDateString()}
@@ -201,7 +201,7 @@ export default function ViewProductTransferInShop({
               >
                 <Box>
                   <Typography fontWeight={600}>
-                    Billed To
+                    {t("invoice_to")}
                   </Typography>
                   <Typography>
                     {language === "kh"
@@ -212,10 +212,10 @@ export default function ViewProductTransferInShop({
 
                 <Box textAlign="right">
                   <Typography>
-                    Requested: {requestedBy?.nameEn}
+                    {t("send_by")}: {language === "en" ? requestedBy?.nameEn : requestedBy?.nameKh}
                   </Typography>
                   <Typography>
-                    Accepted: {acceptedBy?.nameEn || "-"}
+                    {t("accepted_by")}: {language === "en" ? acceptedBy?.nameEn : acceptedBy?.nameKh || "-"}
                   </Typography>
                 </Box>
               </Stack>
@@ -225,11 +225,11 @@ export default function ViewProductTransferInShop({
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>No</TableCell>
-                    <TableCell>Product</TableCell>
-                    <TableCell align="right">Qty</TableCell>
-                    <TableCell align="right">Price</TableCell>
-                    <TableCell align="right">Total</TableCell>
+                    <TableCell>{t("no")}</TableCell>
+                    <TableCell>{t("product")}</TableCell>
+                    <TableCell align="right">{t("quantity")}</TableCell>
+                    <TableCell align="right">{t("price")}</TableCell>
+                    <TableCell align="right">{t("total_price")}</TableCell>
                   </TableRow>
                 </TableHead>
 
@@ -273,7 +273,7 @@ export default function ViewProductTransferInShop({
         
               <Stack alignItems="flex-end">
                 <Typography variant="h6">
-                  Total: ${totalAmount.toFixed(2)}
+                  {t("total_price")}: ${totalAmount.toFixed(2)}
                 </Typography>
               </Stack>
 
@@ -284,12 +284,12 @@ export default function ViewProductTransferInShop({
                 mt={6}
               >
                 <Box textAlign="center">
-                  <Typography>Requested By</Typography>
+                  <Typography>{t("send_by")}</Typography>
                   <Box mt={4}>____________</Box>
                 </Box>
 
                 <Box textAlign="center">
-                  <Typography>Accepted By</Typography>
+                  <Typography>{t("accepted_by")}</Typography>
                   <Box mt={4}>____________</Box>
                 </Box>
               </Stack>

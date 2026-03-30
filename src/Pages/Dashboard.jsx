@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useRef } from "react";
 import {
   Box,
   Button,
@@ -8,7 +8,8 @@ import {
   Grid,
   IconButton,
   InputAdornment,
-  MenuItem, Stack,
+  MenuItem,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -18,30 +19,35 @@ import {
   TextField,
   Tooltip,
   Typography,
-  Breadcrumbs, useTheme
+  Breadcrumbs,
+  useTheme,
+  Paper
 } from "@mui/material";
 import {
   ArrowUpward,
-  ArrowDownward, Download,
+  ArrowDownward,
+  Download,
   Print,
   MonetizationOn,
   TrendingUp,
   ShoppingCart,
-  EventSeat, Search,
+  EventSeat,
+  Search,
   MoreVert
 } from "@mui/icons-material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import ExcelJS from "exceljs";
 import {
   PieChart,
   Pie,
-  Cell, Tooltip as RechartsTooltip, ResponsiveContainer
+  Cell,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer
 } from "recharts";
 import { TableOfContents } from 'lucide-react';
 import { useAuth } from "../context/AuthContext";
@@ -54,19 +60,43 @@ import ErrorPage from "../include/ErrorPage";
 const formatCurrency = (value) =>
   value != null ? `$${Number(value).toFixed(2)}` : "$0.00";
 
+const formatDateLong = (value) => {
+  if (!value) return "-";
+  const d = dayjs(value);
+  return d.format("MMMM D, YYYY");
+};
+
+const toNumber = (value) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+};
+
+const formatFileDate = (value = new Date()) => {
+  return dayjs(value).format("YYYY-MM-DD");
+};
+
+// Helper to detect numeric/currency values for alignment
+const isNumericOrCurrency = (val) => {
+  if (val === null || val === undefined) return false;
+  if (typeof val === 'number') return true;
+  if (typeof val === 'string') {
+    const cleaned = val.replace(/[$,]/g, '');
+    return !isNaN(parseFloat(cleaned)) && isFinite(cleaned);
+  }
+  return false;
+};
+
 export default function Dashboard() {
   const theme = useTheme();
-  const { language } = useAuth();
+  const { language, user } = useAuth();
   const { t } = translateLauguage(language);
   const savedStoreId = localStorage.getItem("activeShopId");
   const [filterType, setFilterType] = useState("today");
   const [customStart, setCustomStart] = useState(null);
   const [customEnd, setCustomEnd] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const [customPopoverAnchor, setCustomPopoverAnchor] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-
- 
 
   const getQueryVars = () => {
     if (filterType === "today") return { filter: "today", dayStart: null, dayEnd: null };
@@ -96,16 +126,14 @@ export default function Dashboard() {
 
   const stats = data?.dashboardStats;
 
-
   const totalOrders = stats?.totalOrders ?? 0;
   const totalSales = stats?.totalSales ?? 0;
   const averageValue = stats?.averageValue ?? 0;
   const reservations = stats?.reservations ?? 0;
-  const dailyRevenue = stats?.dailyRevenue?.length ? stats.dailyRevenue : [0];
+  const dailyRevenue = stats?.dailyRevenue?.length ? stats.dailyRevenue : [];
   const topSellingItems = stats?.topSellingItems?.length ? stats.topSellingItems : [];
   const activeOrders = stats?.activeOrders?.length ? stats.activeOrders : [];
   const categoryStats = stats?.categoryStats?.length ? stats.categoryStats : [];
-
 
   const generateChartCategories = () => {
     const length = dailyRevenue.length;
@@ -131,16 +159,13 @@ export default function Dashboard() {
   const revenueData = dailyRevenue.map((value, index) => ({
     day: chartCategories[index] || `Day ${index + 1}`,
     revenue: value,
-    orders: 0,
   }));
-
 
   const categoryPieData = categoryStats.map((cat, idx) => ({
     name: cat.category,
     value: cat.orders,
     color: `hsl(${idx * 45 % 360}, 70%, 60%)`,
   }));
-
 
   const summaryCards = [
     {
@@ -176,7 +201,6 @@ export default function Dashboard() {
       color: "#9C27B0",
     },
   ];
-
 
   const totalRevenue = dailyRevenue.reduce((acc, val) => acc + val, 0);
 
@@ -250,47 +274,232 @@ export default function Dashboard() {
 
   const series = [{ name: t("revenue") || "Revenue", data: dailyRevenue }];
 
+  const filterLabel = {
+    today: t("today") || "Today",
+    yesterday: t("yesterday"),
+    last7days: t("last7days"),
+    last30days: t("last30days"),
+    thisMonth: t("thisMonth"),
+    lastMonth: t("lastMonth"),
+    custom: t("customRange"),
+  }[filterType];
 
-  const exportToPDF = () => {
-    const doc = new jsPDF();
-    doc.text("Dashboard Report", 14, 15);
-    doc.setFontSize(10);
-    doc.text(`Period: ${filterLabel}`, 14, 22);
-    autoTable(doc, {
-      startY: 30,
-      head: [["Metric", "Value"]],
-      body: [
-        ["Total Orders", totalOrders.toString()],
-        ["Total Sales", formatCurrency(totalSales)],
-        ["Average Value", formatCurrency(averageValue)],
-        ["Reservations", reservations.toString()],
-      ],
-    });
-    if (topSellingItems.length) {
-      autoTable(doc, {
-        head: [["#", "Item", "Orders"]],
-        body: topSellingItems.map((item) => [item.rank, item.name, item.orders]),
-        startY: doc.lastAutoTable.finalY + 10,
-      });
-    }
-    if (categoryStats.length) {
-      autoTable(doc, {
-        head: [["Category", "Orders"]],
-        body: categoryStats.map((cat) => [cat.category, cat.orders]),
-        startY: doc.lastAutoTable.finalY + 10,
-      });
-    }
-    if (activeOrders.length) {
-      autoTable(doc, {
-        head: [["Customer", "Status", "Table"]],
-        body: activeOrders.map((order) => [order.name, order.type, order.table || "-"]),
-        startY: doc.lastAutoTable.finalY + 10,
-      });
-    }
-    doc.save(`dashboard_${filterType}.pdf`);
+  const handleClick = (event) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
+
+  const handleCustomRangeClick = (event) => {
+    setFilterType("custom");
+    setCustomPopoverAnchor(event.currentTarget);
+    handleClose();
   };
 
-  const exportToExcel = () => {
+  const handleCustomPopoverClose = () => {
+    setCustomPopoverAnchor(null);
+  };
+
+  const applyFilter = (type, start = customStart, end = customEnd) => {
+    setFilterType(type);
+    if (type === "custom") {
+      setCustomStart(start);
+      setCustomEnd(end);
+    }
+    handleClose();
+    handleCustomPopoverClose();
+    refetch({
+      shopId: savedStoreId,
+      filter: type === "custom" ? "customRange" : type,
+      dayStart: type === "custom" && start ? start.format("YYYY-MM-DD") : null,
+      dayEnd: type === "custom" && end ? end.format("YYYY-MM-DD") : null,
+    });
+  };
+
+  // ==================== PRINT FUNCTIONALITY ====================
+  const printData = useMemo(() => {
+    const companyName = user?.companyName || user?.shopName || user?.nameEn || user?.name || "Smart Market";
+    const phone = user?.phone || user?.phoneNumber || "(000) 000-0000";
+    const email = user?.email || "support@smartmarket.com";
+    const address = user?.address || "Phnom Penh, Cambodia";
+    const invoiceDate = new Date();
+    const invoiceNumber = `DASH-${dayjs().format("YYYYMMDD")}-${String(savedStoreId || "ALL").slice(-4).toUpperCase()}`;
+
+    // Summary table rows
+    const summaryRows = [
+      ["Total Orders", totalOrders.toLocaleString()],
+      ["Total Sales", formatCurrency(totalSales)],
+      ["Average Order Value", formatCurrency(averageValue)],
+      ["Reservations", reservations.toLocaleString()],
+      ["Total Revenue (Chart Sum)", formatCurrency(totalRevenue)],
+    ];
+
+    // Revenue data rows
+    const revenueRows = revenueData.map(item => [item.day, formatCurrency(item.revenue)]);
+
+    // Top selling items rows
+    const topItemsRows = topSellingItems.map(item => [item.rank, item.name, item.orders]);
+
+    // Category stats rows
+    const categoryRows = categoryStats.map(cat => [cat.category, cat.orders]);
+
+    // Active orders rows
+    const activeOrdersRows = activeOrders.map(order => [order.name, order.type, order.table || "-"]);
+
+    return {
+      companyName,
+      phone,
+      email,
+      address,
+      invoiceNumber,
+      invoiceDate: formatDateLong(invoiceDate),
+      filterLabel,
+      filterPeriod: filterType === "custom" && customStart && customEnd
+        ? `${formatDateLong(customStart)} - ${formatDateLong(customEnd)}`
+        : filterLabel,
+      summaryRows,
+      revenueRows,
+      topItemsRows,
+      categoryRows,
+      activeOrdersRows,
+      hasRevenueData: revenueRows.length > 0,
+      hasTopItems: topItemsRows.length > 0,
+      hasCategoryData: categoryRows.length > 0,
+      hasActiveOrders: activeOrdersRows.length > 0,
+    };
+  }, [totalOrders, totalSales, averageValue, reservations, totalRevenue, revenueData, topSellingItems, categoryStats, activeOrders, filterType, customStart, customEnd, user, savedStoreId]);
+
+  const handlePrint = () => {
+    setTimeout(() => {
+      window.print();
+    }, 80);
+  };
+
+  // ==================== EXCEL EXPORT USING EXCELJS (styled like ReportPage) ====================
+  const handleExportExcel = async () => {
+    const companyName = user?.companyName || user?.shopName || user?.nameEn || user?.name || "Smart Market";
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = "Smart Market";
+    workbook.created = new Date();
+
+    const C = {
+      blue: "FF3F73C7",
+      blueDark: "FF2F60B3",
+      yellow: "FFF4CC3D",
+      light: "FFF2F2F2",
+      white: "FFFFFFFF",
+      text: "FF1F2A44",
+      border: "FFD9DEE8",
+    };
+
+    const thinBorder = {
+      top: { style: "thin", color: { argb: C.border } },
+      left: { style: "thin", color: { argb: C.border } },
+      bottom: { style: "thin", color: { argb: C.border } },
+      right: { style: "thin", color: { argb: C.border } },
+    };
+
+    const headerStyle = {
+      font: { name: "Calibri", size: 12, bold: true, color: { argb: C.white } },
+      fill: { type: "pattern", pattern: "solid", fgColor: { argb: C.blue } },
+      alignment: { horizontal: "center", vertical: "middle" },
+      border: thinBorder,
+    };
+
+    const addStyledSheet = (sheetName, title, headers, rows, addFooter = false) => {
+      const ws = workbook.addWorksheet(sheetName);
+      ws.pageSetup = {
+        paperSize: 9,
+        orientation: "portrait",
+        fitToPage: true,
+        fitToWidth: 1,
+        fitToHeight: 0,
+        margins: { left: 0.25, right: 0.25, top: 0.25, bottom: 0.25 },
+      };
+
+      // Title
+      const titleRow = ws.addRow([title]);
+      titleRow.font = { name: "Calibri", size: 16, bold: true, color: { argb: C.blueDark } };
+      titleRow.alignment = { horizontal: "center", vertical: "middle" };
+      ws.addRow([]); // spacer
+
+      // Headers
+      const headerRow = ws.addRow(headers);
+      headerRow.eachCell((cell) => {
+        cell.font = headerStyle.font;
+        cell.fill = headerStyle.fill;
+        cell.alignment = headerStyle.alignment;
+        cell.border = headerStyle.border;
+      });
+
+      // Data rows
+      rows.forEach((row) => {
+        const dataRow = ws.addRow(row);
+        dataRow.eachCell((cell, colNumber) => {
+          cell.border = thinBorder;
+          const isNumeric = typeof row[colNumber - 1] === 'number' || (!isNaN(parseFloat(row[colNumber - 1])) && isFinite(row[colNumber - 1]));
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: colNumber === 1 ? "left" : (isNumeric ? "right" : "center"),
+          };
+        });
+      });
+
+      // Auto-filter
+      ws.autoFilter = {
+        from: { row: headerRow.number, column: 1 },
+        to: { row: headerRow.number, column: headers.length },
+      };
+
+      // Adjust column widths
+      ws.columns.forEach((col, idx) => {
+        col.width = idx === 0 ? 30 : 20;
+      });
+    };
+
+    // Summary Sheet
+    addStyledSheet("Summary", "Dashboard Summary", ["Metric", "Value"], printData.summaryRows);
+    // Revenue Data Sheet
+    if (printData.hasRevenueData) {
+      addStyledSheet("Revenue Details", "Revenue by Period", ["Period", "Revenue"], printData.revenueRows);
+    }
+    // Top Selling Items Sheet
+    if (printData.hasTopItems) {
+      addStyledSheet("Top Selling Items", "Top Selling Items", ["Rank", "Item", "Orders"], printData.topItemsRows);
+    }
+    // Category Stats Sheet
+    if (printData.hasCategoryData) {
+      addStyledSheet("Category Stats", "Orders by Category", ["Category", "Orders"], printData.categoryRows);
+    }
+    // Active Orders Sheet
+    if (printData.hasActiveOrders) {
+      addStyledSheet("Active Orders", "Active Orders", ["Customer", "Status", "Table"], printData.activeOrdersRows);
+    }
+
+    // Cover sheet with company info
+    const coverWs = workbook.addWorksheet("Dashboard Report");
+    coverWs.mergeCells(1, 1, 1, 4);
+    const titleCell = coverWs.getCell(1, 1);
+    titleCell.value = `${companyName} - Dashboard Report`;
+    titleCell.font = { name: "Calibri", size: 18, bold: true, color: { argb: C.blueDark } };
+    titleCell.alignment = { horizontal: "center", vertical: "middle" };
+
+    coverWs.mergeCells(2, 1, 2, 4);
+    const dateCell = coverWs.getCell(2, 1);
+    dateCell.value = `Generated: ${formatDateLong(new Date())}`;
+    dateCell.font = { name: "Calibri", size: 11 };
+    dateCell.alignment = { horizontal: "center" };
+
+    coverWs.mergeCells(3, 1, 3, 4);
+    const periodCell = coverWs.getCell(3, 1);
+    periodCell.value = `Period: ${printData.filterPeriod}`;
+    periodCell.font = { name: "Calibri", size: 11 };
+    periodCell.alignment = { horizontal: "center" };
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    saveAs(blob, `dashboard_${filterType}_${formatFileDate(new Date())}.xlsx`);
+  };
+
+  // Legacy simple export (keep for backward compatibility, but we'll replace the button)
+  const exportToExcelSimple = () => {
     const wb = XLSX.utils.book_new();
     const summaryData = [
       ["Metric", "Value"],
@@ -334,48 +543,6 @@ export default function Dashboard() {
     saveAs(data, `dashboard_${filterType}.xlsx`);
   };
 
-
-  const filterLabel = {
-    today: t("today") || "Today",
-    yesterday: t("yesterday"),
-    last7days: t("last7days"),
-    last30days: t("last30days"),
-    thisMonth: t("thisMonth"),
-    lastMonth: t("lastMonth"),
-    custom: t("customRange"),
-  }[filterType];
-
-
-  const handleClick = (event) => setAnchorEl(event.currentTarget);
-  const handleClose = () => setAnchorEl(null);
-
-  const handleCustomRangeClick = (event) => {
-    setFilterType("custom");
-    setCustomPopoverAnchor(event.currentTarget);
-    handleClose();
-  };
-
-  const handleCustomPopoverClose = () => {
-    setCustomPopoverAnchor(null);
-  };
-
-  const applyFilter = (type, start = customStart, end = customEnd) => {
-    setFilterType(type);
-    if (type === "custom") {
-      setCustomStart(start);
-      setCustomEnd(end);
-    }
-    handleClose();
-    handleCustomPopoverClose();
-    refetch({
-      shopId: savedStoreId,
-      filter: type === "custom" ? "customRange" : type,
-      dayStart: type === "custom" && start ? start.format("YYYY-MM-DD") : null,
-      dayEnd: type === "custom" && end ? end.format("YYYY-MM-DD") : null,
-    });
-  };
-
-
   if (loading && !stats) {
     return (
       <Box sx={{ p: 3 }}>
@@ -389,468 +556,510 @@ export default function Dashboard() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box >
+      <style>{`
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 1.2cm 0.8cm;
+          }
+          body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            background: #fff !important;
+          }
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          body * {
+            visibility: hidden !important;
+          }
+          #print-dashboard-root,
+          #print-dashboard-root * {
+            visibility: visible !important;
+          }
+          #print-dashboard-root {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            overflow: visible;
+            background: #f2f2f2;
+          }
+          thead {
+            display: table-header-group;
+          }
+          tr, td, th {
+            break-inside: avoid;
+          }
+        }
+      `}</style>
 
-        <Box sx={{ mb: 4 }}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <Breadcrumbs aria-label="breadcrumb" separator="/">
-                <Typography
-                  variant="h6"
-                  sx={{
-                    textDecoration: "none",
-                    borderLeft: "3px solid #1D4592",
-                    pl: 1.5,
-                    fontWeight: 600,
-                  }}
+      <Box sx={{ width: "100%", maxWidth: "100%", mx: "auto", mt: 2, px: { xs: 1, sm: 2, md: 0 } }}>
+        {/* Main Dashboard UI - hidden when printing */}
+        <Box sx={{ "@media print": { display: "none" } }}>
+          <Box sx={{ mb: 4 }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Box>
+                <Breadcrumbs aria-label="breadcrumb" separator="/">
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      textDecoration: "none",
+                      borderLeft: "3px solid #1D4592",
+                      pl: 1.5,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {t("dashboard")}
+                  </Typography>
+                </Breadcrumbs>
+              </Box>
+              <Stack direction="row" spacing={2}>
+                <Tooltip title="Print Report">
+                  <IconButton
+                    onClick={handlePrint}
+                    sx={{
+                      bgcolor: "#f9fafb",
+                      color: "#4a5568",
+                      boxShadow: 1,
+                      "&:hover": { bgcolor: "#edf2f7", color: "#2d3748" },
+                    }}
+                  >
+                    <Print />
+                  </IconButton>
+                </Tooltip>
+
+                <Button
+                  variant="contained"
+                  startIcon={<TableOfContents />}
+                  onClick={handleExportExcel}
                 >
-                  {t("dashboard")}
-                </Typography>
-              </Breadcrumbs>
-            </Box>
-            <Stack direction="row" spacing={2}>
-              <Tooltip title="Print Report">
-                <IconButton
-                  onClick={() => window.print()}
-                  sx={{
-                    bgcolor: "#f9fafb",
-                    color: "#4a5568",
+                  {t("export_excel")}
+                </Button>
 
-                    boxShadow: 1,
-                    "&:hover": { bgcolor: "#edf2f7", color: "#2d3748" },
-                  }}
+                <Button
+                  variant="contained"
+                  startIcon={<Download />}
+                  onClick={handlePrint}
                 >
-                  <Print />
-                </IconButton>
-              </Tooltip>
-
-              <Button
-                variant="contained"
-                startIcon={<TableOfContents />}
-                onClick={exportToExcel}
-
-              >
-                Export Excel
-              </Button>
-
-              <Button
-                variant="contained"
-                startIcon={<Download />}
-                onClick={exportToPDF}
-
-              >
-                Export Report
-              </Button>
+                  {t("export_report")}
+                </Button>
+              </Stack>
             </Stack>
 
-
-          </Stack>
-
-          <Box mt={2}  >
-
-            <Grid container spacing={3} alignItems="center">
-              <Grid size={{ xs: 12, md: 2 }}>
-                <TextField
-                  select
-                  fullWidth
-                  value={filterType}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (val === "custom") {
-
-                    } else {
-                      applyFilter(val);
-                    }
-                  }}
-                  size="small"
-                >
-                  <MenuItem value="today">{t("today")}</MenuItem>
-                  <MenuItem value="yesterday">{t("yesterday")}</MenuItem>
-                  <MenuItem value="last7days">{t("last7days")}</MenuItem>
-                  <MenuItem value="last30days">{t("last30days")}</MenuItem>
-                  <MenuItem value="thisMonth">{t("thisMonth")}</MenuItem>
-                  <MenuItem value="lastMonth">{t("lastMonth")}</MenuItem>
-                  <MenuItem value="custom" onClick={handleCustomRangeClick}>
-                    Custom Range
-                  </MenuItem>
-                </TextField>
+            <Box mt={2}>
+              <Grid container spacing={3} alignItems="center">
+                <Grid size={{ xs: 12, md: 2 }}>
+                  <TextField
+                    select
+                    fullWidth
+                    value={filterType}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "custom") {
+                        // handled by custom range click
+                      } else {
+                        applyFilter(val);
+                      }
+                    }}
+                    size="small"
+                  >
+                    <MenuItem value="today">{t("today")}</MenuItem>
+                    <MenuItem value="yesterday">{t("yesterday")}</MenuItem>
+                    <MenuItem value="last7days">{t("last7days")}</MenuItem>
+                    <MenuItem value="last30days">{t("last30days")}</MenuItem>
+                    <MenuItem value="thisMonth">{t("thisMonth")}</MenuItem>
+                    <MenuItem value="lastMonth">{t("lastMonth")}</MenuItem>
+                    <MenuItem value="custom" onClick={handleCustomRangeClick}>
+                      Custom Range
+                    </MenuItem>
+                  </TextField>
+                </Grid>
+                <Grid size={{ xs: 12, md: 2 }}>
+                  <DatePicker
+                    value={customStart}
+                    onChange={(newValue) => setCustomStart(newValue)}
+                    slotProps={{ textField: { size: "small", fullWidth: true } }}
+                    disabled={filterType !== "custom"}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, md: 2 }}>
+                  <DatePicker
+                    value={customEnd}
+                    onChange={(newValue) => setCustomEnd(newValue)}
+                    slotProps={{ textField: { size: "small", fullWidth: true } }}
+                    disabled={filterType !== "custom"}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, md: 2 }}>
+                  {filterType === "custom" && (
+                    <Stack direction="row" spacing={2}>
+                      <Button
+                        variant="contained"
+                        onClick={() => applyFilter("custom", customStart, customEnd)}
+                        disabled={!customStart || !customEnd}
+                      >
+                        Apply Custom Range
+                      </Button>
+                    </Stack>
+                  )}
+                </Grid>
               </Grid>
-              <Grid size={{ xs: 12, md: 2 }}>
-                <DatePicker
-                 
-                  value={customStart}
-                  onChange={(newValue) => setCustomStart(newValue)}
-                  slotProps={{ textField: { size: "small", fullWidth: true } }}
-                  disabled={filterType !== "custom"}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 2 }}>
-                <DatePicker
-              
-                  value={customEnd}
-                  onChange={(newValue) => setCustomEnd(newValue)}
-                  slotProps={{ textField: { size: "small", fullWidth: true } }}
-                  disabled={filterType !== "custom"}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 2 }}>
-                {filterType === "custom" && (
-                  <Stack direction="row" spacing={2} >
-                    <Button
-                      variant="contained"
-                      onClick={() => applyFilter("custom", customStart, customEnd)}
-                      disabled={!customStart || !customEnd}
-                    >
-                      Apply Custom Range
-                    </Button>
-                  </Stack>
-                )}
-
-              </Grid>
-
-
-
-
-
-            </Grid>
-
+            </Box>
           </Box>
+
+          {/* Summary Cards */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            {summaryCards.map((card, index) => (
+              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+                <Card sx={{ borderRadius: 1, height: "100%", position: "relative", overflow: "hidden" }}>
+                  <CardContent sx={{ position: "relative" }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                      <Box>
+                        <Typography variant="h6" color="text.secondary" sx={{ mb: 0.5 }}>
+                          {card.title}
+                        </Typography>
+                        <Typography variant="h4" fontWeight={700} sx={{ color: card.color, mb: 1 }}>
+                          {card.value}
+                        </Typography>
+                        <Stack direction="row" alignItems="center" spacing={0.5}>
+                          {card.trend === "up" ? (
+                            <ArrowUpward sx={{ fontSize: 16, color: "#22c55e" }} />
+                          ) : (
+                            <ArrowDownward sx={{ fontSize: 16, color: "#ef4444" }} />
+                          )}
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: card.trend === "up" ? "#22c55e" : "#ef4444" }}>
+                            {card.change}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            vs last period
+                          </Typography>
+                        </Stack>
+                      </Box>
+                      <Box sx={{ width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "14px", background: `linear-gradient(135deg, ${card.color}30, ${card.color}10)`, color: card.color }}>
+                        {card.icon}
+                      </Box>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+
+          {/* Charts */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid size={{ xs: 12, md: 8 }}>
+              <Card sx={{ borderRadius: 1, height: "100%" }}>
+                <CardContent>
+                  <Typography variant="h6" fontWeight="600" gutterBottom>
+                    {t("total_revenue")}
+                  </Typography>
+                  <Box sx={{ height: 350, mt: 2 }}>
+                    <Chart options={chartOptions} series={series} type="bar" height={350} />
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid size={{ xs: 12, md: 4 }}>
+              <Card sx={{ borderRadius: 1, height: "100%" }}>
+                <CardContent>
+                  <Typography variant="h6" fontWeight="600" gutterBottom>
+                    {t("orders_by_category")}
+                  </Typography>
+                  <Box sx={{ height: 350, mt: 2 }}>
+                    {categoryPieData.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={categoryPieData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                            outerRadius={100}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {categoryPieData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <RechartsTooltip formatter={(value) => [`${value} orders`, "Orders"]} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary" align="center">
+                        No category data
+                      </Typography>
+                    )}
+                  </Box>
+                  <Stack spacing={1} mt={2}>
+                    {categoryPieData.map((cat, idx) => (
+                      <Stack key={idx} direction="row" justifyContent="space-between" alignItems="center">
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                          <Box sx={{ width: 12, height: 12, borderRadius: "50%", bgcolor: cat.color }} />
+                          <Typography variant="body2">{cat.name}</Typography>
+                        </Stack>
+                        <Typography variant="body2" fontWeight="600">{cat.value}</Typography>
+                      </Stack>
+                    ))}
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          {/* Tables */}
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Card sx={{ borderRadius: 1, height: "100%" }}>
+                <CardContent>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+                    <Typography variant="h6" fontWeight="600">{t("top_selling_items")}</Typography>
+                    <IconButton size="small"><MoreVert /></IconButton>
+                  </Stack>
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>{t("Rank")}</TableCell>
+                          <TableCell>{t("items")}</TableCell>
+                          <TableCell align="right">{t("orders")}</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {topSellingItems.map((item) => (
+                          <TableRow key={item.rank}>
+                            <TableCell>#{item.rank}</TableCell>
+                            <TableCell><Typography variant="body2" fontWeight="500">{item.name}</Typography></TableCell>
+                            <TableCell align="right"><Typography fontWeight="600" color="#667eea">{item.orders}</Typography></TableCell>
+                          </TableRow>
+                        ))}
+                        {topSellingItems.length === 0 && (
+                          <TableRow><TableCell colSpan={3} align="center">No data available</TableCell></TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Card sx={{ borderRadius: 1, height: "100%" }}>
+                <CardContent>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+                    <Typography variant="h6" fontWeight="600">{t("recent_transactions")}</Typography>
+                    <IconButton size="small"><MoreVert /></IconButton>
+                  </Stack>
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>{t("customer")}</TableCell>
+                          <TableCell>{t("status")}</TableCell>
+                          <TableCell align="right">{t("table")}</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {activeOrders.map((order, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell><Typography variant="body2" fontWeight="500">{order.name}</Typography></TableCell>
+                            <TableCell>
+                              <Chip label={order.type} size="small" sx={{ bgcolor: order.type === "completed" ? "#4CAF5015" : "#FF980015", color: order.type === "completed" ? "#4CAF50" : "#FF9800", fontWeight: 500 }} />
+                            </TableCell>
+                            <TableCell align="right">{order.table || "-"}</TableCell>
+                          </TableRow>
+                        ))}
+                        {activeOrders.length === 0 && (
+                          <TableRow><TableCell colSpan={3} align="center">No active orders</TableCell></TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
         </Box>
 
-
- <Grid container spacing={3} sx={{ mb: 4 }}>
-  {summaryCards.map((card, index) => (
-    <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
-      <Card
-        sx={{
-          borderRadius: 1,
-          height: "100%",
-          // boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-          transition: "all 0.25s ease",
-          position: "relative",
-          overflow: "hidden",
- 
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            inset: 0,
-            background: `linear-gradient(135deg, ${card.color}10, transparent)`,
-          },
-        }}
-      >
-        <CardContent sx={{ position: "relative" }}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="flex-start"
-          >
-          
-            <Box>
-              <Typography
-                variant="h6"
-                color="text.secondary"
-                sx={{ mb: 0.5 }}
-              >
-                {card.title}
-              </Typography>
-
-              <Typography
-                variant="h4"
-                fontWeight={700}
-                sx={{ color: card.color, mb: 1 }}
-              >
-                {card.value}
-              </Typography>
-
-              <Stack direction="row" alignItems="center" spacing={0.5}>
-                {card.trend === "up" ? (
-                  <ArrowUpward sx={{ fontSize: 16, color: "#22c55e" }} />
-                ) : (
-                  <ArrowDownward sx={{ fontSize: 16, color: "#ef4444" }} />
-                )}
-
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: 600,
-                    color: card.trend === "up" ? "#22c55e" : "#ef4444",
-                  }}
-                >
-                  {card.change}
-                </Typography>
-
-                <Typography variant="body2" color="text.secondary">
-                  vs last period
-                </Typography>
-              </Stack>
-            </Box>
-
-            {/* ICON */}
-            <Box
-              sx={{
-                width: 48,
-                height: 48,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: "14px",
-                background: `linear-gradient(135deg, ${card.color}30, ${card.color}10)`,
-                color: card.color,
-              }}
-            >
-              {card.icon}
-            </Box>
-          </Stack>
-        </CardContent>
-      </Card>
-    </Grid>
-  ))}
-</Grid>
-
-
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-
-          <Grid size={{ xs: 12, md: 8 }}>
-            <Card
-              sx={{
-                borderRadius: 1,
-
-                height: "100%",
-              }}
-            >
-              <CardContent>
-                <Typography variant="h6" fontWeight="600" gutterBottom>
-                  {t(`total_revenue`)}
-                </Typography>
-                <Box sx={{ height: 350, mt: 2 }}>
-                  <Chart options={chartOptions} series={series} type="bar" height={350} />
-                </Box>
-              </CardContent>
-
-            </Card>
-          </Grid>
-
-
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Card
-              sx={{
-                borderRadius: 1,
-
-                height: "100%",
-              }}
-            >
-              <CardContent>
-                <Typography variant="h6" fontWeight="600" gutterBottom>
-                  Orders by Category
-                </Typography>
-                <Box sx={{ height: 350, mt: 2 }}>
-                  {categoryPieData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={categoryPieData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, percent }) =>
-                            `${name}: ${(percent * 100).toFixed(0)}%`
-                          }
-                          outerRadius={100}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {categoryPieData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <RechartsTooltip
-                          formatter={(value) => [`${value} orders`, "Orders"]}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary" align="center">
-                      No category data
+        {/* Print Layout - hidden until print */}
+        <Box
+          id="print-dashboard-root"
+          sx={{
+            position: "fixed",
+            left: "-10000px",
+            top: 0,
+            width: "100%",
+            visibility: "hidden",
+            pointerEvents: "none",
+            "@media print": {
+              position: "relative",
+              left: 0,
+              top: 0,
+              visibility: "visible",
+              pointerEvents: "auto",
+            },
+          }}
+        >
+          <Box sx={{ bgcolor: "#f2f2f2", width: "100%", maxWidth: "100%", p: 0 }}>
+            <Box sx={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
+              {/* Header */}
+              <Box sx={{ bgcolor: "#1f78c9", color: "#fff", px: 2.5, py: 2.2 }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                  <Box>
+                    <Typography sx={{ fontSize: 18, fontWeight: 700 }}>{printData.companyName}</Typography>
+                    <Typography sx={{ fontSize: 11 }}>cleaning service</Typography>
+                    <Typography sx={{ fontSize: 10.5, mt: 1.1, color: "#ffff" }}>{printData.address}</Typography>
+                    <Typography sx={{ fontSize: 10.5, color: "#ffff" }}>{printData.phone}</Typography>
+                    <Typography sx={{ fontSize: 10.5, color: "#ffff" }}>{printData.email}</Typography>
+                  </Box>
+                  <Box sx={{ minWidth: 220 }}>
+                    <Typography sx={{ fontSize: 50, lineHeight: 1, fontWeight: 800, color: "#f5c633" }}>
+                      {t("dashboard")}
                     </Typography>
-                  )}
-                </Box>
-                <Stack spacing={1} mt={2}>
-                  {categoryPieData.map((cat, idx) => (
-                    <Stack
-                      key={idx}
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <Stack direction="row" alignItems="center" spacing={1}>
-                        <Box
-                          sx={{
-                            width: 12,
-                            height: 12,
-                            borderRadius: "50%",
-                            bgcolor: cat.color,
-                          }}
-                        />
-                        <Typography variant="body2">{cat.name}</Typography>
-                      </Stack>
-                      <Typography variant="body2" fontWeight="600">
-                        {cat.value}
-                      </Typography>
-                    </Stack>
-                  ))}
+                    <Box sx={{ borderTop: "1px solid rgba(255,255,255,.7)", mt: 0.8, pt: 0.8 }}>
+                      <Typography sx={{ fontSize: 10.5, color: "#ffff" }}><b>{t("report")} #:</b> {printData.invoiceNumber}</Typography>
+                      <Typography sx={{ fontSize: 10.5, color: "#ffff" }}><b>{t("date")}:</b> {printData.invoiceDate}</Typography>
+                      <Typography sx={{ fontSize: 10.5, color: "#ffff" }}><b>{t("period")}:</b> {printData.filterPeriod}</Typography>
+                    </Box>
+                  </Box>
                 </Stack>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+              </Box>
+              <Box sx={{ bgcolor: "#f5c633", height: 9, mb: 1.4 }} />
 
-        <Grid container spacing={3}>
-
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Card
-              sx={{
-                borderRadius: 1,
-
-                height: "100%",
-              }}
-            >
-              <CardContent>
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mb={3}
-                >
-                  <Typography variant="h6" fontWeight="600">
-                    Top Selling Items
-                  </Typography>
-                  <IconButton size="small">
-                    <MoreVert />
-                  </IconButton>
-                </Stack>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
+              {/* Summary Table */}
+              <Box sx={{ px: 1.2, mb: 2 }}>
+                <Typography sx={{ fontSize: 16, fontWeight: 700, color: "#1f78c9", mb: 1 }}>{t("summary_metrics")}</Typography>
+                <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 0 }}>
+                  <Table size="small">
+                    <TableHead sx={{ bgcolor: "#1f78c9" }}>
                       <TableRow>
-                        <TableCell>Rank</TableCell>
-                        <TableCell>Item</TableCell>
-                        <TableCell align="right">Orders</TableCell>
+                        <TableCell sx={{ fontWeight: 700, color: "#fff", py: 0.8 }}>{t("metrics")}</TableCell>
+                        <TableCell sx={{ fontWeight: 700, color: "#fff", py: 0.8 }} align="right">{t("value")}</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {topSellingItems.map((item) => (
-                        <TableRow key={item.rank}>
-                          <TableCell>#{item.rank}</TableCell>
-                          <TableCell>
-                            <Typography variant="body2" fontWeight="500">
-                              {item.name}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Typography fontWeight="600" color="#667eea">
-                              {item.orders}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      {topSellingItems.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={3} align="center">
-                            <Typography variant="body2" color="text.secondary">
-                              No data available
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </CardContent>
-            </Card>
-          </Grid>
-
-
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Card
-              sx={{
-                borderRadius: 1,
-
-                height: "100%",
-              }}
-            >
-              <CardContent>
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mb={3}
-                >
-                  <Typography variant="h6" fontWeight="600">
-                    Recent Transactions
-                  </Typography>
-                  <IconButton size="small">
-                    <MoreVert />
-                  </IconButton>
-                </Stack>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Customer</TableCell>
-                        <TableCell>Status</TableCell>
-                        <TableCell align="right">Table</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {activeOrders.map((order, idx) => (
+                      {printData.summaryRows.map((row, idx) => (
                         <TableRow key={idx}>
-                          <TableCell>
-                            <Typography variant="body2" fontWeight="500">
-                              {order.name}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Chip
-                              label={order.type}
-                              size="small"
-                              sx={{
-                                bgcolor:
-                                  order.type === "completed"
-                                    ? "#4CAF5015"
-                                    : "#FF980015",
-                                color:
-                                  order.type === "completed"
-                                    ? "#4CAF50"
-                                    : "#FF9800",
-                                fontWeight: 500,
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            {order.table || "-"}
-                          </TableCell>
+                          <TableCell sx={{ py: 0.6, fontSize: 10.5 }}>{row[0]}</TableCell>
+                          <TableCell sx={{ py: 0.6, fontSize: 10.5 }} align="right">{row[1]}</TableCell>
                         </TableRow>
                       ))}
-                      {activeOrders.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={3} align="center">
-                            <Typography variant="body2" color="text.secondary">
-                              No active orders
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      )}
                     </TableBody>
                   </Table>
                 </TableContainer>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+              </Box>
+
+              {/* Revenue Details */}
+              {printData.hasRevenueData && (
+                <Box sx={{ px: 1.2, mb: 2 }}>
+                  <Typography sx={{ fontSize: 16, fontWeight: 700, color: "#1f78c9", mb: 1 }}>{t("revenue_by_period")}</Typography>
+                  <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 0 }}>
+                    <Table size="small">
+                      <TableHead sx={{ bgcolor: "#1f78c9" }}>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 700, color: "#fff", py: 0.8 }}>{t("period")}</TableCell>
+                          <TableCell sx={{ fontWeight: 700, color: "#fff", py: 0.8 }} align="right">{t("revenue")}</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {printData.revenueRows.map((row, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell sx={{ py: 0.6, fontSize: 10.5 }}>{row[0]}</TableCell>
+                            <TableCell sx={{ py: 0.6, fontSize: 10.5 }} align="right">{row[1]}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+              )}
+
+              {/* Top Selling Items */}
+              {printData.hasTopItems && (
+                <Box sx={{ px: 1.2, mb: 2 }}>
+                  <Typography sx={{ fontSize: 16, fontWeight: 700, color: "#1f78c9", mb: 1 }}>{t("top_selling_items")}</Typography>
+                  <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 0 }}>
+                    <Table size="small">
+                      <TableHead sx={{ bgcolor: "#1f78c9" }}>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 700, color: "#fff", py: 0.8 }}>{t("Rank")}</TableCell>
+                          <TableCell sx={{ fontWeight: 700, color: "#fff", py: 0.8 }}>{t("items")}</TableCell>
+                          <TableCell sx={{ fontWeight: 700, color: "#fff", py: 0.8 }} align="right">{t("orders")}</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {printData.topItemsRows.map((row, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell sx={{ py: 0.6, fontSize: 10.5 }}>{row[0]}</TableCell>
+                            <TableCell sx={{ py: 0.6, fontSize: 10.5 }}>{row[1]}</TableCell>
+                            <TableCell sx={{ py: 0.6, fontSize: 10.5 }} align="right">{row[2]}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+              )}
+
+              {/* Category Stats */}
+              {printData.hasCategoryData && (
+                <Box sx={{ px: 1.2, mb: 2 }}>
+                  <Typography sx={{ fontSize: 16, fontWeight: 700, color: "#1f78c9", mb: 1 }}>Orders by Category</Typography>
+                  <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 0 }}>
+                    <Table size="small">
+                      <TableHead sx={{ bgcolor: "#1f78c9" }}>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 700, color: "#fff", py: 0.8 }}>Category</TableCell>
+                          <TableCell sx={{ fontWeight: 700, color: "#fff", py: 0.8 }} align="right">Orders</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {printData.categoryRows.map((row, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell sx={{ py: 0.6, fontSize: 10.5 }}>{row[0]}</TableCell>
+                            <TableCell sx={{ py: 0.6, fontSize: 10.5 }} align="right">{row[1]}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+              )}
+
+              {/* Active Orders */}
+              {printData.hasActiveOrders && (
+                <Box sx={{ px: 1.2, mb: 2 }}>
+                  <Typography sx={{ fontSize: 16, fontWeight: 700, color: "#1f78c9", mb: 1 }}>Active Orders</Typography>
+                  <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 0 }}>
+                    <Table size="small">
+                      <TableHead sx={{ bgcolor: "#1f78c9" }}>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 700, color: "#fff", py: 0.8 }}>Customer</TableCell>
+                          <TableCell sx={{ fontWeight: 700, color: "#fff", py: 0.8 }}>Status</TableCell>
+                          <TableCell sx={{ fontWeight: 700, color: "#fff", py: 0.8 }} align="right">Table</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {printData.activeOrdersRows.map((row, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell sx={{ py: 0.6, fontSize: 10.5 }}>{row[0]}</TableCell>
+                            <TableCell sx={{ py: 0.6, fontSize: 10.5 }}>{row[1]}</TableCell>
+                            <TableCell sx={{ py: 0.6, fontSize: 10.5 }} align="right">{row[2]}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+              )}
+
+              <Box sx={{ bgcolor: "#f5c633", height: 7, mt: 2 }} />
+              <Box sx={{ bgcolor: "#1f78c9", height: 17 }} />
+            </Box>
+          </Box>
+        </Box>
       </Box>
     </LocalizationProvider>
   );

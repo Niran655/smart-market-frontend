@@ -105,6 +105,7 @@ const RecentOrders = ({ selectedOrderType, setSelectedOrderType, t }) => {
                   }
                 >
                   {orderType}
+
                 </Button>
               )
             )}
