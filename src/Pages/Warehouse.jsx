@@ -457,6 +457,7 @@ import {
   Paper,
   useTheme,
   useMediaQuery,
+  MenuItem,
 } from "@mui/material";
 import { Search } from "lucide-react";
 import dayjs from "dayjs";
@@ -516,6 +517,9 @@ const Warehouse = () => {
   const [purchaseOrderLimit, setPurchaseOrderLimit] = useState(5);
   const [purchaseOrderKeyword, setPurchaseOrderKeyword] = useState("");
 
+  const [productsWarehouseTransferStatus, setProductsWarehouseTransferStatus] = useState("All");
+  const [purchaseOrderStatus, setPurchaseOrderStatus] = useState("All");
+
   const [openTransfer, setOpenTransfer] = useState(false);
   const handleOpenTransfer = () => setOpenTransfer(true);
   const handleCloseTransfer = () => setOpenTransfer(false);
@@ -542,6 +546,8 @@ const Warehouse = () => {
     limit: productWarehouseTransferLimit,
     pagination: true,
     keyword: productWarehouseTransferKeyword,
+    status: productsWarehouseTransferStatus === "All" ? undefined : productsWarehouseTransferStatus
+
   });
 
   const {
@@ -568,7 +574,19 @@ const Warehouse = () => {
     limit: purchaseOrderLimit,
     pagination: true,
     keyword: purchaseOrderKeyword,
+    status: purchaseOrderStatus === "All" ? undefined : purchaseOrderStatus
   });
+
+
+  const handleProductTransferStatusChange = (e) => {
+    setProductsWarehouseTransferStatus(e.target.value);
+    setProductWarehouseTransferPage(1);
+  };
+
+  const handlePurchaseOrderStatusChange = (e) => {
+    setPurchaseOrderStatus(e.target.value);
+    setPurchaseOrderPage(1);
+  };
 
 
 
@@ -834,9 +852,9 @@ const Warehouse = () => {
                     sx={{ flex: 1 }}
                   >
                     <Grid size={{ xs: 3 }}>
-                      {/* <Typography variant="body2" fontWeight={500} mb={0.5}>
+                      <Typography variant="body2" fontWeight={500} mb={0.5}>
                         {t("search")}
-                      </Typography> */}
+                      </Typography>
                       <TextField
                         type="search"
                         size="small"
@@ -851,6 +869,29 @@ const Warehouse = () => {
                           ),
                         }}
                       />
+                    </Grid>
+                    <Grid size={{ xs: 3 }}>
+                      <Typography className="search-head-title">{t("status")}</Typography>
+                      <TextField
+                        className="select-text-field"
+                        select
+                        fullWidth
+                        size="small"
+                        value={productsWarehouseTransferStatus}
+                        sx={{
+                          width: "200px",
+
+                        }}
+                        onChange={handleProductTransferStatusChange}
+                      >
+                        <MenuItem value="All">{t("all")}</MenuItem>
+                        <MenuItem value="pending">{t("pending")}</MenuItem>
+                        <MenuItem value="accepted">{t("accepted")}</MenuItem>
+                        <MenuItem value="partial_accepted">{t("partial_accepted")}</MenuItem>
+                        <MenuItem value="rejected">{t("rejected")}</MenuItem>
+                        <MenuItem value="cancelled">{t("cancelled")}</MenuItem>
+
+                      </TextField>
                     </Grid>
                   </Grid>
 
@@ -972,9 +1013,9 @@ const Warehouse = () => {
                     sx={{ flex: 1 }}
                   >
                     <Grid size={{ xs: 3 }}>
-                      {/* <Typography variant="body2" fontWeight={500} mb={0.5}>
+                      <Typography variant="body2" fontWeight={500} mb={0.5}>
                         {t("search")}
-                      </Typography> */}
+                      </Typography>
                       <TextField
                         type="search"
                         size="small"
@@ -989,6 +1030,29 @@ const Warehouse = () => {
                           ),
                         }}
                       />
+                    </Grid>
+                    <Grid size={{ xs: 3 }}>
+                      <Typography className="search-head-title">{t("status")}</Typography>
+                      <TextField
+                        className="select-text-field"
+                        select
+                        fullWidth
+                        size="small"
+                        value={purchaseOrderStatus}
+                        sx={{
+                          width: "200px",
+
+                        }}
+                        onChange={handlePurchaseOrderStatusChange}
+                      >
+                        <MenuItem value="All">{t("all")}</MenuItem>
+                        <MenuItem value="pending">{t("pending")}</MenuItem>
+                        <MenuItem value="partial_received">{t("partial_accepted")}</MenuItem>
+                        <MenuItem value="received">{t("received")}</MenuItem>
+                        <MenuItem value="cancelled">{t("cancelled")}</MenuItem>
+
+
+                      </TextField>
                     </Grid>
                   </Grid>
 
@@ -1099,7 +1163,7 @@ const Warehouse = () => {
                       <TableCell>{t("previous_stock")}</TableCell>
                       <TableCell>{t("new_stock")}</TableCell>
                       <TableCell>{t("reason")}</TableCell>
-      
+
                     </TableRow>
                   </TableHead>
                   {stockMovementLoading ? (
@@ -1134,7 +1198,7 @@ const Warehouse = () => {
                               label={row?.type}
                               size="small"
                               sx={{
-                                width:50,
+                                width: 50,
                                 bgcolor:
                                   row?.type === "in"
                                     ? "#4CAF50"
@@ -1164,8 +1228,8 @@ const Warehouse = () => {
                           {/* Reason */}
                           <TableCell>{row?.reason || "-"}</TableCell>
 
-                     
- 
+
+
 
                         </TableRow>
                       ))}

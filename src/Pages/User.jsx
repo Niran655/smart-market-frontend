@@ -16,6 +16,8 @@ import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
 import { useState } from "react";
+import { useThemeContext } from "../Context/ThemeContext";
+import star from "../assets/Image/star.png";
 const User = () => {
   const { language } = useAuth();
   const { t } = translateLauguage(language);
@@ -26,6 +28,8 @@ const User = () => {
   const [limit, setLimit] = useState(5);
   const [keyword, setKeyword] = useState("");
   const [role, setRole] = useState("All");
+  const { mode } = useThemeContext();
+const isKhmer = mode === "khmerNewYear";
 
 
   const { data, refetch, loading, } = useQuery(GET_USER_WITH_PAGINATION, {
@@ -151,7 +155,17 @@ const User = () => {
         <Stack direction="row" spacing={2} mt={3}>
           <Button
             variant="contained"
-            startIcon={<LibraryAddOutlinedIcon size={18} />}
+          startIcon={
+  isKhmer ? (
+    <img
+      src={star}
+      alt="Khmer"
+      style={{ width: "20px", height: "20px" }}
+    />
+  ) : (
+    <LibraryAddOutlinedIcon sx={{ fontSize: "1rem" }} />
+  )
+}
             onClick={handleOpen}
           >
             {t("create")}

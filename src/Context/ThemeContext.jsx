@@ -289,7 +289,7 @@
 // };
 import { createTheme, ThemeProvider as MuiThemeProvider } from "@mui/material";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-
+import KhmerBg  from "../assets/Image/khmer-bg.png"; // Make sure to have this image in the specified path
 const ThemeContext = createContext();
 
 export const useThemeContext = () => {
@@ -334,6 +334,7 @@ export const ThemeProvider = ({ children }) => {
     return v === null ? true : v === "true";
   });
 
+  // Persist settings
   useEffect(() => {
     localStorage.setItem("themeMode", mode);
   }, [mode]);
@@ -366,7 +367,6 @@ export const ThemeProvider = ({ children }) => {
     localStorage.setItem("mobileShowLabels", String(mobileShowLabels));
   }, [mobileShowLabels]);
 
-  // Toggle through light → dark → glass
   const toggleColorMode = (newMode) => {
     if (newMode) {
       setMode(newMode);
@@ -399,70 +399,256 @@ export const ThemeProvider = ({ children }) => {
     localStorage.removeItem("mobileShowLabels");
   };
 
+  // Inject global CSS for Khmer New Year starry night background
+// useEffect(() => {
+//     if (mode === "khmerNewYear") {
+//       document.body.classList.add("khmer-new-year-mode");
+//       if (!document.getElementById("khmer-pattern-style")) {
+//         const style = document.createElement("style");
+//         style.id = "khmer-pattern-style";
+//         style.textContent = `
+//           /* Starry night background for Khmer New Year mode */
+//           body.khmer-new-year-mode {
+//             background: radial-gradient(ellipse at bottom, #0d1d31 0%, #0c0d13 100%);
+//             background-attachment: fixed;
+//             position: relative;
+//           }
+//           /* Stars - fixed and animated */
+//           body.khmer-new-year-mode::before {
+//             content: '';
+//             position: fixed;
+//             top: 0;
+//             left: 0;
+//             width: 100%;
+//             height: 100%;
+//             pointer-events: none;
+//             background: transparent;
+//             background-image: 
+//               radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0)),
+//               radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+//               radial-gradient(1px 1px at 150px 120px, #ffd700, rgba(0,0,0,0)),
+//               radial-gradient(3px 3px at 250px 350px, #fff, rgba(0,0,0,0)),
+//               radial-gradient(2px 2px at 400px 50px, #ffd700, rgba(0,0,0,0)),
+//               radial-gradient(1px 1px at 500px 200px, #fff, rgba(0,0,0,0)),
+//               radial-gradient(2px 2px at 650px 450px, #fff, rgba(0,0,0,0)),
+//               radial-gradient(1px 1px at 800px 100px, #ffd700, rgba(0,0,0,0)),
+//               radial-gradient(2px 2px at 950px 300px, #fff, rgba(0,0,0,0)),
+//               radial-gradient(3px 3px at 1100px 500px, #fff, rgba(0,0,0,0)),
+//               radial-gradient(1px 1px at 1250px 80px, #ffd700, rgba(0,0,0,0)),
+//               radial-gradient(2px 2px at 1400px 400px, #fff, rgba(0,0,0,0)),
+//               radial-gradient(1px 1px at 1550px 250px, #fff, rgba(0,0,0,0));
+//             background-repeat: no-repeat;
+//             background-size: 200px 200px;
+//             opacity: 0.8;
+//             animation: twinkle 4s infinite alternate;
+//           }
+//           @keyframes twinkle {
+//             0% { opacity: 0.6; }
+//             100% { opacity: 1; }
+//           }
+//           /* Additional decorative elements: Khmer pattern overlay */
+//           body.khmer-new-year-mode::after {
+//             content: '';
+//             position: fixed;
+//             top: 0;
+//             left: 0;
+//             width: 100%;
+//             height: 100%;
+//             pointer-events: none;
+//             background-image: repeating-linear-gradient(45deg, rgba(255, 179, 0, 0.03) 0px, rgba(255, 179, 0, 0.03) 2px, transparent 2px, transparent 8px);
+//             background-attachment: fixed;
+//           }
+//           /* Cards get a subtle glow and gold border */
+//           .khmer-new-year-mode .MuiCard-root {
+//             border-left: 4px solid #FFB300;
+//             border-bottom: 2px solid #FFB300;
+//             box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+//           }
+//           /* Buttons with festive gradient */
+//           .khmer-new-year-mode .MuiButton-containedPrimary {
+//             background: linear-gradient(135deg, #C62828 0%, #FFB300 100%) !important;
+//           }
+//           /* Scrollbar */
+//           .khmer-new-year-mode ::-webkit-scrollbar-track {
+//             background: #1e293b;
+//           }
+//           .khmer-new-year-mode ::-webkit-scrollbar-thumb {
+//             background: #FFB300;
+//           }
+//         `;
+//         document.head.appendChild(style);
+//       }
+//     } else {
+//       document.body.classList.remove("khmer-new-year-mode");
+//     }
+//   }, [mode]);
+
+useEffect(() => {
+  if (mode === "khmerNewYear") {
+    document.body.classList.add("khmer-new-year-mode");
+    if (!document.getElementById("khmer-pattern-style")) {
+      const style = document.createElement("style");
+      style.id = "khmer-pattern-style";
+      style.textContent = `
+ 
+        body.khmer-new-year-mode {
+          // background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url(${KhmerBg});
+          background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(${KhmerBg});
+          background-size: cover;
+          background-repeat: no-repeat;
+          background-position: center;
+          background-attachment: fixed;
+          background-color: #0c0d13;
+        }
+        /* Stars - fixed and animated */
+        body.khmer-new-year-mode::before {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          background: transparent;
+          background-image: 
+            radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 150px 120px, #ffd700, rgba(0,0,0,0)),
+            radial-gradient(3px 3px at 250px 350px, #fff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 400px 50px, #ffd700, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 500px 200px, #fff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 650px 450px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 800px 100px, #ffd700, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 950px 300px, #fff, rgba(0,0,0,0)),
+            radial-gradient(3px 3px at 1100px 500px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 1250px 80px, #ffd700, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 1400px 400px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 1550px 250px, #fff, rgba(0,0,0,0));
+          background-repeat: no-repeat;
+          background-size: 200px 200px;
+          opacity: 0.8;
+          animation: twinkle 4s infinite alternate;
+        }
+        @keyframes twinkle {
+          0% { opacity: 0.6; }
+          100% { opacity: 1; }
+        }
+        /* Gold pattern overlay */
+        body.khmer-new-year-mode::after {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          background-image: repeating-linear-gradient(45deg, rgba(255, 179, 0, 0.03) 0px, rgba(255, 179, 0, 0.03) 2px, transparent 2px, transparent 8px);
+          background-attachment: fixed;
+        }
+        /* Card, button, scrollbar styles */
+        .khmer-new-year-mode .MuiCard-root {
+          border-left: 4px solid #FFB300;
+          border-bottom: 2px solid #FFB300;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        .khmer-new-year-mode .MuiButton-containedPrimary {
+          background: linear-gradient(135deg, #C62828 0%, #FFB300 100%) !important;
+        }
+        .khmer-new-year-mode ::-webkit-scrollbar-track {
+          background: #1e293b;
+        }
+        .khmer-new-year-mode ::-webkit-scrollbar-thumb {
+          background: #FFB300;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  } else {
+    document.body.classList.remove("khmer-new-year-mode");
+  }
+}, [mode]);
+
   const theme = useMemo(() => {
-    // Determine base palette mode (glass uses dark base)
-    const baseMode = mode === "glass" ? "dark" : mode;
+    const isKhmerNewYear = mode === "khmerNewYear";
+    // For Khmer New Year we use dark base but override colors
+    const baseMode = isKhmerNewYear ? "dark" : mode === "glass" ? "dark" : mode;
     const isGlass = mode === "glass";
+
+    let effectivePrimary = primaryColor;
+    let effectiveSecondary = "#6b7280";
+    if (isKhmerNewYear) {
+      effectivePrimary = "#C62828";   // festive red
+      effectiveSecondary = "#FFB300"; // gold
+    }
 
     return createTheme({
       palette: {
         mode: baseMode,
         primary: {
-          main: primaryColor,
-          light: baseMode === "dark" ? "#e0f2fe" : "#e3f2fd",
-          dark: baseMode === "dark" ? "#0c4a6e" : "#1565c0",
+          main: effectivePrimary,
+          light: isKhmerNewYear ? "#E57373" : baseMode === "dark" ? "#e0f2fe" : "#e3f2fd",
+          dark: isKhmerNewYear ? "#B71C1C" : baseMode === "dark" ? "#0c4a6e" : "#1565c0",
         },
         secondary: {
-          main: baseMode === "dark" ? "#64748b" : "#6b7280",
+          main: effectiveSecondary,
         },
         background: {
-          default: isGlass
-            ? "rgba(15, 23, 42, 0.8)" // semi‑transparent dark
+          default: isKhmerNewYear
+            ? "#0c0d13"   // dark night
+            : isGlass
+            ? "rgba(15, 23, 42, 0.8)"
             : baseMode === "dark"
-              ? "#0f172a"
-              : "#E2E8F0",
-          paper: isGlass
+            ? "#0f172a"
+            : "#E2E8F0",
+          paper: isKhmerNewYear
+            ? "rgba(13, 17, 23, 0.85)"   // semi-transparent dark for cards
+            : isGlass
             ? "rgba(30, 41, 59, 0.7)"
             : baseMode === "dark"
-              ? "#1e293b"
-              : "#ffffff",
+            ? "#1e293b"
+            : "#ffffff",
         },
         text: {
-          primary: baseMode === "dark" ? "#f1f5f9" : "#1e293b",
-          secondary: baseMode === "dark" ? "#94a3b8" : "#64748b",
+          primary: isKhmerNewYear ? "#f8fafc" : baseMode === "dark" ? "#f1f5f9" : "#1e293b",
+          secondary: isKhmerNewYear ? "#FFB300" : baseMode === "dark" ? "#94a3b8" : "#64748b",
         },
-        divider:
-          baseMode === "dark"
-            ? "rgba(255, 255, 255, 0.1)"
-            : "rgba(0, 0, 0, 0.12)",
+        divider: isKhmerNewYear
+          ? "rgba(255, 179, 0, 0.2)"
+          : baseMode === "dark"
+          ? "rgba(255, 255, 255, 0.1)"
+          : "rgba(0, 0, 0, 0.12)",
       },
       typography: {
         fontFamily: ["Siemreap", "Arial", "sans-serif"].join(","),
         fontSize: fontSize === "small" ? 12 : fontSize === "large" ? 16 : 14,
-        h1: { color: baseMode === "dark" ? "#EBEDEF" : "#1e293b" },
-        h2: { color: baseMode === "dark" ? "#EBEDEF" : "#1e293b" },
-        h3: { color: baseMode === "dark" ? "#EBEDEF" : "#1e293b" },
-        h4: { color: baseMode === "dark" ? "#EBEDEF" : "#1e293b" },
-        h5: { color: baseMode === "dark" ? "#EBEDEF" : "#1e293b" },
-        h6: { color: baseMode === "dark" ? "#EBEDEF" : "#1e293b" },
-        body1: { color: baseMode === "dark" ? "#e2e8f0" : "#374151" },
-        body2: { color: baseMode === "dark" ? "#cbd5e1" : "#6b7280" },
+        h1: { color: isKhmerNewYear ? "#FFB300" : baseMode === "dark" ? "#EBEDEF" : "#1e293b" },
+        h2: { color: isKhmerNewYear ? "#FFB300" : baseMode === "dark" ? "#EBEDEF" : "#1e293b" },
+        h3: { color: isKhmerNewYear ? "#FFB300" : baseMode === "dark" ? "#EBEDEF" : "#1e293b" },
+        h4: { color: isKhmerNewYear ? "#FFB300" : baseMode === "dark" ? "#EBEDEF" : "#1e293b" },
+        h5: { color: isKhmerNewYear ? "#FFB300" : baseMode === "dark" ? "#EBEDEF" : "#1e293b" },
+        h6: { color: isKhmerNewYear ? "#FFB300" : baseMode === "dark" ? "#EBEDEF" : "#1e293b" },
+        body1: { color: isKhmerNewYear ? "#e2e8f0" : baseMode === "dark" ? "#e2e8f0" : "#374151" },
+        body2: { color: isKhmerNewYear ? "#cbd5e1" : baseMode === "dark" ? "#cbd5e1" : "#6b7280" },
       },
       components: {
         MuiAppBar: {
           styleOverrides: {
             root: {
-              backgroundColor: isGlass
+              backgroundColor: isKhmerNewYear
+                ? "#C62828"
+                : isGlass
                 ? "rgba(30, 41, 59, 0.7)"
                 : baseMode === "dark"
-                  ? topbarColor
-                  : "#ffffff",
-              color: baseMode === "dark" ? "#f1f5f9" : "#1e293b",
+                ? topbarColor
+                : "#ffffff",
+              backgroundImage: isKhmerNewYear
+                ? "linear-gradient(90deg, #C62828 0%, #FFB300 100%)"
+                : "none",
+              color: isKhmerNewYear ? "#ffffff" : baseMode === "dark" ? "#f1f5f9" : "#1e293b",
               boxShadow:
-                baseMode === "dark"
-                  ? "0 1px 3px 0 rgba(0, 0, 0, 0.3)"
+                baseMode === "dark" || isKhmerNewYear
+                  ? "0 1px 3px 0 rgba(0, 0, 0, 0.5)"
                   : "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
-              backgroundImage: "none",
               ...(isGlass && {
                 backdropFilter: "blur(10px)",
                 WebkitBackdropFilter: "blur(10px)",
@@ -473,14 +659,15 @@ export const ThemeProvider = ({ children }) => {
         MuiDrawer: {
           styleOverrides: {
             paper: {
-              backgroundColor: isGlass
+              backgroundColor: isKhmerNewYear
+                ? "rgba(13, 17, 23, 0.95)"
+                : isGlass
                 ? "rgba(30, 41, 59, 0.7)"
                 : baseMode === "dark"
-                  ? sidebarColor
-                  : "#ffffff",
-              color: baseMode === "dark" ? "#f1f5f9" : "#1e293b",
-              border: "none",
-              backgroundImage: "none",
+                ? sidebarColor
+                : "#ffffff",
+              color: isKhmerNewYear ? "#f8fafc" : baseMode === "dark" ? "#f1f5f9" : "#1e293b",
+              borderRight: isKhmerNewYear ? "2px solid #FFB300" : "none",
               ...(isGlass && {
                 backdropFilter: "blur(10px)",
                 WebkitBackdropFilter: "blur(10px)",
@@ -491,24 +678,27 @@ export const ThemeProvider = ({ children }) => {
         MuiCard: {
           styleOverrides: {
             root: {
-              backgroundColor: isGlass
-                ? "rgba(30, 41, 59, 0.55)"  
+              backgroundColor: isKhmerNewYear
+                ? "rgba(13, 17, 23, 0.85)"
+                : isGlass
+                ? "rgba(30, 41, 59, 0.55)"
                 : baseMode === "dark"
                 ? "#1e293b"
                 : "#ffffff",
               backgroundImage: "none",
               boxShadow: isGlass
-                ? "0 8px 32px rgba(0, 0, 0, 0.25)" 
+                ? "0 8px 32px rgba(0, 0, 0, 0.25)"
                 : baseMode === "dark"
-                ? "0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)"
+                ? "0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3)"
                 : "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
               border: isGlass
-                ? "1px solid rgba(255, 255, 255, 0.15)"  
+                ? "1px solid rgba(255, 255, 255, 0.15)"
+                : isKhmerNewYear
+                ? "1px solid rgba(255, 179, 0, 0.3)"
                 : baseMode === "dark"
                 ? "1px solid rgba(255, 255, 255, 0.05)"
                 : "none",
-              // borderRadius: "12px", 
-              transition: "all 0.3s ease-in-out",  
+              transition: "all 0.3s ease-in-out",
               ...(isGlass && {
                 backdropFilter: "blur(16px) saturate(180%)",
                 WebkitBackdropFilter: "blur(16px) saturate(180%)",
@@ -523,16 +713,15 @@ export const ThemeProvider = ({ children }) => {
               boxShadow: "none",
               border:
                 baseMode === "dark"
-                  ? "1.5px solid rgba(255, 255, 255, 0.08)" // subtle border in dark mode
-                  : "1.5px solid rgba(0, 0, 0, 0.05)",      // light border in light mode
+                  ? "1.5px solid rgba(255, 255, 255, 0.08)"
+                  : "1.5px solid rgba(0, 0, 0, 0.05)",
               ...(isGlass && {
-                backgroundColor: "rgba(30, 41, 59, 0.55)", // translucent dark base
-                backdropFilter: "blur(16px) saturate(180%)", // stronger blur + saturation
+                backgroundColor: "rgba(30, 41, 59, 0.55)",
+                backdropFilter: "blur(16px) saturate(180%)",
                 WebkitBackdropFilter: "blur(16px) saturate(180%)",
-                // borderRadius: "12px", // rounded corners for modern feel
-                border: "1px solid rgba(255, 255, 255, 0.15)", // frosted border
-                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.25)", // depth shadow
-                transition: "all 0.3s ease-in-out", // smooth transitions
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.25)",
+                transition: "all 0.3s ease-in-out",
               }),
             },
           },
@@ -586,70 +775,59 @@ export const ThemeProvider = ({ children }) => {
             },
           },
         },
-MuiAutocomplete: {
-  styleOverrides: {
-    paper: {
-      padding: 5,
-      border:
-        baseMode === "dark"
-          ? "1px solid rgba(255,255,255,0.12)"
-          : "1px solid rgba(0,0,0,0.12)",
-      borderRadius: 10,
-
-      
-      maxHeight: 300,
-      overflowY: "auto",
-
-      marginTop: 6,
-
-      scrollbarWidth: "thin",
-      scrollbarColor:
-        baseMode === "dark"
-          ? "rgba(255,255,255,0.3) transparent"
-          : "rgba(0,0,0,0.3) transparent",
-
-      ...(isGlass && {
-        backgroundColor: "rgba(30, 41, 59, 0.7)",
-        backdropFilter: "blur(10px)",
-        WebkitBackdropFilter: "blur(10px)",
-      }),
-    },
-
-    listbox: {
-      borderRadius: 10,
-      padding: "4px",
-
-    
-      maxHeight: "none",
-    },
-
-    option: {
-      borderRadius: 5,
-      margin: "2px 4px",
-      padding: "8px 12px",
-
-      '&[aria-selected="true"]': {
-        backgroundColor:
-          baseMode === "dark"
-            ? "rgba(255,255,255,0.08)"
-            : "rgba(0,0,0,0.06)",
-      },
-
-      "&:hover": {
-        backgroundColor:
-          baseMode === "dark"
-            ? "rgba(255,255,255,0.05)"
-            : "rgba(0,0,0,0.04)",
-      },
-    },
-  },
-},
+        MuiAutocomplete: {
+          styleOverrides: {
+            paper: {
+              padding: 5,
+              border:
+                baseMode === "dark"
+                  ? "1px solid rgba(255,255,255,0.12)"
+                  : "1px solid rgba(0,0,0,0.12)",
+              borderRadius: 10,
+              maxHeight: 300,
+              overflowY: "auto",
+              marginTop: 6,
+              scrollbarWidth: "thin",
+              scrollbarColor:
+                baseMode === "dark"
+                  ? "rgba(255,255,255,0.3) transparent"
+                  : "rgba(0,0,0,0.3) transparent",
+              ...(isGlass && {
+                backgroundColor: "rgba(30, 41, 59, 0.7)",
+                backdropFilter: "blur(10px)",
+                WebkitBackdropFilter: "blur(10px)",
+              }),
+            },
+            listbox: {
+              borderRadius: 10,
+              padding: "4px",
+              maxHeight: "none",
+            },
+            option: {
+              borderRadius: 5,
+              margin: "2px 4px",
+              padding: "8px 12px",
+              '&[aria-selected="true"]': {
+                backgroundColor:
+                  baseMode === "dark"
+                    ? "rgba(255,255,255,0.08)"
+                    : "rgba(0,0,0,0.06)",
+              },
+              "&:hover": {
+                backgroundColor:
+                  baseMode === "dark"
+                    ? "rgba(255,255,255,0.05)"
+                    : "rgba(0,0,0,0.04)",
+              },
+            },
+          },
+        },
         MuiButton: {
           styleOverrides: {
             root: {
               textTransform: "none",
               borderRadius: 8,
-              color: baseMode === "dark" ? "#f1f5f9" : "#1e293b",
+              color: isKhmerNewYear ? "#f8fafc" : baseMode === "dark" ? "#f1f5f9" : "#1e293b",
             },
             contained: {
               boxShadow: "none",
@@ -657,7 +835,7 @@ MuiAutocomplete: {
                 baseMode === "dark"
                   ? "1.5px solid rgba(255, 255, 255, 0.16)"
                   : "none",
-              color: baseMode === "dark" ? "#f1f5f9" : "#ffffff",
+              color: isKhmerNewYear ? "#ffffff" : baseMode === "dark" ? "#f1f5f9" : "#ffffff",
               "&:hover": {
                 boxShadow: "none",
               },
@@ -679,12 +857,12 @@ MuiAutocomplete: {
             root: {
               "& .MuiOutlinedInput-root": {
                 backgroundColor:
-                  baseMode === "dark" ? "rgba(15, 23, 42, 0.5)" : "#ffffff",
+                  baseMode === "dark" || isKhmerNewYear ? "rgba(15, 23, 42, 0.5)" : "#ffffff",
                 "&:hover fieldset": {
                   borderColor: baseMode === "dark" ? "#475569" : "#d1d5db",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: primaryColor,
+                  borderColor: effectivePrimary,
                 },
               },
             },
@@ -724,7 +902,6 @@ MuiAutocomplete: {
             },
           },
         },
-
         MuiTable: {
           styleOverrides: {
             root: {
@@ -739,7 +916,6 @@ MuiAutocomplete: {
             },
           },
         },
-
         MuiTableHead: {
           styleOverrides: {
             root: {
@@ -756,7 +932,6 @@ MuiAutocomplete: {
             },
           },
         },
-
         MuiTableBody: {
           styleOverrides: {
             root: {
@@ -764,18 +939,16 @@ MuiAutocomplete: {
                 backgroundColor: isGlass
                   ? "rgba(30, 41, 59, 0.55)"
                   : baseMode === "dark"
-                    ? "#1e293b"
-                    : "#ffffff",
+                  ? "#1e293b"
+                  : "#ffffff",
                 transition: "all 0.25s ease-in-out",
                 "&:hover": {
                   backgroundColor: isGlass
                     ? "rgba(55, 65, 81, 0.65)"
                     : baseMode === "dark"
-                      ? "#374151"
-                      : "#f1f5f9",
-                  boxShadow: isGlass
-                    ? "0 4px 12px rgba(0,0,0,0.15)"
-                    : "none",
+                    ? "#374151"
+                    : "#f1f5f9",
+                  boxShadow: isGlass ? "0 4px 12px rgba(0,0,0,0.15)" : "none",
                 },
                 "& .MuiTableCell-root:first-of-type": {
                   borderTopLeftRadius: 6,
@@ -794,7 +967,6 @@ MuiAutocomplete: {
             },
           },
         },
-
         MuiTableCell: {
           styleOverrides: {
             root: {
@@ -813,8 +985,7 @@ MuiAutocomplete: {
               },
             },
             head: {
-              borderBottom: `2px solid ${baseMode === "dark" ? "#475569" : "#d1d5db"
-                }`,
+              borderBottom: `2px solid ${baseMode === "dark" ? "#475569" : "#d1d5db"}`,
               fontWeight: 600,
               fontSize: "16px",
               "@media (max-width:600px)": {
@@ -822,12 +993,10 @@ MuiAutocomplete: {
               },
             },
             body: {
-              borderBottom: `1px solid ${baseMode === "dark" ? "#475569" : "#d1d5db"
-                }`,
+              borderBottom: `1px solid ${baseMode === "dark" ? "#475569" : "#d1d5db"}`,
             },
           },
         },
-
         MuiTablePagination: {
           styleOverrides: {
             root: {
@@ -835,8 +1004,8 @@ MuiAutocomplete: {
               backgroundColor: isGlass
                 ? "rgba(30, 41, 59, 0.55)"
                 : baseMode === "dark"
-                  ? "#1e293b"
-                  : "#ffffff",
+                ? "#1e293b"
+                : "#ffffff",
               borderTop:
                 baseMode === "dark"
                   ? "1px solid rgba(255, 255, 255, 0.1)"
@@ -888,7 +1057,6 @@ MuiAutocomplete: {
             },
           },
         },
-        // ---------- Additional Glass Components ----------
         MuiDialog: {
           styleOverrides: {
             paper: {
@@ -955,7 +1123,6 @@ MuiAutocomplete: {
             },
           },
         },
-        // Add any other component with a background as needed
       },
       shape: {
         borderRadius: 8,

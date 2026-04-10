@@ -1,26 +1,13 @@
-import React from "react";
-import {
-  Box,
-  Stack,
-  Typography,
-  Divider,
-  Tabs,
-  Tab,
-  TextField,
-  Select,
-  MenuItem,
-  IconButton,
-  Button,
-  Tooltip,
-  Paper,
-} from "@mui/material";
-import { Trash2 } from "lucide-react";
+import ManageHistoryOutlinedIcon from "@mui/icons-material/ManageHistoryOutlined";
+import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
-import ManageHistoryOutlinedIcon from "@mui/icons-material/ManageHistoryOutlined";
-import SaleHistory from "./SaleHistory";
+import { Box, Button, Divider, IconButton, MenuItem, Paper, Select, Stack, Tab, Tabs, TextField, Tooltip, Typography } from "@mui/material";
+import { Trash2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
+
 import InvoicePending from "./InvoicePending";
+import SaleHistory from "./SaleHistory";
 
 const CartPanel = ({
   cart,
@@ -28,6 +15,10 @@ const CartPanel = ({
   setOrderType,
   selectedTable,
   setSelectedTable,
+  customerName,
+  setCustomerName,
+  customerPhone,
+  setCustomerPhone,
   updateQty,
   removeFromCart,
   clearCart,
@@ -68,6 +59,47 @@ const CartPanel = ({
     { key: "take_away", label: t("take_away") },
     { key: "delivery", label: t("delivery") },
   ];
+
+  // Debug props
+  useEffect(() => {
+    console.log("CartPanel props:", {
+      customerName,
+      setCustomerName: typeof setCustomerName,
+      customerPhone,
+      setCustomerPhone: typeof setCustomerPhone,
+      selectedTable,
+      setSelectedTable: typeof setSelectedTable,
+      orderType,
+    });
+  }, [customerName, customerPhone, selectedTable, orderType, setCustomerName, setCustomerPhone, setSelectedTable]);
+
+  // Local fallbacks if parent doesn't provide setters
+  const [localCustomerName, _setLocalCustomerName] = useState(customerName || "");
+  const [localCustomerPhone, _setLocalCustomerPhone] = useState(customerPhone || "");
+  const [localTable, _setLocalTable] = useState(selectedTable || tables[0]);
+
+  useEffect(() => {
+    if (customerName !== undefined && customerName !== null) _setLocalCustomerName(customerName);
+  }, [customerName]);
+  useEffect(() => {
+    if (customerPhone !== undefined && customerPhone !== null) _setLocalCustomerPhone(customerPhone);
+  }, [customerPhone]);
+  useEffect(() => {
+    if (selectedTable !== undefined && selectedTable !== null) _setLocalTable(selectedTable);
+  }, [selectedTable]);
+
+  const handleCustomerNameChange = (v) => {
+    if (setCustomerName) setCustomerName(v);
+    else _setLocalCustomerName(v);
+  };
+  const handleCustomerPhoneChange = (v) => {
+    if (setCustomerPhone) setCustomerPhone(v);
+    else _setLocalCustomerPhone(v);
+  };
+  const handleTableChange = (v) => {
+    if (setSelectedTable) setSelectedTable(v);
+    else _setLocalTable(v);
+  };
 
   return (
     <Box>
@@ -114,7 +146,7 @@ const CartPanel = ({
         <Divider />
         <Tabs
           value={orderType}
-          onChange={(e, newValue) => setOrderType(newValue)}
+          onChange={(e, newValue) => setOrderType && setOrderType(newValue)}
           variant="fullWidth"
           className="order-type-tabs"
         >
@@ -138,19 +170,33 @@ const CartPanel = ({
 
         <Divider />
 
-        {orderType === ORDER_TYPES.DINE_IN && (
-          <Box className="customer-info">
-            <TextField
-              fullWidth
-              placeholder={t(`customer`)}
-              size="small"
-              className="customer-field"
-            />
+        <Box className="customer-info">
+          <TextField
+            fullWidth
+            placeholder={t(`customer`)}
+            sx={{mt:1}}
+            size="small"
+            className="customer-field"
+            value={(customerName !== undefined && customerName !== null) ? customerName : localCustomerName}
+            onChange={(e) => handleCustomerNameChange(e.target.value)}
+          />
+
+          <TextField
+            fullWidth
+            placeholder={t(`phone`) || "Phone"}
+            size="small"
+            sx={{ mt: 1 }}
+            value={(customerPhone !== undefined && customerPhone !== null) ? customerPhone : localCustomerPhone}
+            onChange={(e) => handleCustomerPhoneChange(e.target.value)}
+          />
+
+          {orderType === ORDER_TYPES.DINE_IN && (
             <Select
               fullWidth
-              value={selectedTable}
-              onChange={(e) => setSelectedTable(e.target.value)}
+              value={(selectedTable !== undefined && selectedTable !== null) ? selectedTable : localTable}
+              onChange={(e) => handleTableChange(e.target.value)}
               size="small"
+              sx={{ mt: 1 }}
             >
               {tables.map((table) => (
                 <MenuItem key={table} value={table} className="table-menu-item">
@@ -158,8 +204,8 @@ const CartPanel = ({
                 </MenuItem>
               ))}
             </Select>
-          </Box>
-        )}
+          )}
+        </Box>
 
         <Divider className="section-divider" />
 

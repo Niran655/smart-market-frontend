@@ -10,7 +10,6 @@ import { useAuth } from "../context/AuthContext";
 import "../Styles/setting.scss";
 import { translateLauguage } from "../function/translate";
  
- 
 
 export default function Settings() {
   const { language } = useAuth();
@@ -136,6 +135,26 @@ export default function Settings() {
               </Typography>
               <Typography className="text-body">
                 {t(`create_update_delete`)} {t(`suppliers`)}
+              </Typography>
+            </Stack>
+          </Paper>
+        </Grid>
+          <Grid size={{ xs: 12, md: 3 }}>
+          <Paper
+            className="setting-box"
+            component={RouterLink}
+            to="/setting/structure"
+            sx={{ cursor: "pointer", textDecoration: "none" }}
+          >
+            <Box>
+              <img src={Supplier} className="image" alt="Supplier" />
+            </Box>
+            <Stack textAlign="start"  spacing={1}>
+              <Typography className="text-title" variant="h5">
+                {t(`structure`)}
+              </Typography>
+              <Typography className="text-body">
+                {t(`create_update_delete`)} {t(`structure`)}
               </Typography>
             </Stack>
           </Paper>

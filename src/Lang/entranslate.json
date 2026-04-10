@@ -321,5 +321,8 @@
   "phnom_penh":"Phnom Penh",
   "shop_kh":"Shop (Khmer)",
   "shop_en":"Shop (English)",
-  "accepted_at":"Accepted At"
+  "accepted_at":"Accepted At",
+  "profile":"Profile",
+  "load_more":"Load More",
+  "structure":"Structure"
 }

@@ -21,6 +21,7 @@ import Profile from './Pages/Profile';
 import StoreSetting from './Pages/StoreSetting';
 import ReportInshopPage from './Pages/ReportInshop';
  
+ 
 export default function Router() {
   const { isAuthenticated } = useAuth();
 
@@ -43,6 +44,7 @@ export default function Router() {
         { path: 'setting', element: <Settings/> },
         { path: '/setting/unit', element: <Unit/>},
         { path: '/setting/supplier', element: <Supplier/>},
+    
         { path: '/store', element: <Store/>},
         { path: 'report', element: <Report/> },
         { path: '/store/pos/:id/report-in-shop', element: <ReportInshopPage/> },

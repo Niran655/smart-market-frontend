@@ -8,6 +8,7 @@ import {
   Typography,
   Divider,
   Dialog,
+  Breadcrumbs,
 } from "@mui/material";
 import { useState } from "react";
 import useGetProfileById from "../Components/hook/useGetProfileById";
@@ -42,7 +43,27 @@ const formatDateDDMMMYYYY = (date, lang = "en") => {
 };
   return (
     <Box>
-      <Paper sx={{ p: 4, borderRadius: 1 }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Box textAlign="start">
+          <Breadcrumbs aria-label="breadcrumb" separator="/">
+            <Typography
+              // component={RouterLink}
+              // to="/setting"
+              variant="h6"
+              sx={{
+                textDecoration: "none",
+                borderLeft: "3px solid #1D4592",
+                pl: 1.5,
+                fontWeight: 600,
+              }}
+            >
+              {t("profile")}
+            </Typography>
+ 
+          </Breadcrumbs>
+        </Box>
+      </Stack>
+      <Paper sx={{ p: 4, borderRadius: 1,mt:5 }} >
         <Grid container spacing={4}>
 
           <Grid size={{ xs: 12, md: 3 }} >
@@ -125,7 +146,7 @@ const formatDateDDMMMYYYY = (date, lang = "en") => {
           <img
             src={profile?.image}
             alt="Profile"
-            style={{ maxWidth: "100%", borderRadius: 8 }}
+            style={{ maxWidth: "100%",maxHeight:"500px", objectFit: "cover", borderRadius: 8 }}
           />
         </Box>
       </Dialog>

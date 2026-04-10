@@ -57,6 +57,11 @@ import { DASHBOARD_STATS } from "../../graphql/queries";
 import Chart from "react-apexcharts";
 import ErrorPage from "../include/ErrorPage";
 
+import Dashboard1 from "../assets/Image/dashboard-card1.png";
+import Dashboard2 from "../assets/Image/dashboard-card2.png";
+import Dashboard3 from "../assets/Image/dashboard-card3.png";
+import Dashboard4 from "../assets/Image/dashboard-card4.png";
+
 const formatCurrency = (value) =>
   value != null ? `$${Number(value).toFixed(2)}` : "$0.00";
 
@@ -97,6 +102,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const [customPopoverAnchor, setCustomPopoverAnchor] = useState(null);
+  const images = [Dashboard1, Dashboard2, Dashboard3, Dashboard4];
 
   const getQueryVars = () => {
     if (filterType === "today") return { filter: "today", dayStart: null, dayEnd: null };
@@ -174,7 +180,7 @@ export default function Dashboard() {
       change: "+12.5%",
       trend: "up",
       icon: <ShoppingCart sx={{ fontSize: 40 }} />,
-      color: "#4CAF50",
+      color: "#ffffff",
     },
     {
       title: t("total_sales"),
@@ -182,7 +188,7 @@ export default function Dashboard() {
       change: "+8.2%",
       trend: "up",
       icon: <MonetizationOn sx={{ fontSize: 40 }} />,
-      color: "#2196F3",
+      color: "#ffffff",
     },
     {
       title: t("average_value"),
@@ -190,7 +196,7 @@ export default function Dashboard() {
       change: "+5.1%",
       trend: "up",
       icon: <TrendingUp sx={{ fontSize: 40 }} />,
-      color: "#FF9800",
+      color: "#ffffff",
     },
     {
       title: t("reservations"),
@@ -198,7 +204,7 @@ export default function Dashboard() {
       change: "+3.4%",
       trend: "up",
       icon: <EventSeat sx={{ fontSize: 40 }} />,
-      color: "#9C27B0",
+      color: "#ffffff",
     },
   ];
 
@@ -595,8 +601,8 @@ export default function Dashboard() {
         }
       `}</style>
 
-      <Box sx={{ width: "100%", maxWidth: "100%", mx: "auto", mt: 2, px: { xs: 1, sm: 2, md: 0 } }}>
-        {/* Main Dashboard UI - hidden when printing */}
+      <Box sx={{ width: "100%", maxWidth: "100%", mx: "auto", px: { xs: 1, sm: 2, md: 0 } }}>
+
         <Box sx={{ "@media print": { display: "none" } }}>
           <Box sx={{ mb: 4 }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -617,17 +623,18 @@ export default function Dashboard() {
               </Box>
               <Stack direction="row" spacing={2}>
                 <Tooltip title="Print Report">
-                  <IconButton
+                  <Button
                     onClick={handlePrint}
+                    variant="contained"
                     sx={{
-                      bgcolor: "#f9fafb",
-                      color: "#4a5568",
+
+
                       boxShadow: 1,
                       "&:hover": { bgcolor: "#edf2f7", color: "#2d3748" },
                     }}
                   >
                     <Print />
-                  </IconButton>
+                  </Button>
                 </Tooltip>
 
                 <Button
@@ -713,31 +720,98 @@ export default function Dashboard() {
           <Grid container spacing={3} sx={{ mb: 4 }}>
             {summaryCards.map((card, index) => (
               <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
-                <Card sx={{ borderRadius: 1, height: "100%", position: "relative", overflow: "hidden" }}>
-                  <CardContent sx={{ position: "relative" }}>
+                {/* <Card
+                  sx={{
+                    borderRadius: 1,
+                    height: "100%",
+                    position: "relative",
+                    overflow: "hidden",
+                    color: "#fff",
+                    backgroundImage: `url(${images[index % images.length]})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                >
+   */}
+                    <Card
+                      sx={{
+                        borderRadius: 1,
+                        height: "100%",
+                        position: "relative",
+                        overflow: "hidden",
+                        color: "#fff",
+                        backgroundImage: `url(${images[index % images.length]})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        filter: "sepia(0.6) hue-rotate(10deg) saturate(1.4) brightness(1.05)",
+                      }}
+  > 
+                  
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "rgba(0,0,0,0.4)",
+                      // background: "linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.85))",
+                      zIndex: 1,
+                    }}
+                  />
+
+                  <CardContent sx={{ position: "relative", zIndex: 2 }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                       <Box>
-                        <Typography variant="h6" color="text.secondary" sx={{ mb: 0.5 }}>
+                        <Typography variant="h6" sx={{ mb: 0.5, color: "#fff", textAlign: "left" }}>
                           {card.title}
                         </Typography>
-                        <Typography variant="h4" fontWeight={700} sx={{ color: card.color, mb: 1 }}>
+
+                        <Typography variant="h4" fontWeight={700} sx={{ color: card.color, mb: 1, color: "#fff", textAlign: "left" }}>
                           {card.value}
                         </Typography>
+
                         <Stack direction="row" alignItems="center" spacing={0.5}>
                           {card.trend === "up" ? (
                             <ArrowUpward sx={{ fontSize: 16, color: "#22c55e" }} />
                           ) : (
                             <ArrowDownward sx={{ fontSize: 16, color: "#ef4444" }} />
                           )}
-                          <Typography variant="body2" sx={{ fontWeight: 600, color: card.trend === "up" ? "#22c55e" : "#ef4444" }}>
+
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: 600,
+                              color: card.trend === "up" ? "#22c55e" : "#ef4444",
+                            }}
+                          >
                             {card.change}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
+
+                          <Typography variant="body2" sx={{ color: "#ddd" }}>
                             vs last period
                           </Typography>
                         </Stack>
                       </Box>
-                      <Box sx={{ width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "14px", background: `linear-gradient(135deg, ${card.color}30, ${card.color}10)`, color: card.color }}>
+
+                      <Box
+                        sx={{
+                          width: 48,
+                          height: 48,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: "6px",
+
+
+                          background: "rgba(255, 255, 255, 0.15)",
+                          backdropFilter: "blur(10px)",
+                          WebkitBackdropFilter: "blur(10px)",
+
+
+                          border: "1px solid rgba(255, 255, 255, 0.2)",
+                          boxShadow: "0 4px 20px rgba(0,0,0,0.25)",
+
+                          color: "#fff",
+                        }}
+                      >
                         {card.icon}
                       </Box>
                     </Stack>
@@ -747,7 +821,7 @@ export default function Dashboard() {
             ))}
           </Grid>
 
-          {/* Charts */}
+
           <Grid container spacing={3} sx={{ mb: 4 }}>
             <Grid size={{ xs: 12, md: 8 }}>
               <Card sx={{ borderRadius: 1, height: "100%" }}>
@@ -883,7 +957,6 @@ export default function Dashboard() {
           </Grid>
         </Box>
 
-        {/* Print Layout - hidden until print */}
         <Box
           id="print-dashboard-root"
           sx={{

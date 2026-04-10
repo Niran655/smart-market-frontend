@@ -44,7 +44,7 @@ export default function PurchaseOrderForm({
     language,
     setRefetch,
     editData = null,
-    
+
 }) {
     const isEdit = Boolean(editData);
     const { setAlert } = useAuth();
@@ -139,7 +139,7 @@ export default function PurchaseOrderForm({
 
     const { values, errors, touched, handleSubmit, setValues } = formik;
 
-    
+
     const addItem = () =>
         setValues({ ...values, items: [...values.items, emptyItem] });
 
@@ -157,7 +157,7 @@ export default function PurchaseOrderForm({
         setValues({ ...values, items });
     };
 
-     
+
     return (
         <BootstrapDialog open={open} fullWidth maxWidth="sm">
             <DialogTitle>
@@ -173,7 +173,7 @@ export default function PurchaseOrderForm({
                 <Form onSubmit={handleSubmit}>
                     <DialogContent dividers>
                         <Grid container spacing={2}>
-                          
+
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <Typography>{t("suppliers")}</Typography>
                                 <Autocomplete
@@ -196,7 +196,7 @@ export default function PurchaseOrderForm({
                                 />
                             </Grid>
 
-                    
+
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <Typography>{t("remark")}</Typography>
                                 <TextField
@@ -209,7 +209,7 @@ export default function PurchaseOrderForm({
                                 />
                             </Grid>
 
-                           
+
                             <Grid size={{ xs: 12 }}>
                                 <Stack direction="row" justifyContent="space-between">
                                     <Typography>{t("product_list")}</Typography>
@@ -225,26 +225,63 @@ export default function PurchaseOrderForm({
                                         <Autocomplete
                                             options={productWarehouseWithPagination}
                                             loading={productLoading}
-                                        
                                             value={
                                                 productWarehouseWithPagination.find(
                                                     (p) => p.subProduct?._id === item.subProductId
                                                 ) || null
                                             }
-                                            getOptionLabel={(p) =>
-                                                language === "en"
-                                                    ? p.subProduct?.parentProductId?.nameEn
-                                                    : p.subProduct?.parentProductId?.nameKh
+                                            isOptionEqualToValue={(o, v) =>
+                                                o.subProduct?._id === v.subProduct?._id
                                             }
-                                            onChange={(e, val) =>
-                                                updateItem(index, "subProductId", val?.subProduct?._id)
-                                            }
+                                            getOptionLabel={(p) => {
+                                                if (!p) return "";
+                                                const name =
+                                                    language === "en"
+                                                        ? p?.subProduct?.parentProductId?.nameEn || "Unnamed"
+                                                        : p?.subProduct?.parentProductId?.nameKh || "គ្មានឈ្មោះ";
+                                                const unit =
+                                                    language === "en"
+                                                        ? p?.subProduct?.unitId?.nameEn
+                                                        : p?.subProduct?.unitId?.nameKh;
+                                                return `${name} (${unit})`; // <-- keep unit in parentheses
+                                            }}
+                                            onChange={(e, val) => {
+                                                const newItems = [...values.items];
+                                                newItems[index] = {
+                                                    ...newItems[index],
+                                                    subProductId: val?.subProduct?._id || "",
+                                                    costPrice: val?.subProduct?.costPrice || "",
+                                                };
+                                                setValues({
+                                                    ...values,
+                                                    items: newItems,
+                                                });
+                                            }}
+                                            renderOption={(props, option) => {
+                                                const name =
+                                                    language === "en"
+                                                        ? option?.subProduct?.parentProductId?.nameEn
+                                                        : option?.subProduct?.parentProductId?.nameKh;
+                                                const unit =
+                                                    language === "en"
+                                                        ? option?.subProduct?.unitId?.nameEn
+                                                        : option?.subProduct?.unitId?.nameKh;
+                                                return (
+                                                    <li {...props}>
+                                                        <Typography fontSize={14}>
+                                                            {name} ({unit}) {/* same style as getOptionLabel */}
+                                                        </Typography>
+                                                    </li>
+                                                );
+                                            }}
                                             renderInput={(params) => (
-                                                <TextField {...params} size="small"
-                                                 error={touched.supplierId && Boolean(errors.supplierId)}
-                                            helperText={touched.supplierId && errors.supplierId} 
+                                                <TextField
+                                                    {...params}
+                                                    size="small"
+                                                    placeholder={t("select_product")}
+                                                    error={Boolean(touched.toShopIds && errors.toShopIds)}
+                                                    helperText={touched.toShopIds && errors.toShopIds}
                                                 />
-                                                
                                             )}
                                         />
                                     </Grid>

@@ -132,7 +132,7 @@ const Store = () => {
         </Box>
       </Stack>
 
-      {/* Search */}
+    
 
       <Box
         sx={{
@@ -167,7 +167,7 @@ const Store = () => {
           </Grid>
         </Grid>
 
-        {/* Create Shop */}
+ 
 
         <Stack direction="row" spacing={2} mt={3}>
           {(userRole === "superAdmin" || userRole === "admin") && (
@@ -192,7 +192,7 @@ const Store = () => {
         </Stack>
       </Box>
 
-      {/* Shops List */}
+ 
       <Grid container spacing={3} mt={4}>
         {filteredShops?.map((shop, index) => (
           <Grid size={{ xs: 12, md: 4 }} key={index}>

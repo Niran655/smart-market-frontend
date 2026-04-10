@@ -70,7 +70,6 @@ const isNumericOrCurrency = (val) => {
   if (val === null || val === undefined) return false;
   if (typeof val === 'number') return true;
   if (typeof val === 'string') {
-    // Remove $ and commas for checking
     const cleaned = val.replace(/[$,]/g, '');
     return !isNaN(parseFloat(cleaned)) && isFinite(cleaned);
   }
@@ -184,13 +183,13 @@ const ReportPage = ({ shopId = null }) => {
         const sales = toNumber(item.sales);
         const salesPerHour = hours > 0 ? sales / hours : 0;
         return [
-          `${item.name || "-"} (${item.role || "-"})`,
+          `${item.nameEn || "-"} (${item.role || "-"})`,
           String(hours),
           formatCurrency(salesPerHour),
           formatCurrency(sales),
         ];
       });
-      subtotal = mainRows.reduce((sum, row) => sum + toNumber(String(row[3]).replace(/[^0-9.-]+/g, "")), 0);
+      subtotal = performance.reduce((sum, p) => sum + toNumber(p.sales), 0);
       paymentMethod = "Staff Performance";
       notes = [
         `Total staff: ${staff.totalStaff ?? 0}`,
@@ -598,6 +597,16 @@ const ReportPage = ({ shopId = null }) => {
     saveAs(blob, `${reportType}-report-${formatFileDate(new Date())}.xlsx`);
   };
 
+  // Custom filter for staff performance (search by nameEn or nameKh)
+  const filterStaff = (items, query) => {
+    if (!query) return items || [];
+    return (items || []).filter(item =>
+      (item.nameEn || "").toLowerCase().includes(query.toLowerCase()) ||
+      (item.nameKh || "").toLowerCase().includes(query.toLowerCase())
+    );
+  };
+
+  // Generic filter for other data (uses a single field)
   const filterData = (items, field) => {
     if (!searchQuery || !items) return items || [];
     return items.filter((item) =>
@@ -675,7 +684,7 @@ const ReportPage = ({ shopId = null }) => {
       }
     } else if (reportType === "staff") {
       const staff = reportStat.staff || {};
-      const performance = filterData(staff.performance || [], "name");
+      const performance = filterStaff(staff.performance, searchQuery);
       tableHeaders = ["Staff", "Role", "Hours", "Sales", "Orders"];
       tableRows = performance.map((item) => [
         language === "kh" ? item.nameKh : item.nameEn,
@@ -684,7 +693,7 @@ const ReportPage = ({ shopId = null }) => {
         item.sales ? formatCurrency(item.sales) : "-",
         item.orders || "-",
       ]);
-      subtotal = toNumber(staff.totalSales);
+      subtotal = performance.reduce((sum, p) => sum + toNumber(p.sales), 0);
       paymentMethod = "Staff Performance";
       notes = [
         `Total staff: ${staff.totalStaff ?? 0}`,
@@ -744,7 +753,7 @@ const ReportPage = ({ shopId = null }) => {
       ],
       notes,
     };
-  }, [reportStat, reportType, dateRange.start, dateRange.end, shopId, user, searchQuery, printSection]);
+  }, [reportStat, reportType, dateRange.start, dateRange.end, shopId, user, searchQuery, printSection, language]);
 
   const renderReportContent = () => {
     if (loading) {
@@ -914,7 +923,7 @@ const ReportPage = ({ shopId = null }) => {
 
       case "staff":
         if (!staff) return <Typography>{t("no_staff_data_avialble")}</Typography>;
-        const filteredStaffPerformance = filterData(staff.performance, "name");
+        const filteredStaffPerformance = filterStaff(staff.performance, searchQuery);
         return (
           <>
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -946,7 +955,7 @@ const ReportPage = ({ shopId = null }) => {
                 <Paper sx={{ p: 3, textAlign: "center", borderRadius: 1 }}>
                   <Typography color="text.secondary" variant="body2">{t("sale_staff")}</Typography>
                   <Typography variant="h5" fontWeight="600" color="secondary.main">
-                    {formatCurrency(staff.salesPerStaff)}
+                    {formatCurrency(staff.totalSales)}
                   </Typography>
                 </Paper>
               </Grid>
@@ -1270,7 +1279,7 @@ const ReportPage = ({ shopId = null }) => {
           {renderReportContent()}
         </Box>
 
-        {/* Print section – fixed startsWith error and dynamic alignment */}
+        {/* Print section */}
         <Box
           id="print-report-root"
           sx={{

@@ -34,6 +34,8 @@ import { useAuth } from "../context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import Menu from "./menu/Menu";
 import { MenuMobile, MenuNavbar } from "../Menu";
+import { useQuery } from "@apollo/client/react";
+import { GET_SHOP_BY_SHOP_ID } from "../../graphql/queries";
 
 export default function AppLayout() {
   const {
@@ -60,6 +62,8 @@ export default function AppLayout() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userObject, setUserObject] = useState(null);
+
+ 
 
 
   const sidebarWidth = layoutMode === "compact" ? 70 : 250;
@@ -346,11 +350,11 @@ export default function AppLayout() {
                   py: { xs: 0.5, sm: 0 },
                 }}
               >
-                {/* Left section: POS title and grid icon */}
+ 
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <Link to={`/store/pos/${id}`}>
                     <Button>
-                      {/* Hide title on extra small screens */}
+             
                       {!isExtraSmall && (
                         <Typography
                           sx={{
@@ -408,7 +412,7 @@ export default function AppLayout() {
                         component={Link}
                         to={tab.link}
                         sx={{
-                          borderRadius: 10,
+                          borderRadius: 1,
                           backgroundColor:
                             activeTab === tab.key
                               ? "#ffffff"

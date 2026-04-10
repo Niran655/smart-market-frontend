@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Grid,
@@ -24,16 +24,25 @@ const ProductList = ({
   filteredProducts,
   onProductClick,
 }) => {
+  const [visibleCount, setVisibleCount] = useState(12);
+
   const getCategoryData = (category, language) => {
     const name = language === "kh" ? category.nameKh : category.nameEn;
     return { name };
   };
 
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 12);
+  };
+
   return (
     <>
+      {/* HEADER */}
       <Grid container className="product-list-header">
         <Grid size={{ xs: 6 }}>
-          <Typography className="section-title">{t(`product_list`)}</Typography>
+          <Typography className="section-title">
+            {t(`product_list`)}
+          </Typography>
         </Grid>
         <Grid size={{ xs: 6 }}>
           <Box className="search-container">
@@ -55,6 +64,7 @@ const ProductList = ({
         </Grid>
       </Grid>
 
+      {/* CATEGORY */}
       <Box className="category-scroll-container">
         {categories.map((category) => {
           const { name } = getCategoryData(category, language);
@@ -62,11 +72,10 @@ const ProductList = ({
             <Button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
-              variant={selectedCategory === category.id ? "contained" : "outlined"}
-              // className={`category-button ${
-              //   selectedCategory === category.id ? "category-button--active" : ""
-              // }`}
-              sx={{borderRadius:0.7}}
+              variant={
+                selectedCategory === category.id ? "contained" : "outlined"
+              }
+              sx={{ borderRadius: 0.7 }}
             >
               <Box display="flex" alignItems="center" gap={1}>
                 <span>{name}</span>
@@ -76,44 +85,62 @@ const ProductList = ({
         })}
       </Box>
 
+      {/* PRODUCT GRID */}
       <Grid container spacing={1} className="product-grid">
-        {filteredProducts?.map((item, idx) => (
-          <Grid size={{ xs: 3 }} key={idx}>
-            <Card className="product-card" onClick={() => onProductClick(item)}>
-              <CardMedia
-                component="img"
-                height="100"
-                image={item.productImg || "/placeholder-food.jpg"}
-                alt={item.parentProductId?.nameKh || "Product"}
-                className="product-image"
-              />
-              <CardContent className="product-content">
-                <Typography className="product-name">
-                  {language === "kh"
-                    ? item.parentProductId?.nameKh
-                    : item.parentProductId?.nameEn}
-                </Typography>
-                <Typography className="product-category">
-                  {language === "kh"
-                    ? item.parentProductId?.categoryId?.nameKh
-                    : item.parentProductId?.categoryId?.nameEn}
-                </Typography>
-                <Box className="product-footer">
-                  <Typography className="product-price">
-                    {item.salePrice?.toLocaleString()}$
+        {filteredProducts
+          ?.slice(0, visibleCount)
+          .map((item, idx) => (
+            <Grid size={{ xs: 3 }} key={idx}>
+              <Card
+                className="product-card"
+                onClick={() => onProductClick(item)}
+              >
+                <CardMedia
+                  component="img"
+                  height="100"
+                  image={item.productImg || "/placeholder-food.jpg"}
+                  alt={item.parentProductId?.nameKh || "Product"}
+                  className="product-image"
+                />
+                <CardContent className="product-content">
+                  <Typography className="product-name">
+                    {language === "kh"
+                      ? item.parentProductId?.nameKh
+                      : item.parentProductId?.nameEn}
                   </Typography>
-                  <Chip
-                    label={language === "kh" ? item?.unitId?.nameKh : item?.unitId?.nameEn}
-                    size="small"
-                    color="primary"
-                    className="add-chip"
-                  />
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+                  <Typography className="product-category">
+                    {language === "kh"
+                      ? item.parentProductId?.categoryId?.nameKh
+                      : item.parentProductId?.categoryId?.nameEn}
+                  </Typography>
+                  <Box className="product-footer">
+                    <Typography className="product-price">
+                      {item.salePrice?.toLocaleString()}$
+                    </Typography>
+                    <Chip
+                      label={
+                        language === "kh"
+                          ? item?.unitId?.nameKh
+                          : item?.unitId?.nameEn
+                      }
+                      size="small"
+                      color="primary"
+                    />
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
       </Grid>
+
+      {/* LOAD MORE BUTTON */}
+      {visibleCount < filteredProducts?.length && (
+        <Box textAlign="center" mt={2} mb={10}>
+          <Button variant="contained" onClick={handleLoadMore}>
+            {t("load_more") || "Load More"}
+          </Button>
+        </Box>
+      )}
     </>
   );
 };

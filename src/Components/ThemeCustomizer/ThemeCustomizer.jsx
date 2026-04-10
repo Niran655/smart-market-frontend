@@ -48,6 +48,13 @@ export default function ThemeCustomizer() {
     setOpen(!open);
   };
 
+  const getTriggerIcon = () => {
+    if (mode === "khmerNewYear") {
+      return <span style={{ fontSize: "1.2rem" }}>🌸</span>;
+    }
+    return <SettingsIcon className="rotating-icon" />;
+  };
+
   const primaryColors = [
     { name: "Info", value: "#1976d2" },
     { name: "Blue", value: "#1D4592" },
@@ -78,7 +85,10 @@ export default function ThemeCustomizer() {
 
   return (
     <>
-      <Tooltip title="Theme Settings" placement="left">
+      <Tooltip
+        title={mode === "khmerNewYear" ? "Khmer New Year Theme" : "Theme Settings"}
+        placement="left"
+      >
         <IconButton
           className="theme-customizer-trigger"
           onClick={toggleDrawer}
@@ -88,7 +98,9 @@ export default function ThemeCustomizer() {
             top: "50%",
             transform: "translateY(-50%)",
             backgroundColor:
-              mode === "dark"
+              mode === "khmerNewYear"
+                ? "#C62828"
+                : mode === "dark"
                 ? "rgba(30, 41, 59, 0.9)"
                 : "primary.main",
             color: "white",
@@ -98,18 +110,20 @@ export default function ThemeCustomizer() {
             zIndex: 9999,
             "&:hover": {
               backgroundColor:
-                mode === "dark"
+                mode === "khmerNewYear"
+                  ? "#B71C1C"
+                  : mode === "dark"
                   ? "rgba(30, 41, 59, 1)"
                   : "primary.dark",
             },
             boxShadow:
-              mode === "dark"
+              mode === "dark" || mode === "khmerNewYear"
                 ? "0 4px 12px rgba(0, 0, 0, 0.3)"
                 : "0 4px 12px rgba(0, 0, 0, 0.1)",
             backdropFilter: mode === "dark" ? "blur(10px)" : "none",
           }}
         >
-          <SettingsIcon className="rotating-icon" />
+          {getTriggerIcon()}
         </IconButton>
       </Tooltip>
 
@@ -125,21 +139,28 @@ export default function ThemeCustomizer() {
                 ? "#0f172a"
                 : mode === "glass"
                 ? "rgba(15, 23, 42, 0.8)"
+                : mode === "khmerNewYear"
+                ? "rgba(13, 17, 23, 0.95)"
                 : "background.paper",
             backgroundImage:
               mode === "dark"
                 ? "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)"
+                : mode === "khmerNewYear"
+                ? "radial-gradient(ellipse at bottom, #0d1d31 0%, #0c0d13 100%)"
                 : mode === "glass"
                 ? "none"
                 : "none",
             color:
               mode === "dark" || mode === "glass"
                 ? "#e2e8f0"
+                : mode === "khmerNewYear"
+                ? "#f8fafc"
                 : "text.primary",
             ...(mode === "glass" && {
               backdropFilter: "blur(10px)",
               WebkitBackdropFilter: "blur(10px)",
             }),
+            borderRight: mode === "khmerNewYear" ? "2px solid #FFB300" : "none",
           },
         }}
       >
@@ -153,9 +174,11 @@ export default function ThemeCustomizer() {
               backgroundColor:
                 mode === "dark" || mode === "glass"
                   ? "rgba(30, 41, 59, 0.5)"
+                  : mode === "khmerNewYear"
+                  ? "rgba(255, 179, 0, 0.1)"
                   : "transparent",
               borderBottom:
-                mode === "dark" || mode === "glass"
+                mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                   ? "1px solid rgba(255, 255, 255, 0.1)"
                   : "none",
             }}
@@ -167,6 +190,8 @@ export default function ThemeCustomizer() {
                 color:
                   mode === "dark" || mode === "glass"
                     ? "#f8fafc"
+                    : mode === "khmerNewYear"
+                    ? "#FFB300"
                     : "text.primary",
               }}
             >
@@ -179,10 +204,12 @@ export default function ThemeCustomizer() {
                 color:
                   mode === "dark" || mode === "glass"
                     ? "#94a3b8"
+                    : mode === "khmerNewYear"
+                    ? "#FFB300"
                     : "text.secondary",
                 "&:hover": {
                   backgroundColor:
-                    mode === "dark" || mode === "glass"
+                    mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                       ? "rgba(255, 255, 255, 0.1)"
                       : "rgba(0, 0, 0, 0.04)",
                 },
@@ -195,7 +222,7 @@ export default function ThemeCustomizer() {
           <Divider
             sx={{
               borderColor:
-                mode === "dark" || mode === "glass"
+                mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                   ? "rgba(255, 255, 255, 0.1)"
                   : "divider",
             }}
@@ -232,7 +259,7 @@ export default function ThemeCustomizer() {
             }}
           >
             <Stack spacing={3}>
-              {/* Theme Mode - Three buttons */}
+              {/* Theme Mode - Four buttons */}
               <Box>
                 <Typography
                   variant="subtitle2"
@@ -242,12 +269,14 @@ export default function ThemeCustomizer() {
                     color:
                       mode === "dark" || mode === "glass"
                         ? "#f1f5f9"
+                        : mode === "khmerNewYear"
+                        ? "#FFB300"
                         : "text.primary",
                   }}
                 >
                   Theme Mode
                 </Typography>
-                <Stack direction="row" spacing={1}>
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                   <Button
                     variant={mode === "light" ? "contained" : "outlined"}
                     onClick={() => toggleColorMode("light")}
@@ -262,6 +291,8 @@ export default function ThemeCustomizer() {
                           ? "white"
                           : mode === "dark" || mode === "glass"
                           ? "#e2e8f0"
+                          : mode === "khmerNewYear"
+                          ? "#f8fafc"
                           : "text.primary",
                       borderColor:
                         mode === "dark" || mode === "glass"
@@ -291,6 +322,8 @@ export default function ThemeCustomizer() {
                           ? "white"
                           : mode === "dark" || mode === "glass"
                           ? "#e2e8f0"
+                          : mode === "khmerNewYear"
+                          ? "#f8fafc"
                           : "text.primary",
                       borderColor:
                         mode === "dark" || mode === "glass"
@@ -322,6 +355,8 @@ export default function ThemeCustomizer() {
                           ? "white"
                           : mode === "dark" || mode === "glass"
                           ? "#e2e8f0"
+                          : mode === "khmerNewYear"
+                          ? "#f8fafc"
                           : "text.primary",
                       borderColor:
                         mode === "dark" || mode === "glass"
@@ -343,13 +378,44 @@ export default function ThemeCustomizer() {
                   >
                     Glass
                   </Button>
+                  <Button
+                    variant={mode === "khmerNewYear" ? "contained" : "outlined"}
+                    onClick={() => toggleColorMode("khmerNewYear")}
+                    fullWidth
+                    sx={{
+                      backgroundColor:
+                        mode === "khmerNewYear" ? "#C62828" : "transparent",
+                      color:
+                        mode === "khmerNewYear"
+                          ? "white"
+                          : mode === "dark" || mode === "glass"
+                          ? "#e2e8f0"
+                          : mode === "khmerNewYear"
+                          ? "#f8fafc"
+                          : "text.primary",
+                      borderColor:
+                        mode === "dark" || mode === "glass"
+                          ? "#475569"
+                          : "rgba(0, 0, 0, 0.23)",
+                      "&:hover": {
+                        backgroundColor:
+                          mode === "khmerNewYear"
+                            ? "#B71C1C"
+                            : mode === "dark" || mode === "glass"
+                            ? "rgba(255, 255, 255, 0.1)"
+                            : "rgba(0, 0, 0, 0.04)",
+                      },
+                    }}
+                  >
+                    🇰🇭 Khmer New Year
+                  </Button>
                 </Stack>
               </Box>
 
               <Divider
                 sx={{
                   borderColor:
-                    mode === "dark" || mode === "glass"
+                    mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                       ? "rgba(255, 255, 255, 0.1)"
                       : "divider",
                 }}
@@ -365,6 +431,8 @@ export default function ThemeCustomizer() {
                     color:
                       mode === "dark" || mode === "glass"
                         ? "#f1f5f9"
+                        : mode === "khmerNewYear"
+                        ? "#FFB300"
                         : "text.primary",
                   }}
                 >
@@ -382,20 +450,22 @@ export default function ThemeCustomizer() {
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       backgroundColor:
-                        mode === "dark" || mode === "glass"
+                        mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                           ? "rgba(30, 41, 59, 0.5)"
                           : "transparent",
                       borderColor:
-                        mode === "dark" || mode === "glass"
+                        mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                           ? "#475569"
                           : "rgba(0, 0, 0, 0.23)",
                       color:
                         mode === "dark" || mode === "glass"
                           ? "#e2e8f0"
+                          : mode === "khmerNewYear"
+                          ? "#f8fafc"
                           : "text.primary",
                       "&:hover fieldset": {
                         borderColor:
-                          mode === "dark" || mode === "glass"
+                          mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                             ? "#64748b"
                             : "rgba(0, 0, 0, 0.87)",
                       },
@@ -410,6 +480,8 @@ export default function ThemeCustomizer() {
                       color:
                         mode === "dark" || mode === "glass"
                           ? "#94a3b8"
+                          : mode === "khmerNewYear"
+                          ? "#FFB300"
                           : "text.secondary",
                     },
                   }}
@@ -419,7 +491,7 @@ export default function ThemeCustomizer() {
               <Divider
                 sx={{
                   borderColor:
-                    mode === "dark" || mode === "glass"
+                    mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                       ? "rgba(255, 255, 255, 0.1)"
                       : "divider",
                 }}
@@ -435,6 +507,8 @@ export default function ThemeCustomizer() {
                     color:
                       mode === "dark" || mode === "glass"
                         ? "#f1f5f9"
+                        : mode === "khmerNewYear"
+                        ? "#FFB300"
                         : "text.primary",
                   }}
                 >
@@ -449,15 +523,15 @@ export default function ThemeCustomizer() {
                     sx={{
                       "& .MuiSwitch-switchBase.Mui-checked": {
                         color:
-                          mode === "dark" || mode === "glass"
-                            ? "#3b82f6"
+                          mode === "dark" || mode === "glass" || mode === "khmerNewYear"
+                            ? "#FFB300"
                             : "primary.main",
                       },
                       "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
                         {
                           backgroundColor:
-                            mode === "dark" || mode === "glass"
-                              ? "#3b82f6"
+                            mode === "dark" || mode === "glass" || mode === "khmerNewYear"
+                              ? "#FFB300"
                               : "primary.main",
                         },
                     }}
@@ -467,6 +541,8 @@ export default function ThemeCustomizer() {
                       color:
                         mode === "dark" || mode === "glass"
                           ? "#e2e8f0"
+                          : mode === "khmerNewYear"
+                          ? "#f8fafc"
                           : "text.primary",
                     }}
                   >
@@ -478,7 +554,7 @@ export default function ThemeCustomizer() {
               <Divider
                 sx={{
                   borderColor:
-                    mode === "dark" || mode === "glass"
+                    mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                       ? "rgba(255, 255, 255, 0.1)"
                       : "divider",
                 }}
@@ -494,6 +570,8 @@ export default function ThemeCustomizer() {
                     color:
                       mode === "dark" || mode === "glass"
                         ? "#f1f5f9"
+                        : mode === "khmerNewYear"
+                        ? "#FFB300"
                         : "text.primary",
                   }}
                 >
@@ -510,19 +588,19 @@ export default function ThemeCustomizer() {
                         sx={{
                           backgroundColor: color.value,
                           boxShadow:
-                            mode === "dark" || mode === "glass"
+                            mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                               ? "0 2px 8px rgba(0, 0, 0, 0.3)"
                               : "0 2px 4px rgba(0, 0, 0, 0.1)",
                           "&:hover": {
                             transform: "scale(1.1)",
                             boxShadow:
-                              mode === "dark" || mode === "glass"
+                              mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                                 ? "0 4px 12px rgba(0, 0, 0, 0.5)"
                                 : "0 4px 8px rgba(0, 0, 0, 0.2)",
                           },
                           "&.active": {
                             boxShadow:
-                              mode === "dark" || mode === "glass"
+                              mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                                 ? `0 0 0 3px ${color.value}, 0 0 0 6px rgba(255, 255, 255, 0.2)`
                                 : `0 0 0 3px ${color.value}, 0 0 0 6px rgba(0, 0, 0, 0.1)`,
                           },
@@ -536,7 +614,7 @@ export default function ThemeCustomizer() {
               <Divider
                 sx={{
                   borderColor:
-                    mode === "dark" || mode === "glass"
+                    mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                       ? "rgba(255, 255, 255, 0.1)"
                       : "divider",
                 }}
@@ -552,6 +630,8 @@ export default function ThemeCustomizer() {
                     color:
                       mode === "dark" || mode === "glass"
                         ? "#f1f5f9"
+                        : mode === "khmerNewYear"
+                        ? "#FFB300"
                         : "text.primary",
                   }}
                 >
@@ -573,19 +653,19 @@ export default function ThemeCustomizer() {
                               ? "1px solid #e0e0e0"
                               : "none",
                           boxShadow:
-                            mode === "dark" || mode === "glass"
+                            mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                               ? "0 2px 8px rgba(0, 0, 0, 0.3)"
                               : "0 2px 4px rgba(0, 0, 0, 0.1)",
                           "&:hover": {
                             transform: "scale(1.1)",
                             boxShadow:
-                              mode === "dark" || mode === "glass"
+                              mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                                 ? "0 4px 12px rgba(0, 0, 0, 0.5)"
                                 : "0 4px 8px rgba(0, 0, 0, 0.2)",
                           },
                           "&.active": {
                             boxShadow:
-                              mode === "dark" || mode === "glass"
+                              mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                                 ? `0 0 0 3px ${color.value}, 0 0 0 6px rgba(255, 255, 255, 0.2)`
                                 : `0 0 0 3px ${color.value}, 0 0 0 6px rgba(0, 0, 0, 0.1)`,
                           },
@@ -599,7 +679,7 @@ export default function ThemeCustomizer() {
               <Divider
                 sx={{
                   borderColor:
-                    mode === "dark" || mode === "glass"
+                    mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                       ? "rgba(255, 255, 255, 0.1)"
                       : "divider",
                 }}
@@ -615,6 +695,8 @@ export default function ThemeCustomizer() {
                     color:
                       mode === "dark" || mode === "glass"
                         ? "#f1f5f9"
+                        : mode === "khmerNewYear"
+                        ? "#FFB300"
                         : "text.primary",
                   }}
                 >
@@ -636,19 +718,19 @@ export default function ThemeCustomizer() {
                               ? "1px solid #e0e0e0"
                               : "none",
                           boxShadow:
-                            mode === "dark" || mode === "glass"
+                            mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                               ? "0 2px 8px rgba(0, 0, 0, 0.3)"
                               : "0 2px 4px rgba(0, 0, 0, 0.1)",
                           "&:hover": {
                             transform: "scale(1.1)",
                             boxShadow:
-                              mode === "dark" || mode === "glass"
+                              mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                                 ? "0 4px 12px rgba(0, 0, 0, 0.5)"
                                 : "0 4px 8px rgba(0, 0, 0, 0.2)",
                           },
                           "&.active": {
                             boxShadow:
-                              mode === "dark" || mode === "glass"
+                              mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                                 ? `0 0 0 3px ${color.value}, 0 0 0 6px rgba(255, 255, 255, 0.2)`
                                 : `0 0 0 3px ${color.value}, 0 0 0 6px rgba(0, 0, 0, 0.1)`,
                           },
@@ -662,7 +744,7 @@ export default function ThemeCustomizer() {
               <Divider
                 sx={{
                   borderColor:
-                    mode === "dark" || mode === "glass"
+                    mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                       ? "rgba(255, 255, 255, 0.1)"
                       : "divider",
                 }}
@@ -680,6 +762,8 @@ export default function ThemeCustomizer() {
                         color:
                           mode === "dark" || mode === "glass"
                             ? "#f1f5f9"
+                            : mode === "khmerNewYear"
+                            ? "#FFB300"
                             : "text.primary",
                       }}
                     >
@@ -713,6 +797,8 @@ export default function ThemeCustomizer() {
                         color:
                           mode === "dark" || mode === "glass"
                             ? "#e2e8f0"
+                            : mode === "khmerNewYear"
+                            ? "#f8fafc"
                             : "text.primary",
                       }}
                     />
@@ -739,6 +825,8 @@ export default function ThemeCustomizer() {
                         color:
                           mode === "dark" || mode === "glass"
                             ? "#e2e8f0"
+                            : mode === "khmerNewYear"
+                            ? "#f8fafc"
                             : "text.primary",
                       }}
                     />
@@ -765,6 +853,8 @@ export default function ThemeCustomizer() {
                         color:
                           mode === "dark" || mode === "glass"
                             ? "#e2e8f0"
+                            : mode === "khmerNewYear"
+                            ? "#f8fafc"
                             : "text.primary",
                       }}
                     />
@@ -775,7 +865,7 @@ export default function ThemeCustomizer() {
               <Divider
                 sx={{
                   borderColor:
-                    mode === "dark" || mode === "glass"
+                    mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                       ? "rgba(255, 255, 255, 0.1)"
                       : "divider",
                 }}
@@ -793,6 +883,8 @@ export default function ThemeCustomizer() {
                         color:
                           mode === "dark" || mode === "glass"
                             ? "#f1f5f9"
+                            : mode === "khmerNewYear"
+                            ? "#FFB300"
                             : "text.primary",
                       }}
                     >
@@ -826,6 +918,8 @@ export default function ThemeCustomizer() {
                         color:
                           mode === "dark" || mode === "glass"
                             ? "#e2e8f0"
+                            : mode === "khmerNewYear"
+                            ? "#f8fafc"
                             : "text.primary",
                       }}
                     />
@@ -852,6 +946,8 @@ export default function ThemeCustomizer() {
                         color:
                           mode === "dark" || mode === "glass"
                             ? "#e2e8f0"
+                            : mode === "khmerNewYear"
+                            ? "#f8fafc"
                             : "text.primary",
                       }}
                     />
@@ -878,6 +974,8 @@ export default function ThemeCustomizer() {
                         color:
                           mode === "dark" || mode === "glass"
                             ? "#e2e8f0"
+                            : mode === "khmerNewYear"
+                            ? "#f8fafc"
                             : "text.primary",
                       }}
                     />
@@ -890,7 +988,7 @@ export default function ThemeCustomizer() {
           <Divider
             sx={{
               borderColor:
-                mode === "dark" || mode === "glass"
+                mode === "dark" || mode === "glass" || mode === "khmerNewYear"
                   ? "rgba(255, 255, 255, 0.1)"
                   : "divider",
             }}
@@ -902,6 +1000,8 @@ export default function ThemeCustomizer() {
               backgroundColor:
                 mode === "dark" || mode === "glass"
                   ? "rgba(30, 41, 59, 0.5)"
+                  : mode === "khmerNewYear"
+                  ? "rgba(255, 179, 0, 0.1)"
                   : "transparent",
             }}
           >
