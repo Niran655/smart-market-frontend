@@ -132,7 +132,7 @@ const Store = () => {
         </Box>
       </Stack>
 
-    
+
 
       <Box
         sx={{
@@ -167,7 +167,7 @@ const Store = () => {
           </Grid>
         </Grid>
 
- 
+
 
         <Stack direction="row" spacing={2} mt={3}>
           {(userRole === "superAdmin" || userRole === "admin") && (
@@ -192,7 +192,7 @@ const Store = () => {
         </Stack>
       </Box>
 
- 
+
       <Grid container spacing={3} mt={4}>
         {filteredShops?.map((shop, index) => (
           <Grid size={{ xs: 12, md: 4 }} key={index}>
@@ -212,7 +212,7 @@ const Store = () => {
                 alignItems="start"
                 justifyContent="space-between"
               >
-              
+
                 <Stack direction="row" spacing={2} alignItems="start">
                   <img
                     src={shop.image}
@@ -226,7 +226,7 @@ const Store = () => {
                   </Typography>
                 </Stack>
 
-              
+
                 <Button
                   size="small"
                   variant="contained"
@@ -236,7 +236,7 @@ const Store = () => {
                 </Button>
               </Stack>
 
-          
+
               <Stack direction="row" spacing={2} mt={3}>
                 <Button
                   fullWidth
@@ -257,7 +257,7 @@ const Store = () => {
                 >
                   {t("close_shop")}
                 </Button>
- 
+
                 <Box mt={2}>
                   <ShopAction
                     setRefetch={refetch}
@@ -269,8 +269,6 @@ const Store = () => {
                   />
                 </Box>
               </Stack>
-
-
             </Card>
           </Grid>
         ))}

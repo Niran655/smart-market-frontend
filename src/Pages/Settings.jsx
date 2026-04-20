@@ -143,7 +143,7 @@ export default function Settings() {
           <Paper
             className="setting-box"
             component={RouterLink}
-            to="/setting/structure"
+            to="/setting/customer"
             sx={{ cursor: "pointer", textDecoration: "none" }}
           >
             <Box>
@@ -151,15 +151,34 @@ export default function Settings() {
             </Box>
             <Stack textAlign="start"  spacing={1}>
               <Typography className="text-title" variant="h5">
-                {t(`structure`)}
+                {t(`customer`)}
               </Typography>
               <Typography className="text-body">
-                {t(`create_update_delete`)} {t(`structure`)}
+                {t(`create_update_delete`)} {t(`customer`)}
               </Typography>
             </Stack>
           </Paper>
         </Grid>
-         
+          <Grid size={{ xs: 12, md: 3 }}>
+          <Paper
+            className="setting-box"
+            component={RouterLink}
+            to="/setting/table"
+            sx={{ cursor: "pointer", textDecoration: "none" }}
+          >
+            <Box>
+              <img src={Supplier} className="image" alt="Supplier" />
+            </Box>
+            <Stack textAlign="start"  spacing={1}>
+              <Typography className="text-title" variant="h5">
+                {t(`table`)}
+              </Typography>
+              <Typography className="text-body">
+                {t(`create_update_delete`)} {t(`table`)}
+              </Typography>
+            </Stack>
+          </Paper>
+        </Grid>
       </Grid>
     </Box>
   );

@@ -65,6 +65,54 @@ mutation DeleteUser($id: ID!) {
 }
 `
 
+export const CREATE_CUSTOMER = gql`
+mutation CreateCustomer($input: CustomerInput!) {
+  createCustomer(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`;
+
+export const UPDATE_CUSTOMER = gql`
+mutation UpdateCustomer($id: ID!, $input: CustomerInput) {
+  updateCustomer(_id: $id, input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`;
+
+export const DELETE_CUSTOMER = gql`
+  mutation DeleteCustomer($_id: ID!) {
+    deleteCustomer(_id: $_id) {
+      isSuccess
+      message {
+        messageEn
+        messageKh
+      }
+    }
+  }
+`;
+
+export const TOGGLE_CUSTOMER_STATUS = gql`
+  mutation ToggleCustomerStatus($_id: ID!, $active: Boolean!) {
+    toggleCustomerStatus(_id: $_id, active: $active) {
+      isSuccess
+      message {
+        messageEn
+        messageKh
+      }
+    }
+  }
+`;
+
 
 export const CREATE_UNIT = gql`
 mutation CreateUnit($input: UnitInput) {
@@ -502,3 +550,5 @@ mutation RefundSale($id: ID!, $reason: String) {
   }
 }
 `
+
+

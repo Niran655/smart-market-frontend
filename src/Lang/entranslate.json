@@ -324,5 +324,93 @@
   "accepted_at":"Accepted At",
   "profile":"Profile",
   "load_more":"Load More",
-  "structure":"Structure"
+  "structure":"Structure",
+  "addition_price":"Addition Price",
+ 
+  "reports": "Reports",
+ 
+ 
+  "year": "Year",
+  "days_threshold": "Days Threshold",
+ 
+  "category_id": "Category ID",
+ 
+  "average_order_value": "Average Order Value",
+  "net_profit": "Net Profit",
+  "profit_margin": "Profit Margin",
+ 
+  "no_data": "No data available",
+  "view": "View",
+  "best_sellers": "Best Sellers",
+  "sales_by_payment_method": "Sales by Payment Method",
+  "sales_by_order_type": "Sales by Order Type",
+  "daily_sales": "Daily Sales",
+ 
+  "units_sold": "Units Sold",
+ 
+  "orders_count": "Orders Count",
+  "total_amount": "Total Amount",
+  "order_type": "Order Type",
+  
+  "transaction_id": "Transaction ID",
+ 
+  "order_#": "Order #",
+  "supplier": "Supplier",
+ 
+  "unit_cost": "Unit Cost",
+ 
+  "invoice_#": "Invoice #",
+  "total": "Total",
+  "paid": "Paid",
+  "due": "Due",
+  "total_purchased": "Total Purchased",
+  "last_order_date": "Last Order Date",
+  "due_amount": "Due Amount",
+  "overdue_days": "Overdue Days",
+ 
+  "total_spent": "Total Spent",
+  "batch": "Batch",
+  "expiry_date": "Expiry Date",
+  "stock_left": "Stock Left",
+  "days_left": "Days Left",
+ 
+  "min_stock_level": "Min Stock Level",
+ 
+  "source": "Source",
+ 
+  "taxable_sales": "Taxable Sales",
+  "tax_amount": "Tax Amount",
+  "metric": "Metric",
+  "month": "Month",
+  "period": "Period",
+  "grand_total": "GRAND TOTAL",
+  "thank_you": "Thank you for choosing",
+  "system_generated": "This report is system generated",
+   
+  "all_shops": "All Shops",
+  "generated": "Generated",
+  "sales_revenue": "Sales Revenue",
+  "other_income": "Other Income",
+  "cost_of_goods_sold": "Cost of Goods Sold",
+  "gross_profit": "Gross Profit",
+  "operating_expenses": "Operating Expenses",
+  "sale_report": "Sale Report",
+  "purchase_report": "Purchase Report",
+  "inventory_report": "Inventory Report",
+  "invoice_report": "Invoice Report",
+  "supplier_report": "Supplier Report",
+  "supplier_due": "Supplier Due",
+  "customer_report": "Customer Report",
+  "customer_due": "Customer Due",
+  "product_report": "Product Report",
+  "product_expiry": "Product Expiry",
+  "product_alert": "Product Alert",
+  "expense_report": "Expense Report",
+  "income_report": "Income Report",
+  "tax_report": "Tax Report",
+  "profit_loss": "Profit & Loss",
+  "annual_report": "Annual Report",
+  "receive_now":"Receive Now",
+  "name":"Name"
+ 
 }

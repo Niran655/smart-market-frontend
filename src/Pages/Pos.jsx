@@ -765,8 +765,8 @@ const POS = () => {
   const [openPendingDialog, setOpenPendingDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
-  
+  const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
+
   // Existing dialog states
   const [openHistory, setOpenHistory] = useState(false);
   const [openSalePending, setOpenSalePending] = useState(false);
@@ -775,7 +775,7 @@ const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
   const [cart, setCart] = useState([]);
   const [orderType, setOrderType] = useState("dine_in");
   const [selectedTable, setSelectedTable] = useState("Table 01");
-  
+
   // Product list state
   const [selectedOrderType, setSelectedOrderType] = useState("All");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -800,7 +800,7 @@ const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
     onCompleted: ({ createSale }) => {
       if (createSale?.isSuccess) {
         setAlert(true, "success", createSale?.message);
-        console.log("CreateSale",createSale);
+        console.log("CreateSale", createSale);
         setCart([]);
         setOpenPaymentDialog(false);
         setOpenPendingDialog(false);
@@ -838,31 +838,31 @@ const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
     }
   }, [data, language]);
 
-  
+
   const handleScan = async (barcode) => {
-  try {
-    console.log("Scanned:", barcode);
+    try {
+      console.log("Scanned:", barcode);
 
-    const res = await getSubProduct({
-      variables: { subProductId: barcode },
-    });
+      const res = await getSubProduct({
+        variables: { subProductId: barcode },
+      });
 
-    const item = res?.data?.getSubProductById;
+      const item = res?.data?.getSubProductById;
 
-    if (!item) {
-      setAlert(true, "error", "Product not found");
-      return;
+      if (!item) {
+        setAlert(true, "error", "Product not found");
+        return;
+      }
+
+      // 🔥 AUTO ADD TO CART
+      addToCart(item);
+
+      // 🔊 optional sound
+      new Audio("/beep.mp3").play();
+    } catch (error) {
+      console.log(error);
     }
-
-    // 🔥 AUTO ADD TO CART
-    addToCart(item);
-
-    // 🔊 optional sound
-    new Audio("/beep.mp3").play();
-  } catch (error) {
-    console.log(error);
-  }
-};
+  };
 
   // Dialog handlers
   const handleOpenProductDialog = (product) => {
@@ -904,40 +904,47 @@ const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
   const handleOpenSalePending = () => setOpenSalePending(true);
   const handleCloseSalePending = () => setOpenSalePending(false);
 
-  // Cart operations
-  const addToCart = (item) => {
-    setCart((prev) => {
-      const found = prev.find((p) => p.id === item._id);
-      if (found) {
-        return prev.map((p) => (p.id === item._id ? { ...p, qty: p.qty + 1 } : p));
-      }
-      return [
-        ...prev,
-        {
-          id: item._id,
-          subProductId: item._id,
-          productId: item.parentProductId._id,
-          name: language === "kh" ? item.parentProductId.nameKh : item.parentProductId.nameEn,
-          nameEn: item.parentProductId.nameEn,
-          nameKh: item.parentProductId.nameKh,
-          price: item.salePrice,
-          qty: 1,
-          img: item.productImg,
-          variant: "Original",
-        },
-      ];
-    });
-  };
+  
+const addToCart = (item) => {
+ 
+  const uniqueId = item._id;
+  setCart((prev) => {
+    const found = prev.find((p) => p.id === uniqueId);
+    if (found) {
+      return prev.map((p) => (p.id === uniqueId ? { ...p, qty: p.qty + 1 } : p));
+    }
+    return [
+      ...prev,
+      {
+        id: uniqueId,
+        subProductId: item._id,
+        productId: item.parentProductId._id,
+        name: language === "kh" ? item.parentProductId.nameKh : item.parentProductId.nameEn,
+        nameEn: item.parentProductId.nameEn,
+        nameKh: item.parentProductId.nameKh,
+        price: item.salePrice,
+        qty: 1,
+        img: item.productImg,
+        variant: "Original",
+      },
+    ];
+  });
+};
 
-  const addToCartFromDialog = (item) => {
-    setCart((prev) => {
-      const found = prev.find((p) => p.id === item.id);
-      if (found) {
-        return prev.map((p) => (p.id === item.id ? { ...p, qty: p.qty + item.qty } : p));
-      }
-      return [...prev, item];
-    });
-  };
+const addToCartFromDialog = (item) => {
+  setCart((prev) => {
+    // Find by the unique ID (which includes customizations)
+    const foundIndex = prev.findIndex((p) => p.id === item.id);
+    if (foundIndex !== -1) {
+      // Same customization: increase quantity
+      const updated = [...prev];
+      updated[foundIndex].qty += item.qty;
+      return updated;
+    }
+    // Different customization: add as new item
+    return [...prev, item];
+  });
+};
 
   const updateQty = (id, value) => {
     if (value === 0) {
@@ -951,8 +958,8 @@ const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
   //   setCart((prev) => prev.filter((item) => item.id !== id));
   // };
 
-  const removeFromCart = (id) =>{
-      setCart((prev) => prev.filter((item) => item.id !== id));
+  const removeFromCart = (id) => {
+    setCart((prev) => prev.filter((item) => item.id !== id));
   }
 
   const clearCart = () => {
@@ -961,8 +968,8 @@ const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
 
   const handleSelectPendingSale = (cartItems) => {
     setCart(cartItems);
-    setAlert(true, "info", language === "kh" 
-      ? "វិក័យប័ត្របណ្ដោះអាសន្នត្រូវបានទាញយក" 
+    setAlert(true, "info", language === "kh"
+      ? "វិក័យប័ត្របណ្ដោះអាសន្នត្រូវបានទាញយក"
       : "Pending invoice loaded to cart");
   };
 
@@ -1028,7 +1035,7 @@ const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
 
   return (
     <Box className="pos-container">
-     {/* <BarcodeScanner onScan={handleScan} />  */}
+      {/* <BarcodeScanner onScan={handleScan} />  */}
       <ProductDialog
         open={openProductDialog}
         onClose={handleCloseProductDialog}
@@ -1061,7 +1068,7 @@ const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
       />
 
       <Grid container spacing={2} sx={{ height: "90vh", overflow: "hidden" }}>
-      
+
         <Grid size={{ xs: 8 }}>
           <Box sx={{ overflowY: "auto", height: "100vh", scrollbarWidth: "thin", padding: 2 }}>
             <RecentOrders
@@ -1069,7 +1076,7 @@ const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
               setSelectedOrderType={setSelectedOrderType}
               t={t}
             />
-            
+
             <ProductList
               t={t}
               language={language}
@@ -1084,7 +1091,7 @@ const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
           </Box>
         </Grid>
 
-    
+
         <Grid size={{ xs: 4 }} sx={{ borderLeft: "1px solid #D1D5DC" }}>
           <CartPanel
             cart={cart}

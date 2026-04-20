@@ -5,7 +5,6 @@ import AddIcon from "@mui/icons-material/Add";
 import { Box, Button, Divider, IconButton, MenuItem, Paper, Select, Stack, Tab, Tabs, TextField, Tooltip, Typography } from "@mui/material";
 import { Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-
 import InvoicePending from "./InvoicePending";
 import SaleHistory from "./SaleHistory";
 
@@ -39,14 +38,7 @@ const CartPanel = ({
   shopId,
   onSelectPendingSale,
 }) => {
-  const tables = [
-    "Table 01",
-    "Table 02",
-    "Table 03",
-    "Table 04",
-    "Table 05",
-    "Table 06",
-  ];
+  const tables = ["Table 01", "Table 02", "Table 03", "Table 04", "Table 05", "Table 06"];
 
   const ORDER_TYPES = {
     DINE_IN: "dine_in",
@@ -60,45 +52,32 @@ const CartPanel = ({
     { key: "delivery", label: t("delivery") },
   ];
 
-  // Debug props
-  useEffect(() => {
-    console.log("CartPanel props:", {
-      customerName,
-      setCustomerName: typeof setCustomerName,
-      customerPhone,
-      setCustomerPhone: typeof setCustomerPhone,
-      selectedTable,
-      setSelectedTable: typeof setSelectedTable,
-      orderType,
-    });
-  }, [customerName, customerPhone, selectedTable, orderType, setCustomerName, setCustomerPhone, setSelectedTable]);
-
-  // Local fallbacks if parent doesn't provide setters
-  const [localCustomerName, _setLocalCustomerName] = useState(customerName || "");
-  const [localCustomerPhone, _setLocalCustomerPhone] = useState(customerPhone || "");
-  const [localTable, _setLocalTable] = useState(selectedTable || tables[0]);
+ 
+  const [localCustomerName, setLocalCustomerName] = useState(customerName || "");
+  const [localCustomerPhone, setLocalCustomerPhone] = useState(customerPhone || "");
+  const [localTable, setLocalTable] = useState(selectedTable || tables[0]);
 
   useEffect(() => {
-    if (customerName !== undefined && customerName !== null) _setLocalCustomerName(customerName);
+    if (customerName !== undefined && customerName !== null) setLocalCustomerName(customerName);
   }, [customerName]);
   useEffect(() => {
-    if (customerPhone !== undefined && customerPhone !== null) _setLocalCustomerPhone(customerPhone);
+    if (customerPhone !== undefined && customerPhone !== null) setLocalCustomerPhone(customerPhone);
   }, [customerPhone]);
   useEffect(() => {
-    if (selectedTable !== undefined && selectedTable !== null) _setLocalTable(selectedTable);
+    if (selectedTable !== undefined && selectedTable !== null) setLocalTable(selectedTable);
   }, [selectedTable]);
 
   const handleCustomerNameChange = (v) => {
     if (setCustomerName) setCustomerName(v);
-    else _setLocalCustomerName(v);
+    else setLocalCustomerName(v);
   };
   const handleCustomerPhoneChange = (v) => {
     if (setCustomerPhone) setCustomerPhone(v);
-    else _setLocalCustomerPhone(v);
+    else setLocalCustomerPhone(v);
   };
   const handleTableChange = (v) => {
     if (setSelectedTable) setSelectedTable(v);
-    else _setLocalTable(v);
+    else setLocalTable(v);
   };
 
   return (
@@ -122,9 +101,7 @@ const CartPanel = ({
               onClose={onCloseHistory}
               t={t}
               shopId={shopId}
-              onViewDetails={(sale) => {
-                console.log("View sale details:", sale);
-              }}
+              onViewDetails={(sale) => console.log("View sale details:", sale)}
             />
             <InvoicePending
               t={t}
@@ -134,7 +111,6 @@ const CartPanel = ({
               onLoadToCart={onSelectPendingSale}
             />
           </Stack>
-
           <Stack direction={"row"} spacing={2}>
             {cart.length > 0 && (
               <Button size="small" color="error" onClick={clearCart}>
@@ -167,20 +143,17 @@ const CartPanel = ({
             />
           ))}
         </Tabs>
-
         <Divider />
-
         <Box className="customer-info">
           <TextField
             fullWidth
             placeholder={t(`customer`)}
-            sx={{mt:1}}
+            sx={{ mt: 1 }}
             size="small"
             className="customer-field"
             value={(customerName !== undefined && customerName !== null) ? customerName : localCustomerName}
             onChange={(e) => handleCustomerNameChange(e.target.value)}
           />
-
           <TextField
             fullWidth
             placeholder={t(`phone`) || "Phone"}
@@ -189,7 +162,6 @@ const CartPanel = ({
             value={(customerPhone !== undefined && customerPhone !== null) ? customerPhone : localCustomerPhone}
             onChange={(e) => handleCustomerPhoneChange(e.target.value)}
           />
-
           {orderType === ORDER_TYPES.DINE_IN && (
             <Select
               fullWidth
@@ -206,12 +178,10 @@ const CartPanel = ({
             </Select>
           )}
         </Box>
-
         <Divider className="section-divider" />
-
         <Box className="cart-items-container">
           {cart.map((item, idx) => (
-            <Paper key={idx} className="cart-item">
+            <Paper key={item.id} className="cart-item">
               <img
                 src={item.img || "/placeholder-food.jpg"}
                 className="cart-item-image"
@@ -223,13 +193,10 @@ const CartPanel = ({
                   {item.price.toLocaleString()}$
                 </Typography>
               </Stack>
-
               <Box className="cart-item-spacer"></Box>
-
               <Typography className="cart-item-total">
                 {t(`total_price`)}: {(item.qty * item.price).toLocaleString()}$
               </Typography>
-
               <Box className="quantity-controls">
                 <IconButton
                   size="small"
@@ -252,7 +219,6 @@ const CartPanel = ({
                   <AddIcon fontSize="small" />
                 </IconButton>
               </Box>
-
               <Box className="cart-item-actions">
                 <IconButton onClick={() => removeFromCart(item.id)} className="delete-button">
                   <Trash2 size={16} />
@@ -264,9 +230,7 @@ const CartPanel = ({
             <Typography className="empty-cart-message">{t(`cart_empty`)}</Typography>
           )}
         </Box>
-
         <Divider className="section-divider" />
-
         <Box className="order-summary">
           <Box className="summary-row">
             <Typography className="summary-label">{t(`subtotal`)}</Typography>

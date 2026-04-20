@@ -91,6 +91,65 @@ query GetUsersWithPagination($page: Int, $limit: Int, $pagination: Boolean, $key
   }
 }
 `
+export const GET_CUSTOMERS_WITH_PAGINATION = gql`
+query GetCustomersWithPagination($shopIds: ID, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $active: Boolean) {
+  getCustomersWithPagination(shopIds: $shopIds, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, active: $active) {
+    data {
+      _id
+      nameKh
+      nameEn
+      phone
+      email
+      address
+      gender
+      dateOfBirth
+      active
+      shopIds{
+        _id
+        nameEn
+        nameKh
+      }
+      totalSpent
+      totalOrders
+      lastOrderDate
+      note
+      createdAt
+      updatedAt
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
+  }
+}
+`;
+
+export const GET_CUSTOMER_BY_ID = gql`
+  query GetCustomerById($_id: ID!) {
+    getCustomerById(_id: $_id) {
+      _id
+      nameKh
+      nameEn
+      phone
+      email
+      address
+      city
+      gender
+      dateOfBirth
+      active
+      shopId
+      note
+    }
+  }
+`;
 export const GET_CATEGORY_WHITH_PAGINATION = gql`
 query GetCategoryWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
   getCategoryWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
@@ -258,10 +317,46 @@ query GetSubProducts($parentProductId: ID!) {
     check
     barCode
     costPrice
+    additionPrices {
+      _id
+      nameKhmer
+      nameEnglish
+      priceType
+      price
+      tax
+      service
+      total
+      sizeName
+      sugarLevel
+      children {
+        _id
+        nameKhmer
+        nameEnglish
+        priceType
+        price
+        tax
+        service
+        total
+        sizeName
+        sugarLevel
+        children {
+          _id
+          nameKhmer
+          nameEnglish
+          priceType
+          price
+          tax
+          service
+          total
+          sizeName
+          sugarLevel
+        }
+      }
+    }
     createdAt
   }
-}
-`
+}`
+
 export const GET_PRODUCT_FOR_SALE_WITH_PAGINATION = gql`
 query GetProductForSaleWithPagination($shopId: ID, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $categoryId: String) {
   getProductForSaleWithPagination(shopId: $shopId, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, categoryId: $categoryId) {
@@ -273,7 +368,6 @@ query GetProductForSaleWithPagination($shopId: ID, $page: Int, $limit: Int, $pag
         _id
         nameKh
         nameEn
-        
         categoryId {
           nameEn
           nameKh
@@ -287,9 +381,30 @@ query GetProductForSaleWithPagination($shopId: ID, $page: Int, $limit: Int, $pag
         nameEn
       }
       productImg
-      
       taxRate
       salePrice
+      additionPrices {
+        _id
+        nameKhmer
+        nameEnglish
+        priceType
+        price
+        tax
+        service
+        total
+        children {
+          _id
+          nameKhmer
+          nameEnglish
+          priceType
+          price
+          tax
+          service
+          total
+          sizeName
+          sugarLevel
+        }
+      }
     }
     paginator {
       slNo
@@ -304,8 +419,7 @@ query GetProductForSaleWithPagination($shopId: ID, $page: Int, $limit: Int, $pag
       totalDocs
     }
   }
-}
-`
+}`
 
 export const GET_SUPPRODUCT_BY_ID = gql`
 query GetSubProductById($subProductId: ID!) {
@@ -674,6 +788,8 @@ query DashboardStats($filter: String, $shopId: ID, $dayStart: Date, $dayEnd: Dat
   }
 }`
 
+// ===========================START REPROT HERE==========================
+
 export const GET_REPORT_STATS = gql`
 query GetReportStats($type: ReportType, $shopId: ID, $endDate: Date, $startDate: Date) {
   getReportStats(type: $type, shopId: $shopId, endDate: $endDate, startDate: $startDate) {
@@ -729,7 +845,530 @@ query GetReportStats($type: ReportType, $shopId: ID, $endDate: Date, $startDate:
     }
   }
 }`
+ 
 
+export const GET_SALE_REPORT = gql`
+  query GetSaleReport(
+    $shopId: ID
+    $startDate: Date
+    $endDate: Date
+    $page: Int
+    $limit: Int
+    $pagination: Boolean
+  ) {
+    getSaleReport(
+      shopId: $shopId
+      startDate: $startDate
+      endDate: $endDate
+      page: $page
+      limit: $limit
+      pagination: $pagination
+    ) {
+      totalSalesCount
+      totalRevenue
+      totalDiscount
+      totalTax
+      averageOrderValue
+
+      bestSellers {
+        productId
+        productName
+        totalQuantity
+        totalRevenue
+        rank
+      }
+      bestSellersPaginator {
+        totalDocs
+        totalPages
+        currentPage
+        hasNextPage
+        hasPrevPage
+      }
+
+      salesByPaymentMethod {
+        method
+        count
+        amount
+      }
+      paymentMethodPaginator {
+        totalDocs
+        totalPages
+        currentPage
+        hasNextPage
+        hasPrevPage
+      }
+
+      salesByOrderType {
+        type
+        count
+        amount
+      }
+      orderTypePaginator {
+        totalDocs
+        totalPages
+        currentPage
+        hasNextPage
+        hasPrevPage
+      }
+
+      dailySales {
+        date
+        orders
+        revenue
+      }
+      dailySalesPaginator {
+        totalDocs
+        totalPages
+        currentPage
+        hasNextPage
+        hasPrevPage
+      }
+
+      recentTransactions {
+        id
+        date
+        customer
+        type
+        amount
+        status
+      }
+      recentTransactionsPaginator {
+        totalDocs
+        totalPages
+        currentPage
+        hasNextPage
+        hasPrevPage
+      }
+    }
+  }
+`;
+
+export const GET_PURCHASE_REPORT = gql`
+  query GetPurchaseReport($shopId: ID, $startDate: Date, $endDate: Date, $page: Int, $limit: Int, $pagination: Boolean) {
+    getPurchaseReport(shopId: $shopId, startDate: $startDate, endDate: $endDate, page: $page, limit: $limit, pagination: $pagination) {
+      totalPurchaseOrders
+      totalItemsPurchased
+      totalCost
+      averageOrderCost
+      purchasesBySupplier {
+        supplierId
+        supplierName
+        orderCount
+        totalCost
+      }
+      recentPurchases {
+        id
+        orderNumber
+        supplierName
+        totalAmount
+        status
+        createdAt
+      }
+      paginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+    }
+  }
+`;
+
+export const GET_INVENTORY_REPORT = gql`
+  query GetInventoryReport($shopId: ID, $startDate: Date, $endDate: Date, $page: Int, $limit: Int, $pagination: Boolean) {
+    getInventoryReport(shopId: $shopId, startDate: $startDate, endDate: $endDate, page: $page, limit: $limit, pagination: $pagination) {
+      currentStockValue
+      totalItemsInStock
+      lowStockItems
+      outOfStockItems
+      stockHistory {
+        productId
+        productName
+        date
+        movementType
+        quantity
+        previousStock
+        newStock
+        reference
+      }
+      stockHistoryPaginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+      soldStockSummary {
+        productId
+        productName
+        totalSoldQty
+        totalRevenue
+        totalCost
+        grossProfit
+      }
+      soldStockPaginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+      inventoryValuation {
+        productId
+        productName
+        stockQty
+        unitCost
+        totalValue
+      }
+      valuationPaginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+    }
+  }
+`;
+
+export const GET_INVOICE_REPORT = gql`
+  query GetInvoiceReport($shopId: ID, $startDate: Date, $endDate: Date, $page: Int, $limit: Int, $pagination: Boolean) {
+    getInvoiceReport(shopId: $shopId, startDate: $startDate, endDate: $endDate, page: $page, limit: $limit, pagination: $pagination) {
+      totalInvoices
+      totalAmount
+      paidAmount
+      unpaidAmount
+      invoices {
+        id
+        invoiceNumber
+        customerName
+        date
+        total
+        paid
+        due
+        status
+      }
+      paginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+    }
+  }
+`;
+
+export const GET_SUPPLIER_REPORT = gql`
+  query GetSupplierReport($shopId: ID) {
+    getSupplierReport(shopId: $shopId) {
+      totalSuppliers
+      activeSuppliers
+      totalPurchasedAmount
+      supplierPerformance {
+        supplierId
+        supplierName
+        totalOrders
+        totalPurchased
+        lastOrderDate
+      }
+    }
+  }
+`;
+
+export const GET_SUPPLIER_DUE_REPORT = gql`
+  query GetSupplierDueReport($shopId: ID) {
+    getSupplierDueReport(shopId: $shopId) {
+      totalDueToSuppliers
+      suppliersWithDue {
+        supplierId
+        supplierName
+        dueAmount
+        currency
+        overdueDays
+      }
+    }
+  }
+`;
+
+export const GET_CUSTOMER_REPORT = gql`
+  query GetCustomerReport($shopId: ID, $startDate: Date, $endDate: Date, $page: Int, $limit: Int, $pagination: Boolean) {
+    getCustomerReport(shopId: $shopId, startDate: $startDate, endDate: $endDate, page: $page, limit: $limit, pagination: $pagination) {
+      totalCustomers
+      totalSalesToCustomers
+      averageSpendPerCustomer
+      topCustomers {
+        customerName
+        customerPhone
+        totalOrders
+        totalSpent
+      }
+     
+      paginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+    }
+  }
+`;
+
+export const GET_CUSTOMER_DUE_REPORT = gql`
+  query GetCustomerDueReport($shopId: ID, $page: Int, $limit: Int, $pagination: Boolean) {
+    getCustomerDueReport(shopId: $shopId, page: $page, limit: $limit, pagination: $pagination) {
+      totalDueFromCustomers
+      customersWithDue {
+        customerName
+        customerPhone
+        dueAmount
+        oldestDueDate
+      }
+      paginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+    }
+  }
+`;
+
+export const GET_PRODUCT_REPORT = gql`
+  query GetProductReport($shopId: ID, $categoryId: ID, $page: Int, $limit: Int, $pagination: Boolean) {
+    getProductReport(shopId: $shopId, categoryId: $categoryId, page: $page, limit: $limit, pagination: $pagination) {
+      totalProducts
+      activeProducts
+      productsByCategory {
+        categoryId
+        categoryName
+        productCount
+      }
+      productList {
+        productId
+        productName
+        category
+        stock
+        unit
+        costPrice
+        salePrice
+        status
+      }
+      paginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+    }
+  }
+`;
+
+export const GET_PRODUCT_EXPIRY_REPORT = gql`
+  query GetProductExpiryReport($shopId: ID, $daysThreshold: Int, $page: Int, $limit: Int, $pagination: Boolean) {
+    getProductExpiryReport(shopId: $shopId, daysThreshold: $daysThreshold, page: $page, limit: $limit, pagination: $pagination) {
+      expiredProducts {
+        productId
+        productName
+        batchNo
+        expiryDate
+        stock
+        daysUntilExpiry
+      }
+      expiredPaginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+      expiringSoon {
+        productId
+        productName
+        batchNo
+        expiryDate
+        stock
+        daysUntilExpiry
+      }
+      expiringPaginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+    }
+  }
+`;
+
+export const GET_PRODUCT_QUANTITY_ALERT = gql`
+  query GetProductQuantityAlert($shopId: ID, $page: Int, $limit: Int, $pagination: Boolean) {
+    getProductQuantityAlert(shopId: $shopId, page: $page, limit: $limit, pagination: $pagination) {
+      lowStockProducts {
+        productId
+        productName
+        currentStock
+        minStockLevel
+      }
+      lowStockPaginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+      outOfStockProducts {
+        productId
+        productName
+        currentStock
+        minStockLevel
+      }
+      outOfStockPaginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+    }
+  }
+`;
+
+export const GET_EXPENSE_REPORT = gql`
+  query GetExpenseReport($shopId: ID, $startDate: Date, $endDate: Date, $page: Int, $limit: Int, $pagination: Boolean) {
+    getExpenseReport(shopId: $shopId, startDate: $startDate, endDate: $endDate, page: $page, limit: $limit, pagination: $pagination) {
+      totalExpenses
+      expenseByCategory {
+        category
+        amount
+      }
+      monthlyExpenses {
+        month
+        amount
+      }
+      expensesList {
+        _id
+        category
+        amount
+        description
+        date
+      }
+      paginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+    }
+  }
+`;
+
+export const GET_INCOME_REPORT = gql`
+  query GetIncomeReport($shopId: ID, $startDate: Date, $endDate: Date, $page: Int, $limit: Int, $pagination: Boolean) {
+    getIncomeReport(shopId: $shopId, startDate: $startDate, endDate: $endDate, page: $page, limit: $limit, pagination: $pagination) {
+      totalIncome
+      incomeBySource {
+        source
+        amount
+      }
+      monthlyIncome {
+        month
+        amount
+      }
+      incomesList {
+        _id
+        source
+        amount
+        description
+        date
+      }
+      paginator {
+        currentPage
+        totalPages
+        totalDocs
+        hasNextPage
+        hasPrevPage
+      }
+    }
+  }
+`;
+
+export const GET_TAX_REPORT = gql`
+  query GetTaxReport($shopId: ID, $startDate: Date, $endDate: Date) {
+    getTaxReport(shopId: $shopId, startDate: $startDate, endDate: $endDate) {
+      totalTaxCollected
+      taxBreakdown {
+        taxRate
+        taxableSales
+        taxAmount
+      }
+      taxByPeriod {
+        period
+        taxAmount
+      }
+    }
+  }
+`;
+
+export const GET_PROFIT_LOSS_REPORT = gql`
+  query GetProfitLossReport($shopId: ID, $startDate: Date, $endDate: Date) {
+    getProfitLossReport(shopId: $shopId, startDate: $startDate, endDate: $endDate) {
+      startDate
+      endDate
+      totalRevenue
+      totalCostOfGoodsSold
+      grossProfit
+      operatingExpenses
+      netProfit
+      profitMargin
+      breakdown {
+        salesRevenue
+        otherIncome
+        costOfGoodsSold
+        salaries
+        rent
+        utilities
+        marketing
+        otherExpenses
+        taxExpense
+      }
+    }
+  }
+`;
+
+export const GET_ANNUAL_REPORT = gql`
+  query GetAnnualReport($shopId: ID, $year: Int) {
+    getAnnualReport(shopId: $shopId, year: $year) {
+      year
+      totalRevenue
+      totalExpenses
+      netProfit
+      totalSalesOrders
+      averageMonthlyRevenue
+      topMonth {
+        month
+        revenue
+        orders
+      }
+      bottomMonth {
+        month
+        revenue
+        orders
+      }
+      salesByQuarter {
+        quarter
+        revenue
+        orders
+      }
+    }
+  }
+`;
+// ===============================END REPORT QUERY=========================
 export const GET_SUPPLIERS_WITH_PAGINATION = gql`
 query GetSuppliersWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
   getSuppliersWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
@@ -915,6 +1554,42 @@ query GetStockMovementWithPagination($page: Int, $limit: Int, $pagination: Boole
           nameKh
           nameEn
         }
+      }
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
+  }
+}
+`
+
+
+export const GET_TABLE_WITH_PAGINATION = gql`
+query GetTablesWithPagination($shopId: ID!, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $active: Boolean) {
+  getTablesWithPagination(shopId: $shopId, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, active: $active) {
+    data {
+      _id
+      name
+      number
+      capacity
+      active
+      description
+      qrCode
+      createdAt
+      updatedAt
+      shopId {
+        nameKh
+        nameEn
+        _id
       }
     }
     paginator {

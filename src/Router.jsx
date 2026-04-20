@@ -20,6 +20,7 @@ import Supplier from './Pages/Supplier';
 import Profile from './Pages/Profile';
 import StoreSetting from './Pages/StoreSetting';
 import ReportInshopPage from './Pages/ReportInshop';
+import Customer from './Pages/Customer';
  
  
 export default function Router() {
@@ -44,7 +45,7 @@ export default function Router() {
         { path: 'setting', element: <Settings/> },
         { path: '/setting/unit', element: <Unit/>},
         { path: '/setting/supplier', element: <Supplier/>},
-    
+        { path: '/setting/customer', element: <Customer/>},
         { path: '/store', element: <Store/>},
         { path: 'report', element: <Report/> },
         { path: '/store/pos/:id/report-in-shop', element: <ReportInshopPage/> },
