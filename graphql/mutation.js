@@ -552,3 +552,38 @@ mutation RefundSale($id: ID!, $reason: String) {
 `
 
 
+export const CREATE_TABLE = gql`
+mutation CreateTable($input: TableInput) {
+  createTable(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const UPDATE_TABLE = gql`
+mutation UpdateTable($id: ID!, $input: TableInput) {
+  updateTable(_id: $id, input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const DELETE_TABLE = gql`
+mutation DeleteTable($id: ID!) {
+  deleteTable(_id: $id) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`

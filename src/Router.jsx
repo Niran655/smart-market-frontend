@@ -21,6 +21,7 @@ import Profile from './Pages/Profile';
 import StoreSetting from './Pages/StoreSetting';
 import ReportInshopPage from './Pages/ReportInshop';
 import Customer from './Pages/Customer';
+import TablePage from './Pages/Table';
  
  
 export default function Router() {
@@ -46,6 +47,7 @@ export default function Router() {
         { path: '/setting/unit', element: <Unit/>},
         { path: '/setting/supplier', element: <Supplier/>},
         { path: '/setting/customer', element: <Customer/>},
+        { path: '/setting/table', element: <TablePage/>},
         { path: '/store', element: <Store/>},
         { path: 'report', element: <Report/> },
         { path: '/store/pos/:id/report-in-shop', element: <ReportInshopPage/> },

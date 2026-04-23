@@ -1574,8 +1574,8 @@ query GetStockMovementWithPagination($page: Int, $limit: Int, $pagination: Boole
 
 
 export const GET_TABLE_WITH_PAGINATION = gql`
-query GetTablesWithPagination($shopId: ID!, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $active: Boolean) {
-  getTablesWithPagination(shopId: $shopId, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, active: $active) {
+query GetTablesWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $active: Boolean, $shopId: ID) {
+  getTablesWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, active: $active, shopId: $shopId) {
     data {
       _id
       name
@@ -1607,3 +1607,104 @@ query GetTablesWithPagination($shopId: ID!, $page: Int, $limit: Int, $pagination
   }
 }
 `
+
+ 
+
+// ── 1. Main dashboard — overview cards, static lists ─────────────────────────
+export const GET_FULL_DASHBOARD = gql`
+  query GetFullDashboard(
+    $shopId: ID
+    $period: String
+    $startDate: Date
+    $endDate: Date
+  ) {
+    getFullDashboard(
+      shopId: $shopId
+      period: $period
+      startDate: $startDate
+      endDate: $endDate
+    ) {
+      overview {
+        totalSales          { value percentageChange trend }
+        totalSalesReturn    { value percentageChange trend }
+        totalPurchase       { value percentageChange trend }
+        totalPurchaseReturn { value percentageChange trend }
+        profit              { value percentageChange trend }
+        invoiceDue          { value percentageChange trend }
+        totalExpenses       { value percentageChange trend }
+        totalPaymentReturns { value percentageChange trend }
+      }
+      salesPurchaseChart { labels sales purchases }
+      overallInfo        { suppliers customers orders }
+      customerOverview   { firstTime return firstTimePercent returnPercent }
+      topSellingProducts { productId productName sales revenue image }
+      lowStockProducts   { productId productName subProductId stock minStock image }
+      recentSales        { saleId productName category amount date }
+      recentTransactions { date customer quantity price status total }
+      topCustomers       { customerId name country orders totalSpent }
+      topCategories      { categoryId name salesAmount }
+      orderStatistics    { labels values }
+      categoryStatistics { totalCategories totalProducts }
+    }
+  }
+`;
+
+// ── 2. Independent chart data (Sales & Purchase + Sales Stats charts) ─────────
+//    period: "1D" | "1W" | "1M" | "3M" | "6M" | "All"
+export const GET_CHART_DATA = gql`
+  query GetChartData($shopId: ID, $period: String) {
+    getChartData(shopId: $shopId, period: $period) {
+      labels
+      sales
+      purchases
+    }
+  }
+`;
+
+// ── 3. Typed recent transactions ──────────────────────────────────────────────
+//    txType: "sale" | "purchase" | "quotation" | "expense" | "invoice"
+//    period: "1D" | "1W" | "1M" | "3M" | "6M" | "All"
+export const GET_RECENT_TRANSACTIONS_BY_TYPE = gql`
+  query GetRecentTransactionsByType(
+    $shopId: ID
+    $txType: String
+    $period: String
+    $page: Int
+    $limit: Int
+  ) {
+    getRecentTransactionsByType(
+      shopId: $shopId
+      txType: $txType
+      period: $period
+      page: $page
+      limit: $limit
+    ) {
+      items {
+        id
+        date
+        customer
+        quantity
+        price
+        status
+        total
+        type
+      }
+      total
+    }
+  }
+`;
+
+// ── 4. Order statistics + top categories (shared "Weekly ▾" dropdown) ─────────
+//    period: "1D" | "1W" | "1M" | "3M" | "6M" | "All"
+export const GET_ORDER_CATEGORY_STATS = gql`
+  query GetOrderCategoryStats($shopId: ID, $period: String) {
+    getOrderCategoryStats(shopId: $shopId, period: $period) {
+      orderLabels
+      orderValues
+      topCategories      { categoryId name salesAmount }
+      categoryStatistics { totalCategories totalProducts }
+    }
+  }
+`;
+
+ 
