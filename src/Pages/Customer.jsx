@@ -98,7 +98,7 @@ const Customer = () => {
               value={keyword}
               fullWidth
               onChange={(e) => setKeyword(e.target.value)}
-              fullWidth
+              
               InputProps={{ startAdornment: <InputAdornment position="start"><Search /></InputAdornment> }}
             />
           </Grid>
@@ -106,7 +106,7 @@ const Customer = () => {
             <Typography variant="body2" fontWeight={500} mb={0.5}>
               {t("status")}
             </Typography>
-            <TextField select fullWidth size="small" fullWidth value={activeFilter} onChange={(e) => setActiveFilter(e.target.value)}>
+            <TextField select fullWidth size="small"  value={activeFilter} onChange={(e) => setActiveFilter(e.target.value)}>
               <MenuItem value="active">{t("active")}</MenuItem>
               <MenuItem value="inactive">{t("inactive")}</MenuItem>
               <MenuItem value="all">{t("all")}</MenuItem>

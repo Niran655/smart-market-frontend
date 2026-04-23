@@ -77,8 +77,8 @@ const CAT_COLORS = [T.orange, T.navy, T.teal, T.purple, "#F43F5E", "#10B981"];
 const cardSx = {
   borderRadius: "12px",
   boxShadow: "0 1px 4px rgba(0,0,0,.06)",
-  border: `1px solid ${T.border}`,
-  background: T.card,
+  // border: `1px solid ${T.border}`,
+  // background: T.card,
 };
 const thSx = { bgcolor: "#FAFBFF", fontSize: "0.72rem", fontWeight: 700, color: T.slate, textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: `1px solid ${T.border}`, py: 1 };
 const tdSx = { fontSize: "0.8rem", color: "#1A2332", borderBottom: `1px solid ${T.border}`, py: 1 };

@@ -5,7 +5,7 @@ import * as React from "react";
 
 export default function CircularIndeterminate() {
   return (
-    <TableBody   sx={{ height: "300px", borderRadius: "20px",borderRadius: "20px" }}>
+    <TableBody   sx={{ height: "300px", borderRadius: "20px" }}>
       <TableRow>
         <TableCell colSpan={10} align="center">
           <Box >
