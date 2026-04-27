@@ -16,7 +16,7 @@ export default function SidebarNav() {
     const [activeItem, setActiveItem] = useState(null)
     const { sidebarColor, layoutMode } = useThemeContext();
     const handleItemClick = (label) => {
-        setActiveItem(label); // Set active item on click
+        setActiveItem(label);  
     };
     const sidebarItems = [
         { label: 'Dashboard', path: '/dashboard', icon: <RxDashboard /> },
@@ -47,7 +47,7 @@ export default function SidebarNav() {
                 <SideBarItems
                     key={item.label}
                     item={item}
-                    isActive={activeItem === item.label} // Pass isActive prop
+                    isActive={activeItem === item.label}  
                     onClick={() => handleItemClick(item.label)}
                     showLabel={layoutMode !== 'compact'}
                 />

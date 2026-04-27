@@ -50,7 +50,7 @@ const ProductDialog = ({ open, onClose, product, onAddToCart, language, t }) => 
 
   if (!product) return null;
 
-  // Calculate addition total: size price + sugar price
+  
   const sizePrice = selectedSize?.price || 0;
   const sugarPrice = selectedSugar?.price || 0;
   const additionTotal = sizePrice + sugarPrice;
@@ -59,7 +59,7 @@ const ProductDialog = ({ open, onClose, product, onAddToCart, language, t }) => 
   const finalUnitPrice = basePrice + additionTotal;
   const finalTotal = finalUnitPrice * quantity;
 
-  // Build descriptive name with size and sugar
+ 
   const buildItemName = () => {
     const baseName = language === "kh" ? product.parentProductId?.nameKh : product.parentProductId?.nameEn;
     const sizeName = selectedSize ? (language === "kh" ? selectedSize.nameKhmer : selectedSize.nameEnglish) : "";
@@ -72,8 +72,8 @@ const ProductDialog = ({ open, onClose, product, onAddToCart, language, t }) => 
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
-    setExpanded(size._id); // expand the selected size
-    // Auto-select first sugar level of the new size
+    setExpanded(size._id);  
+ 
     if (size.children && size.children.length > 0) {
       setSelectedSugar(size.children[0]);
     } else {
@@ -86,19 +86,19 @@ const ProductDialog = ({ open, onClose, product, onAddToCart, language, t }) => 
   };
 
   const handleAccordionChange = (sizeId) => (event, isExpanded) => {
-    // Only change expanded state if the click is not on the radio button
+ 
     if (event.target.type !== 'radio') {
       setExpanded(isExpanded ? sizeId : false);
     }
   };
 
 const handleAddToCart = () => {
-  // Create a unique ID based on product ID + size ID + sugar ID
+ 
   const uniqueId = `${product._id}_${selectedSize?._id || 'no_size'}_${selectedSugar?._id || 'no_sugar'}`;
   
   const itemToAdd = {
-    id: uniqueId,                 // unique composite ID
-    originalId: product._id,     // keep original for reference
+    id: uniqueId,               
+    originalId: product._id,    
     subProductId: product._id,
     productId: product.parentProductId._id,
     name: buildItemName(),
@@ -253,7 +253,7 @@ const handleAddToCart = () => {
 
               <Divider />
 
-              {/* Quantity & Price */}
+        
               <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Box>
                   <Typography variant="body2" color="text.secondary">

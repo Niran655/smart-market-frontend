@@ -318,7 +318,7 @@ export const ThemeProvider = ({ children }) => {
   });
 
   const [topbarColor, setTopbarColor] = useState(() => {
-    return localStorage.getItem("topbarColor") || "#ffffff";
+    return localStorage.getItem("topbarColor") || "#1E293B";
   });
 
   const [fontSize, setFontSize] = useState(() => {
@@ -570,7 +570,7 @@ useEffect(() => {
 
   const theme = useMemo(() => {
     const isKhmerNewYear = mode === "khmerNewYear";
-    // For Khmer New Year we use dark base but override colors
+  
     const baseMode = isKhmerNewYear ? "dark" : mode === "glass" ? "dark" : mode;
     const isGlass = mode === "glass";
 

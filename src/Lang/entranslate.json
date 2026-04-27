@@ -411,6 +411,23 @@
   "profit_loss": "Profit & Loss",
   "annual_report": "Annual Report",
   "receive_now":"Receive Now",
-  "name":"Name"
- 
+  "name":"Name",
+  "week":"Week",
+  "total_sale_return":"Total Sale Return",
+  "total_purchase":"Total Purchase",
+  "total_purchase_return":"Total Purchase Return",
+  "profit":"Profit",
+  "invoice_due":"Invoice Due",
+  "total_expenses":"Total Expense",
+  "total_payment_returns":"Total Payment Return",
+  "sales_purchase":"Sales/Purchase",
+  "overall_info":"Overall Informatio",
+  "low_stock_products":"Low Stock Products",
+  "sales_stats":"Sales Stats",
+  "top_customers":"Top Customers",
+  "top_categories":"Top Categories",
+  "order_statistics":"Order Statistics",
+  "customer_overview":"Customer Overview",
+  "number": "Number",
+  "capactiy": "Capacity"
 }

@@ -26,7 +26,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogActions-root": { padding: theme.spacing(1) },
 }));
 
-// Helper: calculate total for a row (price + tax + service)
+ 
 const calcTotal = (price, tax, service) =>
   (Number(price) || 0) + (Number(tax) || 0) + (Number(service) || 0);
 
@@ -143,7 +143,7 @@ export default function SubProductForm({
     onSubmit: async (values) => {
       setLoadingLocal(true);
 
-      // Recursively process additionPrices, preserving sizeName and sugarLevel
+ 
       const processAdditionPrices = (items) => {
         if (!items) return [];
         return items.map(item => ({
@@ -209,7 +209,7 @@ export default function SubProductForm({
     setValues,
   } = formik;
 
-  // Populate form when editing
+ 
   useEffect(() => {
     if (open) {
       if (dialogTitle === "Update" && subProductData) {
@@ -252,7 +252,7 @@ export default function SubProductForm({
     }
   }, [open, subProductData, parentProductId, setValues, resetForm, setFieldValue]);
 
-  // ----- Parent row handlers (sizes) -----
+ 
   const handleAddParentRow = () => {
     const newParent = {
       nameKhmer: "",
@@ -285,7 +285,7 @@ export default function SubProductForm({
     setFieldValue("additionPrices", updated);
   };
 
-  // ----- Child row handlers (sugar levels for a size) -----
+ 
   const handleAddChildRow = (parentIdx) => {
     const updated = [...values.additionPrices];
     const newChild = {
@@ -323,7 +323,7 @@ export default function SubProductForm({
     setExpandedRows(prev => ({ ...prev, [idx]: !prev[idx] }));
   };
 
-  // Auto‑calculate main totalPrice
+ 
   useEffect(() => {
     const service = Number(values.servicePrice || 0);
     const sale = Number(values.salePrice || 0);

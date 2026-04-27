@@ -13,9 +13,7 @@ export default function SideBarItems({ item, isActive, onClick, showLabel = true
         }
     };
 
-    // const handleDropdownSelect = (path) => {
-    //     navigate(path);
-    // };
+ 
     return (
         <div onClick={() => { handleNavigation(); onClick() }}
             className={`sidebar-item ${isActive ? 'active' : ''} ${!showLabel ? 'icon-only' : ''}`} // Conditionally add active class

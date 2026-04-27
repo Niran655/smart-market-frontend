@@ -159,7 +159,7 @@ const TablePage = () => {
               <TableCell>{t("no")}</TableCell>
               <TableCell>{t("name")}</TableCell>
               <TableCell>{t("number")}</TableCell>
-              <TableCell>{t("capacity")}</TableCell>
+              <TableCell>{t("capactiy")}</TableCell>
               <TableCell>{t("status")}</TableCell>
               <TableCell align="center">{t("action")}</TableCell>
             </TableRow>

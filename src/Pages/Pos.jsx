@@ -741,7 +741,14 @@ import { Navigate, useParams } from "react-router-dom";
 import { Box, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { GET_PRODUCT_FOR_SALE_WITH_PAGINATION, GET_SUPPRODUCT_BY_ID } from "../../graphql/queries";
+
+import {
+  GET_PRODUCT_FOR_SALE_WITH_PAGINATION,
+  GET_SUPPRODUCT_BY_ID,
+  GET_TABLE_BY_SHOP_ID,
+  GET_CUSTOMERS_BY_SHOP_ID,
+} from "../../graphql/queries";
+
 import { CREATE_SALE } from "../../graphql/mutation";
 import { translateLauguage } from "../function/translate";
 import ProductDialog from "../Components/pos/ProductDialog";
@@ -750,39 +757,42 @@ import ProductList from "../Components/pos/ProductList";
 import CartPanel from "../Components/pos/CartPanel";
 import RecentOrders from "../Components/pos/RecentOrders";
 import "../Styles/pos.scss";
-import BarcodeScanner from "../Components/pos/BarcodeScanner";
+
+const GUEST = { _id: "guest", nameEn: "Guest", nameKh: "ភ្ញៀវ" };
 
 const POS = () => {
   const { shopId } = useParams();
   const activeShopId = localStorage.getItem("activeShopId");
-  const { setAlert } = useAuth();
-  const { language } = useAuth();
+  const { setAlert, language } = useAuth();
   const { t } = translateLauguage(language);
 
-  // Dialog states
+ 
   const [openProductDialog, setOpenProductDialog] = useState(false);
   const [openPaymentDialog, setOpenPaymentDialog] = useState(false);
   const [openPendingDialog, setOpenPendingDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
-  const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
-
-  // Existing dialog states
   const [openHistory, setOpenHistory] = useState(false);
   const [openSalePending, setOpenSalePending] = useState(false);
 
-  // Cart state
+ 
   const [cart, setCart] = useState([]);
   const [orderType, setOrderType] = useState("dine_in");
-  const [selectedTable, setSelectedTable] = useState("Table 01");
 
-  // Product list state
+ 
+ 
+  const [selectedTable, setSelectedTable] = useState(null);    
+  const [selectedCustomer, setSelectedCustomer] = useState(GUEST);
+
+  
   const [selectedOrderType, setSelectedOrderType] = useState("All");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [categories, setCategories] = useState([
     { id: "all", nameEn: "All", nameKh: "ទាំងអស់" },
   ]);
   const [searchKeyword, setSearchKeyword] = useState("");
+
+ 
+  const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
 
   const { data, loading } = useQuery(GET_PRODUCT_FOR_SALE_WITH_PAGINATION, {
     variables: {
@@ -796,24 +806,32 @@ const POS = () => {
     pollInterval: 1000,
   });
 
-  const [createSale, { loading: creating, error: createError }] = useMutation(CREATE_SALE, {
+  const { data: tablesData } = useQuery(GET_TABLE_BY_SHOP_ID, {
+    variables: { shopId },
+  });
+
+  const { data: customersData } = useQuery(GET_CUSTOMERS_BY_SHOP_ID, {
+    variables: { shopId },
+  });
+
+ 
+  const [createSale, { loading: creating }] = useMutation(CREATE_SALE, {
     onCompleted: ({ createSale }) => {
       if (createSale?.isSuccess) {
         setAlert(true, "success", createSale?.message);
-        console.log("CreateSale", createSale);
         setCart([]);
+        setSelectedCustomer(GUEST);
+        setSelectedTable(null);
         setOpenPaymentDialog(false);
         setOpenPendingDialog(false);
       } else {
         setAlert(true, "error", createSale?.message);
       }
     },
-    onError: (error) => {
-      console.log("Error", error);
-      setAlert(true, "error", error.message);
-    },
+    onError: (error) => setAlert(true, "error", error.message),
   });
 
+  
   useEffect(() => {
     if (data?.getProductForSaleWithPagination?.data) {
       const categoryMap = new Map();
@@ -829,47 +847,31 @@ const POS = () => {
             });
           }
         });
-
-      const uniqueCategories = Array.from(categoryMap.values());
       setCategories([
         { id: "all", nameEn: "All", nameKh: "ទាំងអស់" },
-        ...uniqueCategories,
+        ...Array.from(categoryMap.values()),
       ]);
     }
   }, [data, language]);
 
-
+ 
   const handleScan = async (barcode) => {
     try {
-      console.log("Scanned:", barcode);
-
-      const res = await getSubProduct({
-        variables: { subProductId: barcode },
-      });
-
+      const res = await getSubProduct({ variables: { subProductId: barcode } });
       const item = res?.data?.getSubProductById;
-
-      if (!item) {
-        setAlert(true, "error", "Product not found");
-        return;
-      }
-
-      // 🔥 AUTO ADD TO CART
+      if (!item) { setAlert(true, "error", "Product not found"); return; }
       addToCart(item);
-
-      // 🔊 optional sound
-      new Audio("/beep.mp3").play();
+      new Audio("/beep.mp3").play().catch(() => {});
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
-  // Dialog handlers
+ 
   const handleOpenProductDialog = (product) => {
     setSelectedProduct(product);
     setOpenProductDialog(true);
   };
-
   const handleCloseProductDialog = () => {
     setOpenProductDialog(false);
     setSelectedProduct(null);
@@ -882,10 +884,7 @@ const POS = () => {
     }
     setOpenPaymentDialog(true);
   };
-
-  const handleClosePaymentDialog = () => {
-    setOpenPaymentDialog(false);
-  };
+  const handleClosePaymentDialog = () => setOpenPaymentDialog(false);
 
   const handleOpenPendingDialog = () => {
     if (cart.length === 0) {
@@ -894,113 +893,107 @@ const POS = () => {
     }
     setOpenPendingDialog(true);
   };
+  const handleClosePendingDialog = () => setOpenPendingDialog(false);
 
-  const handleClosePendingDialog = () => {
-    setOpenPendingDialog(false);
+ 
+  const addToCart = (item) => {
+    const uniqueId = item._id;
+    setCart((prev) => {
+      const found = prev.find((p) => p.id === uniqueId);
+      if (found) return prev.map((p) => p.id === uniqueId ? { ...p, qty: p.qty + 1 } : p);
+      return [
+        ...prev,
+        {
+          id: uniqueId,
+          subProductId: item._id,
+          productId: item.parentProductId._id,
+          name: language === "kh" ? item.parentProductId.nameKh : item.parentProductId.nameEn,
+          nameEn: item.parentProductId.nameEn,
+          nameKh: item.parentProductId.nameKh,
+          price: item.salePrice,
+          qty: 1,
+          img: item.productImg,
+          variant: "Original",
+        },
+      ];
+    });
   };
 
-  const handleOpenSaleHistory = () => setOpenHistory(true);
-  const handleCloseSaleHistory = () => setOpenHistory(false);
-  const handleOpenSalePending = () => setOpenSalePending(true);
-  const handleCloseSalePending = () => setOpenSalePending(false);
-
-  
-const addToCart = (item) => {
- 
-  const uniqueId = item._id;
-  setCart((prev) => {
-    const found = prev.find((p) => p.id === uniqueId);
-    if (found) {
-      return prev.map((p) => (p.id === uniqueId ? { ...p, qty: p.qty + 1 } : p));
-    }
-    return [
-      ...prev,
-      {
-        id: uniqueId,
-        subProductId: item._id,
-        productId: item.parentProductId._id,
-        name: language === "kh" ? item.parentProductId.nameKh : item.parentProductId.nameEn,
-        nameEn: item.parentProductId.nameEn,
-        nameKh: item.parentProductId.nameKh,
-        price: item.salePrice,
-        qty: 1,
-        img: item.productImg,
-        variant: "Original",
-      },
-    ];
-  });
-};
-
-const addToCartFromDialog = (item) => {
-  setCart((prev) => {
-    // Find by the unique ID (which includes customizations)
-    const foundIndex = prev.findIndex((p) => p.id === item.id);
-    if (foundIndex !== -1) {
-      // Same customization: increase quantity
-      const updated = [...prev];
-      updated[foundIndex].qty += item.qty;
-      return updated;
-    }
-    // Different customization: add as new item
-    return [...prev, item];
-  });
-};
+  const addToCartFromDialog = (item) => {
+    setCart((prev) => {
+      const foundIndex = prev.findIndex((p) => p.id === item.id);
+      if (foundIndex !== -1) {
+        const updated = [...prev];
+        updated[foundIndex].qty += item.qty;
+        return updated;
+      }
+      return [...prev, item];
+    });
+  };
 
   const updateQty = (id, value) => {
-    if (value === 0) {
-      removeFromCart(id);
-    } else {
-      setCart((prev) => prev.map((item) => (item.id === id ? { ...item, qty: value } : item)));
-    }
+    if (value === 0) removeFromCart(id);
+    else setCart((prev) => prev.map((item) => item.id === id ? { ...item, qty: value } : item));
   };
 
-  // const removeFromCart = (id) => {
-  //   setCart((prev) => prev.filter((item) => item.id !== id));
-  // };
-
-  const removeFromCart = (id) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  }
-
-  const clearCart = () => {
-    setCart([]);
-  };
+  const removeFromCart = (id) => setCart((prev) => prev.filter((item) => item.id !== id));
+  const clearCart = () => setCart([]);
 
   const handleSelectPendingSale = (cartItems) => {
     setCart(cartItems);
-    setAlert(true, "info", language === "kh"
-      ? "វិក័យប័ត្របណ្ដោះអាសន្នត្រូវបានទាញយក"
-      : "Pending invoice loaded to cart");
+    setAlert(
+      true, "info",
+      language === "kh"
+        ? "វិក័យប័ត្របណ្ដោះអាសន្នត្រូវបានទាញយក"
+        : "Pending invoice loaded to cart"
+    );
   };
 
+ 
   const subtotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
   const tax = subtotal * 0.1;
   const total = subtotal + tax;
 
+ 
   const handleCreateSale = async (paymentInfo, isPending = false) => {
     try {
       const subtotalRounded = Number(subtotal.toFixed(2));
-      const taxRounded = Number(tax.toFixed(2));
-      const totalRounded = Number((subtotalRounded + taxRounded).toFixed(2));
+      const taxRounded      = Number(tax.toFixed(2));
+      const totalRounded    = Number((subtotalRounded + taxRounded).toFixed(2));
+
+ 
+      const tableNumber = orderType === "dine_in" && selectedTable?.number
+        ? selectedTable.number
+        : "";
+ 
+      const customerName = selectedCustomer?._id === "guest"
+        ? "Guest"
+        : (language === "kh"
+            ? selectedCustomer?.nameKh || selectedCustomer?.nameEn
+            : selectedCustomer?.nameEn) ?? "Guest";
 
       const input = {
-        shopId: shopId,
+        shopId,
+        orderType,
+        customerName,
+        customerPhone: "",
+        tableNumber,
         items: cart.map((item) => ({
-          product: item.productId,
+          product:      item.productId,
           subProductId: item.subProductId,
-          name: item.name,
-          price: Number(item.price.toFixed(2)),
-          quantity: item.qty,
-          total: Number((item.price * item.qty).toFixed(2)),
+          name:         item.name,
+          price:        Number(item.price.toFixed(2)),
+          quantity:     item.qty,
+          total:        Number((item.price * item.qty).toFixed(2)),
         })),
-        subtotal: subtotalRounded,
-        tax: taxRounded,
-        discount: 0,
-        total: totalRounded,
-        paymentMethod: paymentInfo.method || "cash",
-        amountPaid: paymentInfo.amountPaid || 0,
-        change: paymentInfo.change || 0,
-        status: isPending ? "pending" : "completed",
+        subtotal:      subtotalRounded,
+        tax:           taxRounded,
+        discount:      0,
+        total:         totalRounded,
+        paymentMethod: paymentInfo.method     || "cash",
+        amountPaid:    paymentInfo.amountPaid || 0,
+        change:        paymentInfo.change     || 0,
+        status:        isPending ? "pending" : "completed",
       };
 
       await createSale({ variables: { input } });
@@ -1008,34 +1001,24 @@ const addToCartFromDialog = (item) => {
       console.error("Error creating sale:", error);
     }
   };
+ 
+  if (activeShopId !== shopId) return <Navigate to="/store" replace />;
 
-  if (activeShopId !== shopId) {
-    return <Navigate to="/store" replace />;
-  }
-
+ 
   const filteredProducts = data?.getProductForSaleWithPagination?.data?.filter((item) => {
-    if (selectedCategory === "all") {
-      const matchesSearch =
-        item.parentProductId?.nameKh?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        item.parentProductId?.nameEn?.toLowerCase().includes(searchKeyword.toLowerCase());
-      return matchesSearch;
-    } else {
-      const matchesCategory =
-        item.parentProductId?.categoryId?._id === selectedCategory ||
-        item.parentProductId?.categoryId?.nameEn === selectedCategory ||
-        item.parentProductId?.categoryId?.nameKh === selectedCategory;
-
-      const matchesSearch =
-        item.parentProductId?.nameKh?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        item.parentProductId?.nameEn?.toLowerCase().includes(searchKeyword.toLowerCase());
-
-      return matchesCategory && matchesSearch;
-    }
+    const matchesSearch =
+      item.parentProductId?.nameKh?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+      item.parentProductId?.nameEn?.toLowerCase().includes(searchKeyword.toLowerCase());
+    if (selectedCategory === "all") return matchesSearch;
+    const matchesCategory =
+      item.parentProductId?.categoryId?._id === selectedCategory ||
+      item.parentProductId?.categoryId?.nameEn === selectedCategory ||
+      item.parentProductId?.categoryId?.nameKh === selectedCategory;
+    return matchesCategory && matchesSearch;
   });
 
   return (
     <Box className="pos-container">
-      {/* <BarcodeScanner onScan={handleScan} />  */}
       <ProductDialog
         open={openProductDialog}
         onClose={handleCloseProductDialog}
@@ -1068,7 +1051,6 @@ const addToCartFromDialog = (item) => {
       />
 
       <Grid container spacing={2} sx={{ height: "90vh", overflow: "hidden" }}>
-
         <Grid size={{ xs: 8 }}>
           <Box sx={{ overflowY: "auto", height: "100vh", scrollbarWidth: "thin", padding: 2 }}>
             <RecentOrders
@@ -1076,7 +1058,6 @@ const addToCartFromDialog = (item) => {
               setSelectedOrderType={setSelectedOrderType}
               t={t}
             />
-
             <ProductList
               t={t}
               language={language}
@@ -1091,14 +1072,19 @@ const addToCartFromDialog = (item) => {
           </Box>
         </Grid>
 
-
         <Grid size={{ xs: 4 }} sx={{ borderLeft: "1px solid #D1D5DC" }}>
           <CartPanel
             cart={cart}
             orderType={orderType}
             setOrderType={setOrderType}
+          
+            tablesData={tablesData}
+     
             selectedTable={selectedTable}
             setSelectedTable={setSelectedTable}
+            customersData={customersData}
+            selectedCustomer={selectedCustomer}
+            setSelectedCustomer={setSelectedCustomer}
             updateQty={updateQty}
             removeFromCart={removeFromCart}
             clearCart={clearCart}
@@ -1112,10 +1098,10 @@ const addToCartFromDialog = (item) => {
             onStopInvoice={handleOpenPendingDialog}
             openHistory={openHistory}
             openSalePending={openSalePending}
-            onOpenHistory={handleOpenSaleHistory}
-            onCloseHistory={handleCloseSaleHistory}
-            onOpenSalePending={handleOpenSalePending}
-            onCloseSalePending={handleCloseSalePending}
+            onOpenHistory={() => setOpenHistory(true)}
+            onCloseHistory={() => setOpenHistory(false)}
+            onOpenSalePending={() => setOpenSalePending(true)}
+            onCloseSalePending={() => setOpenSalePending(false)}
             shopId={shopId}
             onSelectPendingSale={handleSelectPendingSale}
           />

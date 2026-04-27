@@ -6,6 +6,8 @@ import Category from "../assets/Image/category.png";
 import Supplier from "../assets/Image/supplier.png";
 import Unit from "../assets/Image/unit.png";
 import User from "../assets/Image/man.png";
+import Table from "../assets/Image/table.png";
+import Customer from "../assets/Image/customer.png";
 import { useAuth } from "../context/AuthContext";
 import "../Styles/setting.scss";
 import { translateLauguage } from "../function/translate";
@@ -147,7 +149,7 @@ export default function Settings() {
             sx={{ cursor: "pointer", textDecoration: "none" }}
           >
             <Box>
-              <img src={Supplier} className="image" alt="Supplier" />
+              <img src={Customer} className="image" alt="Customer" />
             </Box>
             <Stack textAlign="start"  spacing={1}>
               <Typography className="text-title" variant="h5">
@@ -167,7 +169,7 @@ export default function Settings() {
             sx={{ cursor: "pointer", textDecoration: "none" }}
           >
             <Box>
-              <img src={Supplier} className="image" alt="Supplier" />
+              <img src={Table} className="image" alt="Table" />
             </Box>
             <Stack textAlign="start"  spacing={1}>
               <Typography className="text-title" variant="h5">

@@ -55,7 +55,7 @@ export default function PurchaseOrderReceive({
     }
   );
 
-  // ================= HANDLERS =================
+   
   const updateQty = (index, value) => {
     const qty = Math.max(
       0,
@@ -84,7 +84,7 @@ export default function PurchaseOrderReceive({
     });
   };
 
-  // ================= RENDER =================
+ 
   return (
     <Drawer
       anchor="right"

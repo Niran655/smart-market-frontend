@@ -97,7 +97,7 @@ const ReportPage = ({ shopId = null }) => {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(today.getDate() - 30);
 
-  // Tab state
+ 
   const [activeTab, setActiveTab] = useState(0);
   const tabs = [
     { label: t("sale_report") || "Sale Report", value: "sale" },
@@ -118,14 +118,13 @@ const ReportPage = ({ shopId = null }) => {
     { label: t("annual_report") || "Annual Report", value: "annual" },
   ];
 
-  // Filters
+   
   const [dateRange, setDateRange] = useState({ start: thirtyDaysAgo, end: today });
   const [selectedYear, setSelectedYear] = useState(today.getFullYear());
   const [daysThreshold, setDaysThreshold] = useState(30);
   const [categoryId, setCategoryId] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-
-  // For Sale Report: choose which detailed view to show
+ 
   const [saleDetailView, setSaleDetailView] = useState("bestSellers");
   const saleDetailOptions = [
     { value: "bestSellers", label: t("best_sellers") || "Best Sellers" },
@@ -135,18 +134,18 @@ const ReportPage = ({ shopId = null }) => {
     { value: "recentTransactions", label: t("recent_transactions") || "Recent Transactions" },
   ];
 
-  // Pagination
+ 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [pagination] = useState(true);
 
-  // Reset page when filters change
+ 
   useEffect(() => {
     setPage(1);
     setSearchQuery("");
   }, [activeTab, dateRange, selectedYear, categoryId, saleDetailView]);
 
-  // Build query variables
+  
   const getQueryVariables = () => {
     const common = { shopId, page, limit, pagination };
     const currentTab = tabs[activeTab].value;
@@ -229,7 +228,7 @@ const ReportPage = ({ shopId = null }) => {
 
   const reportData = data?.[Object.keys(data || {})[0]];
 
-  // Helper to get table headers and rows based on active tab and sale detail view
+ 
   const getTableHeaders = () => {
     const currentTab = tabs[activeTab].value;
     if (currentTab === "sale") {
@@ -248,7 +247,7 @@ const ReportPage = ({ shopId = null }) => {
           return [t("product") || "Product", t("units_sold") || "Units Sold", t("revenue") || "Revenue"];
       }
     }
-    // Other reports (non-sale)
+ 
     switch (currentTab) {
       case "purchase": return [t("order_#") || "Order #", t("supplier") || "Supplier", t("total_amount") || "Total Amount", t("status") || "Status", t("date") || "Date"];
       case "inventory": return [t("product") || "Product", t("stock") || "Stock", t("unit_cost") || "Unit Cost", t("total_value") || "Total Value"];
@@ -304,7 +303,7 @@ const ReportPage = ({ shopId = null }) => {
       }
     }
 
-    // Other reports (non-sale)
+ 
     switch (currentTab) {
       case "purchase": {
         const recent = data.recentPurchases || [];
@@ -382,12 +381,12 @@ const ReportPage = ({ shopId = null }) => {
     }
   };
 
-  // Determine which paginator to use - ONLY for recentTransactions view in sale report
+ 
   const getPaginator = () => {
     const currentTab = tabs[activeTab].value;
     if (!reportData) return null;
     
-    // For sale report, only show paginator when viewing recentTransactions
+ 
     if (currentTab === "sale") {
       if (saleDetailView === "recentTransactions") {
         return reportData.paginator;
@@ -395,7 +394,7 @@ const ReportPage = ({ shopId = null }) => {
       return null;
     }
     
-    // Other reports
+   
     switch (currentTab) {
       case "purchase": return reportData.paginator;
       case "inventory": return reportData.valuationPaginator;
@@ -412,7 +411,7 @@ const ReportPage = ({ shopId = null }) => {
   };
 
   const paginator = getPaginator();
-  // Handle zero totalDocs gracefully
+ 
   const totalPages = paginator?.totalPages && paginator.totalDocs > 0 ? paginator.totalPages : 0;
   const totalDocs = paginator?.totalDocs || 0;
 
@@ -421,7 +420,7 @@ const ReportPage = ({ shopId = null }) => {
     setPage(1);
   };
 
-  // Professional print function – captures the current table view
+ 
   const handlePrint = () => {
     const printWindow = window.open("", "_blank");
     const doc = printWindow.document;
@@ -615,7 +614,7 @@ const ReportPage = ({ shopId = null }) => {
     printWindow.print();
   };
 
-  // Export to Excel (exports current view)
+ 
   const handleExport = async () => {
     if (!reportData) return;
     const workbook = new ExcelJS.Workbook();
@@ -628,7 +627,7 @@ const ReportPage = ({ shopId = null }) => {
     saveAs(blob, `${tabs[activeTab].label}-${formatFileDate()}.xlsx`);
   };
 
-  // Render main content
+ 
   const renderContent = () => {
     if (loading) return <CircularIndeterminate />;
     if (error) return <Alert severity="error" sx={{ my: 2 }}>{t("failed_to_load_report")}: {error.message}</Alert>;

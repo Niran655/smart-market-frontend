@@ -10,26 +10,26 @@ export default function TableForm({ open, onClose, t, tableData, setRefetch }) {
   const { setAlert, user } = useAuth();
   const [loading, setLoading] = useState(false);
 
-
   const { data: shopsData, loading: shopsLoading } = useQuery(GET_ALL_SHOP, {
     variables: { id: user?._id },
     skip: !user?._id,
   });
 
   const shops = shopsData?.getAllShops || [];
+
   const shopOptions = shops.map((shop) => ({
     id: shop._id,
     label: shop.nameEn,
   }));
 
-
+ 
   const [formValues, setFormValues] = useState({
     name: "",
     number: "",
     capacity: "",
     description: "",
     active: true,
-    shopIds: [],
+    shopIds: [],   
   });
 
   const [createTable] = useMutation(CREATE_TABLE, {
@@ -66,47 +66,49 @@ export default function TableForm({ open, onClose, t, tableData, setRefetch }) {
     },
   });
 
-   
-useEffect(() => {
-  if (tableData) {
-    setFormValues({
-      name: tableData.name || "",
-      number: tableData.number || "",
-      capacity: tableData.capacity || "",
-      active: tableData.active ?? true,
-      description: tableData?.description || "",
+ 
+  useEffect(() => {
+    if (tableData) {
+      setFormValues({
+        name: tableData.name || "",
+        number: tableData.number || "",
+        capacity: tableData.capacity || "",
+        active: tableData.active ?? true,
+        description: tableData?.description || "",
+        shopIds: tableData?.shopIds?.map(s => s._id || s) || [],  
+      });
+    } else {
+      setFormValues({
+        name: "",
+        number: "",
+        capacity: "",
+        description: "",
+        active: true,
+        shopIds: user?.shopIds?.map(s => s._id || s) || [], 
+      });
+    }
+  }, [tableData, user]);
 
-      // ✅ correct mapping
-      shopId: tableData?.shopId?._id || "",
-    });
-  } else {
-    setFormValues({
-      name: "",
-      number: "",
-      capacity: "",
-      active: true,
-
-      // default from user
-      shopId: user?.shopIds?.[0]?._id || "",
-    });
-  }
-}, [tableData, user]);
-
+ 
   const validationSchema = Yup.object({
     name: Yup.string().required(t("require")),
     number: Yup.string().required(t("require")),
     capacity: Yup.number()
-    
+      .typeError(t("must_be_number"))
+      .positive(t("must_be_positive"))
+      .integer(t("must_be_integer"))
       .required(t("require")),
-   shopId: Yup.string().required(t("require")),
+    shopIds: Yup.array().min(1, t("require")),  
   });
 
+ 
   const handleSubmit = (values) => {
     setLoading(true);
+
     const payload = {
       ...values,
       capacity: Number(values.capacity),
-        shopId: values.shopId,
+      shopIds: values.shopIds,  
     };
 
     if (!tableData) {
@@ -123,7 +125,7 @@ useEffect(() => {
           name: "shopIds",
           label: t("shop"),
           type: "autocomplete",
-          multiple: true,
+          multiple: true,     
           options: shopOptions,
           loading: shopsLoading,
           grid: { xs: 12 },
@@ -147,7 +149,6 @@ useEffect(() => {
         {
           name: "description",
           label: t("description"),
-
           grid: { xs: 12, md: 6 },
         },
         {

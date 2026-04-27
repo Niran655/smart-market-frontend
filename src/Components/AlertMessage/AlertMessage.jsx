@@ -1,10 +1,7 @@
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import React, { useContext } from "react";
-
+import React from "react";
 import { useAuth } from "../../context/AuthContext";
-//Srcs
-import "./alertmessage.scss";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -12,54 +9,55 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 export default function AlertMessage() {
   const { alert, setAlert, language } = useAuth();
-  let open = alert()?.open;
-  let message = alert()?.message;
-  let status = alert()?.status;
 
-  const handleCloseAlert = (reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
+  const open = alert()?.open;
+  const message = alert()?.message;
+  const status = alert()?.status;
+
+  const handleClose = (_, reason) => {
+    if (reason === "clickaway") return;
     setAlert(false, "", "");
   };
 
-  return (
-    <div className="alert-message">
-      {status === "success" ? (
-        <Snackbar
-          open={open}
-          autoHideDuration={3000}
-          onClose={handleCloseAlert}
-          className="snackbar-alert"
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        >
-          <Alert
-            severity="success"
-            onClose={handleCloseAlert}
-            className={"alert-success"}
-          >
-            {language === "en" ? message?.messageEn : message?.messageKh}
-          </Alert>
-        </Snackbar>
-      ) : null}
+  const getColor = () => {
+    switch (status) {
+      case "success":
+        return "#00C9A7";
+      case "error":
+        return "#FF6F91";
+      case "warning":
+        return "#FFA500";
+      default:
+        return "#333";
+    }
+  };
 
-      {status === "error" ? (
-        <Snackbar
-          open={open}
-          autoHideDuration={3000}
-          onClose={handleCloseAlert}
-          className="snackbar-alert"
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        >
-          <Alert
-            severity="error"
-            className={"alert-error"}
-            onClose={handleCloseAlert}
-          >
-            {language === "en" ? message?.messageEn : message?.messageKh}
-          </Alert>
-        </Snackbar>
-      ) : null}
-    </div>
+  return (
+    <Snackbar
+      open={open}
+      autoHideDuration={3000}
+      onClose={handleClose}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
+    >
+      <Alert
+        onClose={handleClose}
+        severity={status}
+        sx={{
+          borderRadius: "999px",
+          backgroundColor: getColor(),
+          color: "#fff",
+          px: 3,
+          py: 1,
+          fontSize: "0.9rem",
+          fontWeight: 500,
+          boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+          alignItems: "center",
+        }}
+      >
+        {language === "en"
+          ? message?.messageEn
+          : message?.messageKh}
+      </Alert>
+    </Snackbar>
   );
 }

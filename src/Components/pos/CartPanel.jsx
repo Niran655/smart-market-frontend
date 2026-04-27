@@ -2,25 +2,33 @@ import ManageHistoryOutlinedIcon from "@mui/icons-material/ManageHistoryOutlined
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
-import { Box, Button, Divider, IconButton, MenuItem, Paper, Select, Stack, Tab, Tabs, TextField, Tooltip, Typography } from "@mui/material";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import TableRestaurantOutlinedIcon from "@mui/icons-material/TableRestaurantOutlined";
+import {
+  Box, Button, Divider, FormControl, IconButton, InputLabel,
+  MenuItem, Paper, Select, Stack, Tab, Tabs, TextField,
+  Tooltip, Typography,
+} from "@mui/material";
 import { Trash2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import InvoicePending from "./InvoicePending";
 import SaleHistory from "./SaleHistory";
 
+const GUEST = { _id: "guest", nameEn: "Guest", nameKh: "ភ្ញៀវ" };
+
 const CartPanel = ({
   cart,
-  orderType,
-  setOrderType,
-  selectedTable,
-  setSelectedTable,
-  customerName,
-  setCustomerName,
-  customerPhone,
-  setCustomerPhone,
   updateQty,
   removeFromCart,
   clearCart,
+  orderType,
+  setOrderType,
+  tablesData,
+  selectedTable,        
+  setSelectedTable,
+  customersData,
+  selectedCustomer,
+  setSelectedCustomer,
   subtotal,
   tax,
   total,
@@ -38,64 +46,76 @@ const CartPanel = ({
   shopId,
   onSelectPendingSale,
 }) => {
-  const tables = ["Table 01", "Table 02", "Table 03", "Table 04", "Table 05", "Table 06"];
-
-  const ORDER_TYPES = {
-    DINE_IN: "dine_in",
-    TAKEAWAY: "take_away",
-    DELIVERY: "delivery",
-  };
-
-  const orderTypes = [
-    { key: "dine_in", label: t("dine_in") },
-    { key: "take_away", label: t("take_away") },
-    { key: "delivery", label: t("delivery") },
-  ];
 
  
-  const [localCustomerName, setLocalCustomerName] = useState(customerName || "");
-  const [localCustomerPhone, setLocalCustomerPhone] = useState(customerPhone || "");
-  const [localTable, setLocalTable] = useState(selectedTable || tables[0]);
+  const rawTables = tablesData
+    ? (Object.values(tablesData).find(Array.isArray) ?? [])
+    : [];
 
-  useEffect(() => {
-    if (customerName !== undefined && customerName !== null) setLocalCustomerName(customerName);
-  }, [customerName]);
-  useEffect(() => {
-    if (customerPhone !== undefined && customerPhone !== null) setLocalCustomerPhone(customerPhone);
-  }, [customerPhone]);
-  useEffect(() => {
-    if (selectedTable !== undefined && selectedTable !== null) setLocalTable(selectedTable);
-  }, [selectedTable]);
+  const rawCustomers = customersData
+    ? (Object.values(customersData).find(Array.isArray) ?? [])
+    : [];
 
-  const handleCustomerNameChange = (v) => {
-    if (setCustomerName) setCustomerName(v);
-    else setLocalCustomerName(v);
+  const activeTables    = rawTables.filter((tbl) => tbl.active !== false);
+  const customerOptions = [GUEST, ...rawCustomers.filter((c) => c.active !== false)];
+ 
+  useEffect(() => {
+    if (!selectedCustomer) setSelectedCustomer(GUEST);
+  }, []);
+
+ 
+  const orderTypes = [
+    { key: "dine_in",   label: t("dine_in")  },
+    { key: "take_away", label: t("take_away") },
+    { key: "delivery",  label: t("delivery")  },
+  ];
+
+  const displayName = (c) =>
+    language === "kh" ? (c.nameKh || c.nameEn) : c.nameEn;
+
+  const handleOrderTypeChange = (_, newValue) => {
+    setOrderType(newValue);
+    if (newValue !== "dine_in") setSelectedTable(null);
   };
-  const handleCustomerPhoneChange = (v) => {
-    if (setCustomerPhone) setCustomerPhone(v);
-    else setLocalCustomerPhone(v);
+
+  const handleCustomerChange = (e) => {
+    const id = e.target.value;
+    const found = customerOptions.find((c) => c._id === id);
+    setSelectedCustomer(found ?? GUEST);
   };
-  const handleTableChange = (v) => {
-    if (setSelectedTable) setSelectedTable(v);
-    else setLocalTable(v);
+
+ 
+  const handleTableChange = (e) => {
+    const selectedId = e.target.value;
+    if (!selectedId) {
+      setSelectedTable(null);
+      return;
+    }
+    const foundTable = activeTables.find((tbl) => tbl._id === selectedId);
+    setSelectedTable(foundTable ?? null);
   };
 
   return (
     <Box>
       <Box className="cart-panel" sx={{ overflow: "auto", height: "100%" }}>
+
+       
         <Box className="cart-header">
-          <Stack direction={"row"} spacing={2} alignItems={"center"}>
-            <Typography className="cart-title">{t(`current_order`)}</Typography>
-            <Tooltip title="View history">
-              <IconButton onClick={onOpenHistory}>
-                <ReceiptOutlinedIcon />
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography className="cart-title">{t("current_order")}</Typography>
+
+            <Tooltip title={t("view_history") || "View history"}>
+              <IconButton size="small" onClick={onOpenHistory}>
+                <ReceiptOutlinedIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="View Pending Invoices">
-              <IconButton onClick={onOpenSalePending}>
-                <ManageHistoryOutlinedIcon />
+
+            <Tooltip title={t("pending_invoices") || "Pending invoices"}>
+              <IconButton size="small" onClick={onOpenSalePending}>
+                <ManageHistoryOutlinedIcon fontSize="small" />
               </IconButton>
             </Tooltip>
+
             <SaleHistory
               open={openHistory}
               onClose={onCloseHistory}
@@ -111,18 +131,20 @@ const CartPanel = ({
               onLoadToCart={onSelectPendingSale}
             />
           </Stack>
-          <Stack direction={"row"} spacing={2}>
-            {cart.length > 0 && (
-              <Button size="small" color="error" onClick={clearCart}>
-                <Typography color="error">{t(`clear`)}</Typography>
-              </Button>
-            )}
-          </Stack>
+
+          {cart.length > 0 && (
+            <Button size="small" color="error" onClick={clearCart}>
+              <Typography color="error">{t("clear")}</Typography>
+            </Button>
+          )}
         </Box>
+
         <Divider />
+
+        
         <Tabs
           value={orderType}
-          onChange={(e, newValue) => setOrderType && setOrderType(newValue)}
+          onChange={handleOrderTypeChange}
           variant="fullWidth"
           className="order-type-tabs"
         >
@@ -143,114 +165,160 @@ const CartPanel = ({
             />
           ))}
         </Tabs>
+
         <Divider />
-        <Box className="customer-info">
-          <TextField
-            fullWidth
-            placeholder={t(`customer`)}
-            sx={{ mt: 1 }}
-            size="small"
-            className="customer-field"
-            value={(customerName !== undefined && customerName !== null) ? customerName : localCustomerName}
-            onChange={(e) => handleCustomerNameChange(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            placeholder={t(`phone`) || "Phone"}
-            size="small"
-            sx={{ mt: 1 }}
-            value={(customerPhone !== undefined && customerPhone !== null) ? customerPhone : localCustomerPhone}
-            onChange={(e) => handleCustomerPhoneChange(e.target.value)}
-          />
-          {orderType === ORDER_TYPES.DINE_IN && (
+
+        
+        <Box
+          className="customer-info"
+          sx={{ px: 1.5, py: 1.5, display: "flex", flexDirection: "column", gap: 1 }}
+        >
+           
+          <FormControl fullWidth size="small">
+            <InputLabel>
+              <Stack direction="row" alignItems="center" spacing={0.5}>
+                <PersonOutlineIcon sx={{ fontSize: 15 }} />
+                <span>{t("customer") || "Customer"}</span>
+              </Stack>
+            </InputLabel>
             <Select
-              fullWidth
-              value={(selectedTable !== undefined && selectedTable !== null) ? selectedTable : localTable}
-              onChange={(e) => handleTableChange(e.target.value)}
-              size="small"
-              sx={{ mt: 1 }}
+              value={selectedCustomer?._id ?? "guest"}
+              label={`  ${t("customer") || "Customer"}`}
+              onChange={handleCustomerChange}
             >
-              {tables.map((table) => (
-                <MenuItem key={table} value={table} className="table-menu-item">
-                  {table}
+              {customerOptions.map((c) => (
+                <MenuItem key={c._id} value={c._id}>
+                  {displayName(c)}
+                  {c._id === "guest" && (
+                    <Typography
+                      component="span"
+                      sx={{ fontSize: 11, color: "text.disabled", ml: 0.5 }}
+                    >
+                      ({t("walk_in") || "walk-in"})
+                    </Typography>
+                  )}
                 </MenuItem>
               ))}
             </Select>
+          </FormControl>
+
+          
+          {orderType === "dine_in" && (
+            <FormControl fullWidth size="small">
+              <InputLabel>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  <TableRestaurantOutlinedIcon sx={{ fontSize: 15 }} />
+                  <span>{t("table") || "Table"}</span>
+                </Stack>
+              </InputLabel>
+              <Select
+           
+                value={selectedTable?._id ?? ""}
+                label={`  ${t("table") || "Table"}`}
+                onChange={handleTableChange}
+              >
+                <MenuItem value="">
+                  <Typography sx={{ color: "text.disabled", fontSize: 13 }}>
+                    — {t("select_table") || "Select table"} —
+                  </Typography>
+                </MenuItem>
+                {activeTables.map((tbl) => (
+                  <MenuItem key={tbl._id} value={tbl._id}>
+                    <Stack direction="row" justifyContent="space-between" width="100%">
+                      <span>{tbl.number} — {tbl.name}</span>
+                      <Typography sx={{ fontSize: 11, color: "text.disabled", ml: 2 }}>
+                        {tbl.capacity} seats
+                      </Typography>
+                    </Stack>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           )}
         </Box>
+
         <Divider className="section-divider" />
+
+     
         <Box className="cart-items-container">
-          {cart.map((item, idx) => (
-            <Paper key={item.id} className="cart-item">
-              <img
-                src={item.img || "/placeholder-food.jpg"}
-                className="cart-item-image"
-                alt={item.name}
-              />
-              <Stack direction={"column"} className="cart-item-details">
-                <Typography className="cart-item-name">{item.name}</Typography>
-                <Typography className="cart-item-price">
-                  {item.price.toLocaleString()}$
-                </Typography>
-              </Stack>
-              <Box className="cart-item-spacer"></Box>
-              <Typography className="cart-item-total">
-                {t(`total_price`)}: {(item.qty * item.price).toLocaleString()}$
-              </Typography>
-              <Box className="quantity-controls">
-                <IconButton
-                  size="small"
-                  onClick={() => updateQty(item.id, item.qty - 1)}
-                  className="qty-button"
-                >
-                  <RemoveIcon fontSize="small" />
-                </IconButton>
-                <TextField
-                  value={item.qty}
-                  onChange={(e) => updateQty(item.id, parseInt(e.target.value) || 0)}
-                  size="small"
-                  className="qty-input"
+          {cart.length === 0 ? (
+            <Typography className="empty-cart-message">{t("cart_empty")}</Typography>
+          ) : (
+            cart.map((item) => (
+              <Paper key={item.id} className="cart-item">
+                <img
+                  src={item.img || "/placeholder-food.jpg"}
+                  className="cart-item-image"
+                  alt={item.name}
                 />
-                <IconButton
-                  size="small"
-                  onClick={() => updateQty(item.id, item.qty + 1)}
-                  className="qty-button"
-                >
-                  <AddIcon fontSize="small" />
-                </IconButton>
-              </Box>
-              <Box className="cart-item-actions">
-                <IconButton onClick={() => removeFromCart(item.id)} className="delete-button">
-                  <Trash2 size={16} />
-                </IconButton>
-              </Box>
-            </Paper>
-          ))}
-          {cart.length === 0 && (
-            <Typography className="empty-cart-message">{t(`cart_empty`)}</Typography>
+                <Stack direction="column" className="cart-item-details">
+                  <Typography className="cart-item-name">{item.name}</Typography>
+                  <Typography className="cart-item-price">
+                    {item.price.toLocaleString()}$
+                  </Typography>
+                </Stack>
+                <Box className="cart-item-spacer" />
+                <Typography className="cart-item-total">
+                  {t("total_price")}: {(item.qty * item.price).toLocaleString()}$
+                </Typography>
+                <Box className="quantity-controls">
+                  <IconButton
+                    size="small"
+                    onClick={() => updateQty(item.id, item.qty - 1)}
+                    className="qty-button"
+                  >
+                    <RemoveIcon fontSize="small" />
+                  </IconButton>
+                  <TextField
+                    value={item.qty}
+                    onChange={(e) => updateQty(item.id, parseInt(e.target.value) || 0)}
+                    size="small"
+                    className="qty-input"
+                    inputProps={{ min: 1, style: { textAlign: "center" } }}
+                  />
+                  <IconButton
+                    size="small"
+                    onClick={() => updateQty(item.id, item.qty + 1)}
+                    className="qty-button"
+                  >
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+                <Box className="cart-item-actions">
+                  <IconButton onClick={() => removeFromCart(item.id)} className="delete-button">
+                    <Trash2 size={16} />
+                  </IconButton>
+                </Box>
+              </Paper>
+            ))
           )}
         </Box>
+
         <Divider className="section-divider" />
+
+        {/* ── Order summary ───────────────────────────────────────────────── */}
         <Box className="order-summary">
           <Box className="summary-row">
-            <Typography className="summary-label">{t(`subtotal`)}</Typography>
+            <Typography className="summary-label">{t("subtotal")}</Typography>
             <Typography className="summary-value">{subtotal.toLocaleString()}$</Typography>
           </Box>
           <Box className="summary-row">
-            <Typography className="summary-label">{t(`tax`)} (10%)</Typography>
+            <Typography className="summary-label">{t("tax")} (10%)</Typography>
             <Typography className="summary-value">{tax.toLocaleString()}$</Typography>
           </Box>
           <Box className="summary-row">
-            <Typography className="summary-label">{t(`discount`)}</Typography>
+            <Typography className="summary-label">{t("discount")}</Typography>
             <Typography className="summary-value">0$</Typography>
           </Box>
           <Divider />
           <Box className="total-row">
-            <Typography className="total-label">{t(`total_price`)}</Typography>
+            <Typography className="total-label">{t("total_price")}</Typography>
             <Typography className="total-value">{total.toLocaleString()}$</Typography>
           </Box>
         </Box>
-        <Stack direction={"row"} spacing={2} alignItems={"center"}>
+
+        {/* ── Action buttons ──────────────────────────────────────────────── */}
+        <Stack direction="row" spacing={2} alignItems="center" sx={{ px: 1.5, pb: 1.5 }}>
           <Button
             fullWidth
             variant="contained"
@@ -260,7 +328,7 @@ const CartPanel = ({
             sx={{ bgcolor: "warning.main", "&:hover": { bgcolor: "warning.dark" } }}
             onClick={onStopInvoice}
           >
-            {t(`stop_invoice`)}
+            {t("stop_invoice")}
           </Button>
           <Button
             fullWidth
@@ -270,9 +338,10 @@ const CartPanel = ({
             disabled={cart.length === 0 || creating}
             className="pay-button"
           >
-            {t(`pay_now`)} {total.toLocaleString()}$
+            {t("pay_now")} {total.toLocaleString()}$
           </Button>
         </Stack>
+
       </Box>
     </Box>
   );

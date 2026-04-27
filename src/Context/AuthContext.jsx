@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
   });
   const userRole = user?.role || ""
 
-  // ==================language=====================
+ 
   const handleGetLanguage = () => {
     return window.localStorage.getItem("language") || "en"
   }
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
   };
   
 
-  //=================alert============================
+  
     const [open, setOpen] = useState(false);
     const [alertStatus, setAlertStatus] = useState("");
     const [messageAlert, setMessageAlert] = useState({
@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }) => {
       messageKh,
     });
 
-    // auto close after 3 seconds
+ 
     setTimeout(() => {
       setOpen(false);
     }, 3000);

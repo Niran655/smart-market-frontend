@@ -243,7 +243,7 @@ export default function PurchaseOrderForm({
                                                     language === "en"
                                                         ? p?.subProduct?.unitId?.nameEn
                                                         : p?.subProduct?.unitId?.nameKh;
-                                                return `${name} (${unit})`; // <-- keep unit in parentheses
+                                                return `${name} (${unit})`;  
                                             }}
                                             onChange={(e, val) => {
                                                 const newItems = [...values.items];

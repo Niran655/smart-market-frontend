@@ -49,7 +49,7 @@ export default function SubProductBarcode({ open, onClose, subProductId, t }) {
       fullWidth
       PaperProps={{
         sx: {
-          overflow: "visible", // prevent scrollbars
+          overflow: "visible", 
         },
       }}
     >
@@ -62,17 +62,17 @@ export default function SubProductBarcode({ open, onClose, subProductId, t }) {
           textAlign: "center",
         
           p: 3,
-          overflow: "visible", // no scroll inside content
+          overflow: "visible",  
         }}
       >
         <div ref={barcodeRef} style={{ display: "inline-block" }}>
           <Barcode
             value={subProductId || "000000"}
             format="CODE128"
-            width={1.5}          // wider bars
-            height={100}       // taller barcode
-            fontSize={20}      // larger text
-            margin={30}        // more spacing
+            width={1.5}         
+            height={100}    
+            fontSize={20}     
+            margin={30}    
             displayValue={true}
           
           />

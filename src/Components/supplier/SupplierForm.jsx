@@ -26,7 +26,7 @@ export default function SupplierForm({
     
   });
 
-  // ─────────── CREATE ───────────
+ 
   const [createSupplier] = useMutation(CREATE_SUPPLIER, {
     onCompleted: ({ createSupplier }) => {
       setLoading(false);
@@ -44,7 +44,7 @@ export default function SupplierForm({
     },
   });
 
-  // ─────────── UPDATE ───────────
+ 
   const [updateSupplier] = useMutation(UPDATE_SUPPLIER, {
     onCompleted: ({ updateSupplier }) => {
       setLoading(false);
@@ -62,7 +62,7 @@ export default function SupplierForm({
     },
   });
 
-  // ─────────── LOAD DATA FOR EDIT ───────────
+ 
   useEffect(() => {
     if (supplierData) {
       setFormValues({
@@ -77,14 +77,14 @@ export default function SupplierForm({
     }
   }, [supplierData]);
 
-  // ─────────── VALIDATION ───────────
+ 
   const validationSchema = Yup.object({
         nameKh: Yup.string().required(t("require")),
         nameEn: Yup.string().required(t("require")),
         remark: Yup.string().nullable(),
   });
 
-  // ─────────── SUBMIT ───────────
+ 
   const handleSubmit = (values) => {
     setLoading(true);
     if (dialogTitle === "Create") {
@@ -96,7 +96,7 @@ export default function SupplierForm({
     }
   };
 
-  // ─────────── CLOSE ───────────
+ 
   const handleClose = async () => {
     if (dialogTitle === "Create" && uploadedFilePath) {
       await supabase.storage.from("images").remove([uploadedFilePath]);
@@ -104,7 +104,7 @@ export default function SupplierForm({
     onClose();
   };
 
-  // ─────────── FORM FIELDS ───────────
+ 
   const tabs = [
     {
       fields: [

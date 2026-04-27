@@ -27,7 +27,7 @@ query GetUnitWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyw
   }
 }
 `
-export  const GET_PROFIEL_BY_ID = gql`
+export const GET_PROFIEL_BY_ID = gql`
 query GetProfileById($id: ID) {
   getProfileById(_id: $id) {
     _id
@@ -150,6 +150,28 @@ export const GET_CUSTOMER_BY_ID = gql`
     }
   }
 `;
+
+export const GET_CUSTOMERS_BY_SHOP_ID = gql`
+query GetCustomersByShop($shopId: ID!) {
+  getCustomersByShop(shopId: $shopId) {
+    _id
+    nameKh
+    nameEn
+    phone
+    email
+    address
+    gender
+    dateOfBirth
+    active
+    totalSpent
+    totalOrders
+    lastOrderDate
+    note
+    createdAt
+    updatedAt
+  }
+}`
+
 export const GET_CATEGORY_WHITH_PAGINATION = gql`
 query GetCategoryWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
   getCategoryWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
@@ -248,6 +270,45 @@ query GetShopByShopId($shopId: ID!, $id: ID) {
   }
 }
 `
+
+export const GET_SHOP_BY_ID = gql`
+query GetShopById($id: ID!) {
+  getShopById(_id: $id) {
+    _id
+    user {
+      _id
+      nameEn
+      nameKh
+    }
+    code
+    image
+    nameEn
+    nameKh
+    type
+    remark
+    address
+    
+    active
+    createdAt
+    updatedAt
+  }
+}`
+
+export const GET_TABLE_BY_SHOP_ID = gql`
+query GetTableByShopId($shopId: ID!) {
+  getTableByShopId(shopId: $shopId) {
+    _id
+    name
+    number
+    capacity
+    active
+    description
+    qrCode
+    createdAt
+    updatedAt
+  }
+}`
+
 
 export const GET_PRODUCT_WITH_PAGINATION = gql`
 query GetProductsWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
@@ -718,6 +779,10 @@ export const GET_SALES = gql`
           nameEn
           nameKh
         }
+        customerName
+        customerPhone
+        tableNumber
+        orderType
         shopId
         items {
           product {
@@ -845,7 +910,7 @@ query GetReportStats($type: ReportType, $shopId: ID, $endDate: Date, $startDate:
     }
   }
 }`
- 
+
 
 export const GET_SALE_REPORT = gql`
   query GetSaleReport(
@@ -1574,7 +1639,7 @@ query GetStockMovementWithPagination($page: Int, $limit: Int, $pagination: Boole
 
 
 export const GET_TABLE_WITH_PAGINATION = gql`
-query GetTablesWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $active: Boolean, $shopId: ID) {
+query GetTablesWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $active: Boolean, $shopId: [ID]) {
   getTablesWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, active: $active, shopId: $shopId) {
     data {
       _id
@@ -1586,10 +1651,10 @@ query GetTablesWithPagination($page: Int, $limit: Int, $pagination: Boolean, $ke
       qrCode
       createdAt
       updatedAt
-      shopId {
+      shopIds {
+        _id
         nameKh
         nameEn
-        _id
       }
     }
     paginator {
@@ -1608,7 +1673,7 @@ query GetTablesWithPagination($page: Int, $limit: Int, $pagination: Boolean, $ke
 }
 `
 
- 
+
 
 // ── 1. Main dashboard — overview cards, static lists ─────────────────────────
 export const GET_FULL_DASHBOARD = gql`
@@ -1694,8 +1759,7 @@ export const GET_RECENT_TRANSACTIONS_BY_TYPE = gql`
   }
 `;
 
-// ── 4. Order statistics + top categories (shared "Weekly ▾" dropdown) ─────────
-//    period: "1D" | "1W" | "1M" | "3M" | "6M" | "All"
+ 
 export const GET_ORDER_CATEGORY_STATS = gql`
   query GetOrderCategoryStats($shopId: ID, $period: String) {
     getOrderCategoryStats(shopId: $shopId, period: $period) {
@@ -1707,4 +1771,3 @@ export const GET_ORDER_CATEGORY_STATS = gql`
   }
 `;
 
- 

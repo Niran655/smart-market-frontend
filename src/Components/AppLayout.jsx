@@ -391,8 +391,8 @@ export default function AppLayout() {
                     order: { xs: 3, sm: 2 },
                     overflowX: "auto",
                     whiteSpace: "nowrap",
-                    scrollbarWidth: "none", // Firefox
-                    "&::-webkit-scrollbar": { display: "none" }, // Chrome/Safari
+                    scrollbarWidth: "none",  
+                    "&::-webkit-scrollbar": { display: "none" }, 
                     maxWidth: "100%",
                   }}
                 >
