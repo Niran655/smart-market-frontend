@@ -21,7 +21,7 @@ import Profile from './Pages/Profile';
 import StoreSetting from './Pages/StoreSetting';
 import Customer from './Pages/Customer';
 import TablePage from './Pages/Table';
-import ReportInshopPage from './Pages/ReportInshop';
+import ReportInshop from './Pages/ReportInshop';
  
  
 export default function Router() {
@@ -50,7 +50,7 @@ export default function Router() {
         { path: '/setting/table', element: <TablePage/>},
         { path: '/store', element: <Store/>},
         { path: 'report', element: <Report/> },
-        { path: '/store/pos/:id/report-in-shop', element: <ReportInshopPage/> },
+        { path: '/store/pos/:id/report-in-shop', element: <ReportInshop/> },
         { path: 'profile', element:<Profile/>},
         { path: "setting/user/:userId/profile", element: <Profile /> },
         { path: '/setting/user', element: <User/> },

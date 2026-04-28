@@ -3,7 +3,7 @@ import ReportPage from "./Report";
 import { Box } from "@mui/material";
  
 
-const ReportInshopPage = () => {
+const ReportInshop = () => {
   const savedStoreId = localStorage.getItem("activeShopId");
 
   return(
@@ -14,4 +14,4 @@ const ReportInshopPage = () => {
     ); 
 };
 
-export default ReportInshopPage;
+export default ReportInshop;
