@@ -40,6 +40,7 @@ const Customer = () => {
   const [limit, setLimit] = useState(10);
   const [keyword, setKeyword] = useState("");
   const [activeFilter, setActiveFilter] = useState("active");
+  
 
   const { data, refetch, loading } = useQuery(GET_CUSTOMERS_WITH_PAGINATION, {
     variables: {
