@@ -47,9 +47,7 @@ export const AuthProvider = ({ children }) => {
     const saved = localStorage.getItem("user");
     return saved ? JSON.parse(saved) : null;
   });
-  const userRole = user?.role || ""
-
- 
+  const userRole = user?.role || "";
   const handleGetLanguage = () => {
     return window.localStorage.getItem("language") || "en"
   }
