@@ -429,5 +429,14 @@
   "order_statistics":"Order Statistics",
   "customer_overview":"Customer Overview",
   "number": "Number",
-  "capactiy": "Capacity"
+  "capactiy": "Capacity",
+  "add_table": "Add Table",
+  "table_name":"Table Name",
+  "table_number":"Table Number",
+  "capacity":"Capacity",
+  "update_table":"Update Table",
+  "add_customer":"Add Customer",
+  "update_customer":"Update Customer",
+  "view_sale_history":"View Sale History"
+  
 }

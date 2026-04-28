@@ -806,6 +806,10 @@ const POS = () => {
     pollInterval: 1000,
   });
 
+  const { refetch: refetchCustomers } = useQuery(GET_CUSTOMERS_BY_SHOP_ID, { 
+    variables: { shopId: [shopId] } 
+  });
+
   const { data: tablesData } = useQuery(GET_TABLE_BY_SHOP_ID, {
     variables: { shopId },
   });
@@ -1079,7 +1083,7 @@ const POS = () => {
             setOrderType={setOrderType}
           
             tablesData={tablesData}
-     
+            refetchCustomers={refetchCustomers}
             selectedTable={selectedTable}
             setSelectedTable={setSelectedTable}
             customersData={customersData}

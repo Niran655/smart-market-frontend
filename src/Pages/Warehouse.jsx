@@ -947,7 +947,9 @@ const Warehouse = () => {
                                 {productWarehouseTransferPaginator.slNo + index}
                               </TableCell>
                               <TableCell>
-                                {row.toShop?.nameEn || row.toShop?.nameKh || "-"}
+                                {language === "en"
+                                  ? row.toShop?.nameEn
+                                  : row.toShop?.nameKh || "-"}
                               </TableCell>
                               <TableCell>{row.items.length}</TableCell>
                               <TableCell>{totalQty}</TableCell>

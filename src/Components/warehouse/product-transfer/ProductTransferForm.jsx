@@ -311,11 +311,11 @@ export default function ProductTransferForm({
 
 
                   <Grid size={{ xs: 12, md: 2 }}>
-                    <Typography>{t("cost")}</Typography>
+                    <Typography>{t("price_per_unit")}</Typography>
                     <TextField
                       size="small"
                       type="number"
-                      placeholder={t("cost")}
+                      placeholder={t("price")}
                       value={item.costPrice}
                       onChange={(e) =>
                         updateItem(index, "costPrice", e.target.value)

@@ -98,7 +98,6 @@ const Customer = () => {
               value={keyword}
               fullWidth
               onChange={(e) => setKeyword(e.target.value)}
-              
               InputProps={{ startAdornment: <InputAdornment position="start"><Search /></InputAdornment> }}
             />
           </Grid>

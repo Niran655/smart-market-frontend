@@ -9,10 +9,11 @@ import {
   MenuItem, Paper, Select, Stack, Tab, Tabs, TextField,
   Tooltip, Typography,
 } from "@mui/material";
-import { Trash2 } from "lucide-react";
-import { useEffect } from "react";
+import { SquarePlus, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import InvoicePending from "./InvoicePending";
 import SaleHistory from "./SaleHistory";
+import CustomerForm from "../customer/CustomerForm";
 
 const GUEST = { _id: "guest", nameEn: "Guest", nameKh: "ភ្ញៀវ" };
 
@@ -24,7 +25,7 @@ const CartPanel = ({
   orderType,
   setOrderType,
   tablesData,
-  selectedTable,        
+  selectedTable,
   setSelectedTable,
   customersData,
   selectedCustomer,
@@ -45,9 +46,10 @@ const CartPanel = ({
   onCloseSalePending,
   shopId,
   onSelectPendingSale,
+  refetchCustomers,
 }) => {
+  const [openCustomerForm, setOpenCustomerForm] = useState(false);
 
- 
   const rawTables = tablesData
     ? (Object.values(tablesData).find(Array.isArray) ?? [])
     : [];
@@ -56,18 +58,17 @@ const CartPanel = ({
     ? (Object.values(customersData).find(Array.isArray) ?? [])
     : [];
 
-  const activeTables    = rawTables.filter((tbl) => tbl.active !== false);
+  const activeTables = rawTables.filter((tbl) => tbl.active !== false);
   const customerOptions = [GUEST, ...rawCustomers.filter((c) => c.active !== false)];
- 
+
   useEffect(() => {
     if (!selectedCustomer) setSelectedCustomer(GUEST);
-  }, []);
+  }, [selectedCustomer]);
 
- 
   const orderTypes = [
-    { key: "dine_in",   label: t("dine_in")  },
+    { key: "dine_in", label: t("dine_in") },
     { key: "take_away", label: t("take_away") },
-    { key: "delivery",  label: t("delivery")  },
+    { key: "delivery", label: t("delivery") },
   ];
 
   const displayName = (c) =>
@@ -84,7 +85,6 @@ const CartPanel = ({
     setSelectedCustomer(found ?? GUEST);
   };
 
- 
   const handleTableChange = (e) => {
     const selectedId = e.target.value;
     if (!selectedId) {
@@ -95,16 +95,19 @@ const CartPanel = ({
     setSelectedTable(foundTable ?? null);
   };
 
+  const handleCustomerCreated = () => {
+    if (refetchCustomers) refetchCustomers();
+  };
+
   return (
     <Box>
       <Box className="cart-panel" sx={{ overflow: "auto", height: "100%" }}>
-
-       
+        {/* Header */}
         <Box className="cart-header">
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography className="cart-title">{t("current_order")}</Typography>
 
-            <Tooltip title={t("view_history") || "View history"}>
+            <Tooltip title={t("view_sale_history")}>
               <IconButton size="small" onClick={onOpenHistory}>
                 <ReceiptOutlinedIcon fontSize="small" />
               </IconButton>
@@ -141,105 +144,130 @@ const CartPanel = ({
 
         <Divider />
 
+ 
+<Tabs
+  value={orderType}
+  onChange={handleOrderTypeChange}
+  variant="fullWidth"
+  className="order-type-tabs"
+  sx={{
+    minHeight: 36,  
+  }}
+>
+  {orderTypes.map((type) => (
+    <Tab
+      key={type.key}
+      label={type.label}
+      value={type.key}
+      component={Button}
+      sx={{
+        mx: 0.3,
+        minHeight: 36,
+        py: 0.5,       
+        px: 1.5,        
+        fontSize: "0.8rem",  
+        textTransform: "none",
+        borderRadius: "6px",
         
-        <Tabs
-          value={orderType}
-          onChange={handleOrderTypeChange}
-          variant="fullWidth"
-          className="order-type-tabs"
-        >
-          {orderTypes.map((type) => (
-            <Tab
-              key={type.key}
-              label={type.label}
-              value={type.key}
-              component={Button}
-              sx={{
-                mx: 0.2,
-                "&.Mui-selected": {
-                  bgcolor: "primary.main",
-                  color: "white",
-                  borderRadius: "5px",
-                },
-              }}
-            />
-          ))}
-        </Tabs>
+        "&.Mui-selected": {
+          bgcolor: "primary.main",
+          color: "#fff",
+        },
+      }}
+    />
+  ))}
+</Tabs>
 
         <Divider />
 
-        
-        <Box
-          className="customer-info"
-          sx={{ px: 1.5, py: 1.5, display: "flex", flexDirection: "column", gap: 1 }}
-        >
-           
-          <FormControl fullWidth size="small">
-            <InputLabel>
-              <Stack direction="row" alignItems="center" spacing={0.5}>
-                <PersonOutlineIcon sx={{ fontSize: 15 }} />
-                <span>{t("customer") || "Customer"}</span>
-              </Stack>
-            </InputLabel>
-            <Select
-              value={selectedCustomer?._id ?? "guest"}
-              label={`  ${t("customer") || "Customer"}`}
-              onChange={handleCustomerChange}
-            >
-              {customerOptions.map((c) => (
-                <MenuItem key={c._id} value={c._id}>
-                  {displayName(c)}
-                  {c._id === "guest" && (
-                    <Typography
-                      component="span"
-                      sx={{ fontSize: 11, color: "text.disabled", ml: 0.5 }}
-                    >
-                      ({t("walk_in") || "walk-in"})
-                    </Typography>
-                  )}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
 
-          
-          {orderType === "dine_in" && (
-            <FormControl fullWidth size="small">
+        <Box className="customer-info" sx={{ px: 1.5, py: 1.5 }}>
+          <Stack
+            direction="row"
+            spacing={2}
+            flexWrap="wrap"
+            useFlexGap
+            sx={{ alignItems: "flex-start" }}
+          >
+            <Tooltip title={t("add_customer")}>
+              <IconButton
+                size="small"
+                onClick={() => setOpenCustomerForm(true)}
+                sx={{ mt: 0.5, px: 0.5 }}
+                title={t("add_customer")}
+              >
+                <SquarePlus fontSize="small" />
+              </IconButton>
+            </Tooltip>
+
+
+
+            <FormControl size="small" sx={{ flex: 1, minWidth: 180 }}>
               <InputLabel>
                 <Stack direction="row" alignItems="center" spacing={0.5}>
-                  <TableRestaurantOutlinedIcon sx={{ fontSize: 15 }} />
-                  <span>{t("table") || "Table"}</span>
+                  <PersonOutlineIcon sx={{ fontSize: 15 }} />
+                  <span>{t("customer") || "Customer"}</span>
                 </Stack>
               </InputLabel>
               <Select
-           
-                value={selectedTable?._id ?? ""}
-                label={`  ${t("table") || "Table"}`}
-                onChange={handleTableChange}
+                value={selectedCustomer?._id ?? "guest"}
+                label={`  ${t("customer") || "Customer"}`}
+                onChange={handleCustomerChange}
               >
-                <MenuItem value="">
-                  <Typography sx={{ color: "text.disabled", fontSize: 13 }}>
-                    — {t("select_table") || "Select table"} —
-                  </Typography>
-                </MenuItem>
-                {activeTables.map((tbl) => (
-                  <MenuItem key={tbl._id} value={tbl._id}>
-                    <Stack direction="row" justifyContent="space-between" width="100%">
-                      <span>{tbl.number} — {tbl.name}</span>
-                      <Typography sx={{ fontSize: 11, color: "text.disabled", ml: 2 }}>
-                        {tbl.capacity} seats
+                {customerOptions.map((c) => (
+                  <MenuItem key={c._id} value={c._id}>
+                    {displayName(c)}
+                    {c._id === "guest" && (
+                      <Typography
+                        component="span"
+                        sx={{ fontSize: 11, color: "text.disabled", ml: 0.5 }}
+                      >
+                        ({t("walk_in") || "walk-in"})
                       </Typography>
-                    </Stack>
+                    )}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
-          )}
+
+            {/* Table Select (only for dine_in) */}
+            {orderType === "dine_in" && (
+              <FormControl size="small" sx={{ flex: 1, minWidth: 180 }}>
+                <InputLabel>
+                  <Stack direction="row" alignItems="center" spacing={0.5}>
+                    <TableRestaurantOutlinedIcon sx={{ fontSize: 15 }} />
+                    <span>{t("table") || "Table"}</span>
+                  </Stack>
+                </InputLabel>
+                <Select
+                  value={selectedTable?._id ?? ""}
+                  label={`  ${t("table") || "Table"}`}
+                  onChange={handleTableChange}
+                >
+                  <MenuItem value="">
+                    <Typography sx={{ color: "text.disabled", fontSize: 13 }}>
+                      — {t("select_table") || "Select table"} —
+                    </Typography>
+                  </MenuItem>
+                  {activeTables.map((tbl) => (
+                    <MenuItem key={tbl._id} value={tbl._id}>
+                      <Stack direction="row" justifyContent="space-between" width="100%">
+                        <span>{tbl.number} — {tbl.name}</span>
+                        <Typography sx={{ fontSize: 11, color: "text.disabled", ml: 2 }}>
+                          {tbl.capacity} seats
+                        </Typography>
+                      </Stack>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+          </Stack>
         </Box>
 
         <Divider className="section-divider" />
 
-     
+        {/* Cart Items */}
         <Box className="cart-items-container">
           {cart.length === 0 ? (
             <Typography className="empty-cart-message">{t("cart_empty")}</Typography>
@@ -296,7 +324,7 @@ const CartPanel = ({
 
         <Divider className="section-divider" />
 
-        {/* ── Order summary ───────────────────────────────────────────────── */}
+        {/* Order Summary */}
         <Box className="order-summary">
           <Box className="summary-row">
             <Typography className="summary-label">{t("subtotal")}</Typography>
@@ -317,7 +345,7 @@ const CartPanel = ({
           </Box>
         </Box>
 
-        {/* ── Action buttons ──────────────────────────────────────────────── */}
+        {/* Action Buttons */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ px: 1.5, pb: 1.5 }}>
           <Button
             fullWidth
@@ -341,8 +369,17 @@ const CartPanel = ({
             {t("pay_now")} {total.toLocaleString()}$
           </Button>
         </Stack>
-
       </Box>
+
+
+      <CustomerForm
+        open={openCustomerForm}
+        onClose={() => setOpenCustomerForm(false)}
+        dialogTitle="Create"
+        t={t}
+        setRefetch={handleCustomerCreated}
+
+      />
     </Box>
   );
 };

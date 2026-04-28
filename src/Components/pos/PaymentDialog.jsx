@@ -105,7 +105,8 @@ const PaymentDialog = ({
                         p: 2,
                         cursor: "pointer",
                         borderColor: paymentMethod === method ? "primary.main" : "divider",
-                        bgcolor: paymentMethod === method ? "primary.light" : "background.paper",
+                        // bgcolor: paymentMethod === method ? "primary.light" : "background.paper",
+                    
                       }}
                       onClick={() => setPaymentMethod(method)}
                     >

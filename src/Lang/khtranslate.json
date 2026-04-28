@@ -410,5 +410,13 @@
   "customer_overview":"ទិដ្ឋភាពអតិថិជន",
   "number": "លេខ",
   "capactiy": "ចំនួន",
-  "sales":"លក់"
+  "sales":"លក់",
+  "add_table": "បន្ថែមតុ",
+  "table_name":"ឈ្មោះតុ",
+  "table_number":"លេខតុ",
+  "capacity":"ចំនួនកៅអី",
+  "update_table":"កែប្រែតុ",
+  "add_customer":"បន្ថែមអតិថិជន",
+  "update_customer":"កែប្រែអតិថិជន",
+  "view_sale_history":"មើលប្រវត្តិការលក់"
 }

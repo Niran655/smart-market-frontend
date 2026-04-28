@@ -107,14 +107,14 @@ export default function CustomerForm({
 
  
   const validationSchema = Yup.object({
-    nameEn: Yup.string().required(t("require")),
-    phone: Yup.string().required(t("require")),
+    nameKh : Yup.string().required(t("require")),
+    nameEn: Yup.string(),
+    phone: Yup.string(),
     email: Yup.string().email().nullable(),
     gender: Yup.string(),
     shopIds: Yup.array().min(1, t("require")),
   });
 
- 
   const handleSubmit = (values) => {
     setLoading(true);
 
