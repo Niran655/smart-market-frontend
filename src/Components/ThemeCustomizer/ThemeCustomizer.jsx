@@ -19,7 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import { useThemeContext } from "../../Context/ThemeContext";
+import { useThemeContext } from "../../context/ThemeContext";
 import "./ThemeCustomizer.scss";
 
 export default function ThemeCustomizer() {

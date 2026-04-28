@@ -24,7 +24,7 @@ import {
 } from "iconsax-react";
 import { useState } from "react";
 
-import { useThemeContext } from "../Context/ThemeContext";
+import { useThemeContext } from "../context/ThemeContext";
 import "./menuNavbar.scss";
 
 export default function MenuMobile({ onNavigate, showLabels }) {

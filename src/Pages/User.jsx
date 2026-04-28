@@ -16,7 +16,7 @@ import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
 import { useState } from "react";
-import { useThemeContext } from "../Context/ThemeContext";
+import { useThemeContext } from "../context/ThemeContext";
 import star from "../assets/Image/star.png";
 const User = () => {
   const { language } = useAuth();

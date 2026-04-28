@@ -8,7 +8,7 @@ import { RxDashboard } from "react-icons/rx";
 import { Avatar, Box, Stack, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
-import { useThemeContext } from '../Context/ThemeContext';
+import { useThemeContext } from '../context/ThemeContext';
 //icon
 import SideBarItems from './SideBarItems';
 

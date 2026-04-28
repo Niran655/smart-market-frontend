@@ -6,7 +6,7 @@ import { Bag2, Category, DocumentText1, HomeHashtag, Messages2, Tag, UserOctagon
 import { useState } from "react";
 
 import logo from "../assets/Image/logo.png";
-import { useThemeContext } from "../Context/ThemeContext";
+import { useThemeContext } from "../context/ThemeContext";
 import "./menuNavbar.scss";
 import { useAuth } from "../context/AuthContext";
 import { translateLauguage } from "../function/translate";

@@ -29,7 +29,7 @@ import { useEffect, useState } from "react";
 
 import CambodiaFlag from "../assets/Image/cambodiaflag.png";
 import EnglishFlag from "../assets/Image/englishflag.png";
-import { useThemeContext } from "../Context/ThemeContext";
+import { useThemeContext } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import Menu from "./menu/Menu";
