@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import * as Yup from "yup";
 import { CREATE_TABLE, UPDATE_TABLE } from "../../../graphql/mutation";
 import { GET_ALL_SHOP } from "../../../graphql/queries";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import ReusableForm from "../include/useForm";
 
 export default function TableForm({ open, onClose, t, tableData, setRefetch }) {

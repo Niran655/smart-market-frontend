@@ -3,7 +3,7 @@ import { Switch } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 
 import { UPDATE_USER_STATUS } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 
 export default function AllowUser({ refetch, editData }) {
   const [checked, setChecked] = useState(!!editData?.active);

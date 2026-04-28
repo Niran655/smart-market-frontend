@@ -691,7 +691,7 @@ import { X, CheckCircle, RefreshCw, MoreVertical, Eye } from "lucide-react";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import { translateLauguage } from "../../function/translate";
 import { GET_SALES, GET_SHOP_BY_ID } from "../../../graphql/queries";
 import { REFUND_SALE } from "../../../graphql/mutation";

@@ -14,7 +14,7 @@ import ProductAction from "../Components/product/ProductAction";
 import ProductForm from "../Components/product/ProductForm";
 import FooterPagination from "../include/FooterPagination";
 import "../Styles/TableStyle.scss";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../Context/AuthContext";
 import { GET_PRODUCT_WITH_PAGINATION, GET_SUP_PRODUCT } from "../../graphql/queries";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";

@@ -3,7 +3,7 @@ import { SquarePen, Trash } from "lucide-react";
 import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { DELETE_TABLE } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import UseDeleteForm from "../include/useDeleteForm";
 
 export default function TableAction({ tableData, setRefetch, t, onEdit }) {

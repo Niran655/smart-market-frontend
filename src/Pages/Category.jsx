@@ -10,7 +10,7 @@ import CategoryAction from "../Components/category/CategoryAction";
 import CategoryForm from "../Components/category/CategoryForm";
 import FooterPagination from "../include/FooterPagination";
 import "../Styles/TableStyle.scss";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../Context/AuthContext";
 import { GET_CATEGORY_WHITH_PAGINATION } from "../../graphql/queries";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";

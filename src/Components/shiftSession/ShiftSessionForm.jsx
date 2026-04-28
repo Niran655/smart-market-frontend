@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import * as Yup from "yup";
 
 import { CREATE_SHIFT_SESSION, UPDATE_SHIFT_SEESION } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import { GET_USER_WITH_PAGINATION } from "../../../graphql/queries";
 import ReusableForm from "../include/useForm";
 export default function ShiftSessionForm({

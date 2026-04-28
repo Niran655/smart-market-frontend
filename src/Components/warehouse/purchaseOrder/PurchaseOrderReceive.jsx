@@ -17,7 +17,7 @@ import { X } from "lucide-react";
 import { useMutation } from "@apollo/client/react";
 import { RECEIVE_PURCHASE_ORDER } from "../../../../graphql/mutation";
 import { useState, useMemo } from "react";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../Context/AuthContext";
 
 export default function PurchaseOrderReceive({
   open,

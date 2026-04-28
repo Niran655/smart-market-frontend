@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import "../../Styles/dialogStyle.scss";
 import { DELETE_SHOP } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 
 export default function ShopDelete({
   open,

@@ -23,7 +23,7 @@ import {
   X,
 } from "lucide-react";
 
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import { translateLauguage } from "../../function/translate";
 
 import "../../Styles/menu.scss";

@@ -740,7 +740,7 @@ import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
 import { Navigate, useParams } from "react-router-dom";
 import { Box, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../Context/AuthContext";
 
 import {
   GET_PRODUCT_FOR_SALE_WITH_PAGINATION,

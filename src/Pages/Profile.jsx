@@ -13,7 +13,7 @@ import {
 import { useState } from "react";
 import useGetProfileById from "../Components/hook/useGetProfileById";
 import { useParams } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 
 const Profile = () => {

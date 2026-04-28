@@ -1,7 +1,7 @@
 import { MenuItem, Pagination, Select, Stack, Typography } from "@mui/material";
 import React from "react";
 
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 
 export default function FooterPagination({

@@ -55,7 +55,7 @@ import {
   GET_PROFIT_LOSS_REPORT,
   GET_ANNUAL_REPORT,
 } from "../../graphql/queries";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import FooterPagination from "../include/FooterPagination";
 import EmptyData from "../include/EmptyData";

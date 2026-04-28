@@ -5,7 +5,7 @@ import { useContext, useState } from "react";
 
 import "../../Styles/dialogStyle.scss";
 import { DELETE_CATEGORY } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import { translateLauguage } from "../../function/translate";
 
 export default function DeleteCategory({

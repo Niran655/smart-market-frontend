@@ -26,7 +26,7 @@ import {
 } from "@mui/material";
 import { X, Clock, ShoppingBag, CreditCard, Trash2 } from 'lucide-react';
 import { useQuery, useMutation } from "@apollo/client/react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import { GET_SALES } from "../../../graphql/queries";
 import { UPDATE_SALE_STATUS } from "../../../graphql/mutation";
 import { AttachMoney, QrCode } from "@mui/icons-material";

@@ -3,11 +3,11 @@ import { BrowserRouter } from 'react-router-dom';
 import { CssBaseline } from '@mui/material';
 import ThemeCustomizer from './Components/ThemeCustomizer/ThemeCustomizer';
 import AlertMessage from "./Components/AlertMessage/AlertMessage";
-import { ThemeProvider } from './context/ThemeContext';
+import { ThemeProvider } from './Context/ThemeContext';
 import { client } from "../apolloClient";
 import './App.scss';
 import Router from './Router';
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./Context/AuthContext";
 
 function App() {
   return (

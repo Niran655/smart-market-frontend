@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import WarehouseInShop from './Pages/WarehouseInShop';
 import AppLayout from './Components/AppLayout';
-import { useAuth } from './context/AuthContext';
+import { useAuth } from './Context/AuthContext';
 import Dashboard from './Pages/Dashboard';
 import Warehouse from './Pages/Warehouse';
 import Category from './Pages/Category';

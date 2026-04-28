@@ -470,7 +470,7 @@ import useGetProductWarehouseWithPagination from "../Components/hook/useGetProdu
 import ProductWarehouseAction from "../Components/warehouse/ProductWarehouseAction";
 import FooterPagination from "../include/FooterPagination";
 import "../Styles/TableStyle.scss";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";

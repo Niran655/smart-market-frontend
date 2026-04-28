@@ -15,7 +15,7 @@ import { useMutation } from "@apollo/client/react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { ACCEPT_WAREHOUSE_TRANSFER } from "../../../../graphql/mutation";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../Context/AuthContext";
 
 export default function AcceptProductDialog({
   open,

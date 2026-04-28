@@ -24,7 +24,7 @@ import ShopForm from "../Components/Shop/ShopForm";
 import { GET_ALL_SHOP, GET_OPEN_SHIFT } from "../../graphql/queries";
 
 import { translateLauguage } from "../function/translate";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../Context/AuthContext";
 
 
 const Store = () => {

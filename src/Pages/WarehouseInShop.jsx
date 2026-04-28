@@ -10,7 +10,7 @@ import useGetProductWarehouseInShopWithPagination from "../Components/hook/useGe
 import useGetWarehouseTransferWithPagination from "../Components/hook/useGetWarehouseTransferWithPagination";
 import FooterPagination from "../include/FooterPagination";
 import "../Styles/modernTable.scss";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";

@@ -4,7 +4,7 @@ import { SquarePen, Trash } from "lucide-react";
 import React, { useState } from "react";
 
 import { DELETE_SUPPLIER, DELETE_USER } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import UseDeleteForm from "../include/useDeleteForm";
  
 import SupplierForm from "./SupplierForm";

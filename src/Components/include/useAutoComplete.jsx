@@ -3,7 +3,7 @@ import { Autocomplete, TextField, Typography } from "@mui/material";
 import { useFormikContext } from "formik";
 
 import { translateLauguage } from "../../function/translate";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 
 export default function UseAutocomplete({
   name,

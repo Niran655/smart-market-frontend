@@ -15,7 +15,7 @@ import * as React from "react";
 import * as Yup from "yup";
 
 import { ADJUST_STOCK } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {

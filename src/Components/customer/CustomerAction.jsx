@@ -3,7 +3,7 @@ import { IconButton, Stack } from "@mui/material";
 import { SquarePen, Trash } from "lucide-react";
 import { useState } from "react";
 import { DELETE_CUSTOMER } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import UseDeleteForm from "../include/useDeleteForm";
 import CustomerForm from "./CustomerForm";
 

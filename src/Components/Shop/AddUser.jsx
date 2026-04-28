@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import "../../Styles/dialogStyle.scss";
 import { ADD_USER_CONTROLL_SHOP, DELETE_USER_FROM_SHOP } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import { GET_SHOP_BY_SHOP_ID, GET_USER_WITH_PAGINATION } from "../../../graphql/queries";
 
 const ITEM_HEIGHT = 48;

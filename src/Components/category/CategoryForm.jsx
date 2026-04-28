@@ -15,7 +15,7 @@ import { useEffect } from "react";
 import * as Yup from "yup";
 
 import { CREATE_CATEGORY, UPDATE_CATEGORY } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),

@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import logo from "../assets/Image/logo.png";
 import { LOGIN } from "../../graphql/mutation";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../Context/AuthContext";
 import "../Styles/login.scss";
 
 const validationSchema = Yup.object({

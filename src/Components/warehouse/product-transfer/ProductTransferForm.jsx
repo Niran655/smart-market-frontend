@@ -24,7 +24,7 @@ import { useMemo } from "react";
 
 import useGetAllShopAutoComplete from "../../include/includeAutoComplete";
 import { CREATE_WAREHOUSE_TRANSFER } from "../../../../graphql/mutation";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../Context/AuthContext";
 import useGetProductWarehouseWithPagination from "../../hook/useGetProductWarehouseWithPagination";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({

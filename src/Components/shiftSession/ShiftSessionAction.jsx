@@ -4,7 +4,7 @@ import { SquarePen, Trash } from "lucide-react";
 import { useState } from "react";
 
 
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 
 import UseDeleteForm from "../include/useDeleteForm";
 import ShiftSessionForm from "./ShiftSessionForm";

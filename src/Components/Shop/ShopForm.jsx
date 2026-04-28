@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 
 import { CREATE_SHOP, UPDATE_SHOP } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import UploadImage from "../../utils/UploadImage";
 import { supabase } from "../../supabaseClient";
 

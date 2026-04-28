@@ -3,7 +3,7 @@ import { Switch } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
 
 import { UPDATE_CATEGORY_STATUS } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 
 export default function UpdateCategoryStatus({ refetch, editData }) {
   const [checked, setChecked] = useState(!!editData?.active);

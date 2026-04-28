@@ -2,7 +2,7 @@ import { Button, CircularProgress, Dialog, DialogContent, DialogContentText, Dia
 import { CircleX } from "lucide-react";
 import { useState } from "react";
 
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import { translateLauguage } from "../../function/translate";
 export default function UseDeleteForm({ open, onClose, handleDelete, loading }) {
   const [confirmationText, setConfirmationText] = useState("");

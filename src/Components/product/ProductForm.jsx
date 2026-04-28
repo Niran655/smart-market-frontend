@@ -16,7 +16,7 @@ import * as Yup from "yup";
 
 import UseAutocomplete from "../include/useAutoComplete";
 import { CREATE_PRODUCT, UPDATE_PRODUCT } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import { GET_CATEGORY, GET_UNIT } from "../../../graphql/queries";
 import UploadImage from "../../utils/UploadImage";
 

@@ -10,13 +10,13 @@ import AllowUser from "../Components/user/AllowUser";
 import UserForm from "../Components/user/UserForm";
 import FooterPagination from "../include/FooterPagination";
 import "../Styles/TableStyle.scss";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../Context/AuthContext";
 import { GET_USER_WITH_PAGINATION } from "../../graphql/queries";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
 import { useState } from "react";
-import { useThemeContext } from "../context/ThemeContext";
+import { useThemeContext } from "../Context/ThemeContext";
 import star from "../assets/Image/star.png";
 const User = () => {
   const { language } = useAuth();

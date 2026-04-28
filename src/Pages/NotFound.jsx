@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button, Stack } from "@mui/material";
 
 import ImageNotFound from "../assets/Image/not-found.png";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 
 export default function NotFound() {

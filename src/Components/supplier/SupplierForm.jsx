@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import * as Yup from "yup";
 
 import { CREATE_SUPPLIER, UPDATE_SUPPLIER } from "../../../graphql/mutation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import { supabase } from "../../supabaseClient";
 import ReusableForm from "../include/useForm";
 
