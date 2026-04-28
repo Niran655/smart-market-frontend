@@ -19,9 +19,9 @@ import Pos from './Pages/Pos';
 import Supplier from './Pages/Supplier';
 import Profile from './Pages/Profile';
 import StoreSetting from './Pages/StoreSetting';
-import ReportInshopPage from './Pages/ReportInshop';
 import Customer from './Pages/Customer';
 import TablePage from './Pages/Table';
+import ReportInshopPage from './Pages/ReportInshop';
  
  
 export default function Router() {
