@@ -69,7 +69,7 @@ const STATUS_COLORS = {
   overdue: { bg: T.redPale, color: T.red },
   paid: { bg: T.tealPale, color: T.teal },
   unpaid: { bg: T.redPale, color: T.red },
-  cancelled: { bg: "#F1F5F9", color: T.slate },
+  cancelled: { bg: "#F1F5F9" },
 };
 const getStatusStyle = (s) => STATUS_COLORS[s?.toLowerCase()] || STATUS_COLORS.pending;
 const CAT_COLORS = [T.orange, T.navy, T.teal, T.purple, "#F43F5E", "#10B981"];
@@ -78,7 +78,7 @@ const cardSx = {
   borderRadius: "12px",
   boxShadow: "0 1px 4px rgba(0,0,0,.06)",
 };
-const thSx = { bgcolor: "#FAFBFF", fontSize: "0.72rem", fontWeight: 700, color: T.slate, textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: `1px solid ${T.border}`, py: 1 };
+const thSx = { bgcolor: "#FAFBFF", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: `1px solid ${T.border}`, py: 1 };
 const tdSx = { fontSize: "0.8rem", color: "#1A2332", borderBottom: `1px solid ${T.border}`, py: 1 };
 
 const PERIOD_OPTIONS = [
@@ -158,7 +158,7 @@ const PeriodDropdown = ({ active, onChange }) => {
         onClick={(e) => setAnchor(e.currentTarget)}
         sx={{
           px: 1, py: 0.4, border: `1px solid ${T.border}`, borderRadius: 1.5,
-          fontSize: "0.7rem", color: T.slate, cursor: "pointer",
+          fontSize: "0.7rem", cursor: "pointer",
           display: "flex", alignItems: "center", gap: 0.3,
           "&:hover": { bgcolor: T.orangePale },
         }}
@@ -359,7 +359,7 @@ export default function Dashboard() {
     colors: [T.orange, T.navy],
     legend: { show: false },
     dataLabels: { enabled: false },
-    plotOptions: { pie: { donut: { size: "72%", labels: { show: true, total: { show: true, label: "Total", color: T.slate, fontSize: "12px", formatter: (w) => w.globals.seriesTotals.reduce((a, b) => a + b, 0).toLocaleString() } } } } },
+    plotOptions: { pie: { donut: { size: "72%", labels: { show: true, total: { show: true, label: "Total", fontSize: "12px", formatter: (w) => w.globals.seriesTotals.reduce((a, b) => a + b, 0).toLocaleString() } } } } },
     stroke: { width: 0 },
     tooltip: { y: { formatter: (v) => `${v.toLocaleString()} customers` } },
     noData: { text: "No data", align: "center", verticalAlign: "middle", style: { color: T.slate, fontSize: "12px" } },
@@ -474,7 +474,7 @@ export default function Dashboard() {
   if (loading && !dashboard) return (
     <Box sx={{ p: 4 }}>
       <LinearProgress sx={{ borderRadius: 4, bgcolor: T.orangePale, "& .MuiLinearProgress-bar": { bgcolor: T.orange } }} />
-      <Typography sx={{ mt: 2, color: T.slate, fontSize: "0.875rem" }}>{t("loading") || "Loading..."}</Typography>
+      <Typography sx={{ mt: 2, fontSize: "0.875rem" }}>{t("loading") || "Loading..."}</Typography>
     </Box>
   );
   if (error) return <ErrorPage t={t} error={error} refetch={refetch} />;
@@ -580,7 +580,7 @@ export default function Dashboard() {
                           <Typography sx={{ fontSize: "1.15rem", fontWeight: 800, mb: 0.6 }}>{formatCurrency(card.value)}</Typography>
                           <Stack direction="row" alignItems="center" spacing={0.8}>
                             <TrendPill trend={card.trend} change={card.change} />
-                            <Typography sx={{ fontSize: "0.65rem", color: T.slate }}>vs last period</Typography>
+                            <Typography sx={{ fontSize: "0.65rem" }}>vs last period</Typography>
                           </Stack>
                         </Box>
                         <Box sx={{ width: 38, height: 38, borderRadius: 2, bgcolor: card.iconBg, display: "flex", alignItems: "center", justifyContent: "center" }}>{card.icon}</Box>
@@ -634,7 +634,7 @@ export default function Dashboard() {
                         <Grid size={4} key={i}>
                           <Box sx={{ textAlign: "center", py: 1.5, borderRight: i < 2 ? `1px solid ${T.border}` : "none" }}>
                             <Typography sx={{ fontWeight: 800, fontSize: "1.15rem", color: item.color }}>{item.value.toLocaleString()}</Typography>
-                            <Typography sx={{ fontSize: "0.68rem", color: T.slate, mt: 0.2 }}>{item.label}</Typography>
+                            <Typography sx={{ fontSize: "0.68rem", mt: 0.2 }}>{item.label}</Typography>
                           </Box>
                         </Grid>
                       ))}
@@ -660,7 +660,7 @@ export default function Dashboard() {
                             <Stack direction="row" justifyContent="space-between" mb={0.3}>
                               <Stack direction="row" alignItems="center" spacing={0.6}>
                                 <Box sx={{ width: 7, height: 7, borderRadius: "50%", bgcolor: row.color }} />
-                                <Typography sx={{ fontSize: "0.72rem", color: T.slate }}>{row.label}</Typography>
+                                <Typography sx={{ fontSize: "0.72rem" }}>{row.label}</Typography>
                               </Stack>
                               <Typography sx={{ fontSize: "0.72rem", fontWeight: 700, color: "#1A2332" }}>{row.value.toLocaleString()}</Typography>
                             </Stack>
@@ -702,7 +702,7 @@ export default function Dashboard() {
                                     <Avatar sx={{ width: 28, height: 28, borderRadius: 1.5, bgcolor: `${T.orange}15`, color: T.orange, fontSize: "0.65rem", fontWeight: 700 }}>{(item.productName || "?")[0]}</Avatar>
                                     <Box>
                                       <Typography sx={{ fontSize: "0.78rem", fontWeight: 600, color: "#1A2332", lineHeight: 1.2 }}>{item.productName}</Typography>
-                                      <Typography sx={{ fontSize: "0.65rem", color: T.slate }}>${(item.revenue / (item.sales || 1)).toFixed(2)} avg</Typography>
+                                      <Typography sx={{ fontSize: "0.65rem" }}>${(item.revenue / (item.sales || 1)).toFixed(2)} avg</Typography>
                                     </Box>
                                   </Stack>
                                 </TableCell>
@@ -740,11 +740,11 @@ export default function Dashboard() {
                               <TableRow key={idx} hover sx={{ "&:last-child td": { border: 0 }, "&:hover": { bgcolor: T.orangePale } }}>
                                 <TableCell sx={tdSx}>
                                   <Stack direction="row" alignItems="center" spacing={1.2}>
-                                    <Avatar sx={{ width: 28, height: 28, borderRadius: 1.5, bgcolor: "#F1F5F9", color: T.slate, fontSize: "0.65rem" }}>{(item.productName || "?")[0]}</Avatar>
+                                    <Avatar sx={{ width: 28, height: 28, borderRadius: 1.5, bgcolor: "#F1F5F9", fontSize: "0.65rem" }}>{(item.productName || "?")[0]}</Avatar>
                                     <Typography sx={{ fontSize: "0.78rem", color: "#1A2332" }}>{item.productName}</Typography>
                                   </Stack>
                                 </TableCell>
-                                <TableCell sx={{ ...tdSx, color: T.slate, fontSize: "0.7rem" }}>{item.id || "-"}</TableCell>
+                                <TableCell sx={{ ...tdSx, fontSize: "0.7rem" }}>{item.id || "-"}</TableCell>
                                 <TableCell align="right">
                                   <Chip
                                     label={item.stock <= item.minStock ? `Instock: ${item.stock}` : item.stock}
@@ -756,7 +756,7 @@ export default function Dashboard() {
                                     }}
                                   />
                                 </TableCell>
-                                <TableCell align="right" sx={{ ...tdSx, color: T.slate }}>{item.minStock}</TableCell>
+                                <TableCell align="right" sx={{ ...tdSx }}>{item.minStock}</TableCell>
                               </TableRow>
                             ))
                           }
@@ -779,12 +779,12 @@ export default function Dashboard() {
                       <Stack direction="row" spacing={1} alignItems="center">
                         <Stack direction="row" alignItems="center" spacing={0.6}>
                           <Box sx={{ width: 10, height: 10, borderRadius: 2, bgcolor: T.orange }} />
-                          <Typography sx={{ fontSize: "0.68rem", color: T.slate }}>{t("sales") || "Revenue"}</Typography>
+                          <Typography sx={{ fontSize: "0.68rem" }}>{t("sales") || "Revenue"}</Typography>
                           <Typography sx={{ fontSize: "0.78rem", fontWeight: 800, color: T.orange }}>{formatCurrency(overview.totalSales?.value || 0)}</Typography>
                         </Stack>
                         <Stack direction="row" alignItems="center" spacing={0.6}>
                           <Box sx={{ width: 10, height: 10, borderRadius: 2, bgcolor: T.teal }} />
-                          <Typography sx={{ fontSize: "0.68rem", color: T.slate }}>{t("purchases") || "Purchase"}</Typography>
+                          <Typography sx={{ fontSize: "0.68rem" }}>{t("purchases") || "Purchase"}</Typography>
                           <Typography sx={{ fontSize: "0.78rem", fontWeight: 800, color: T.teal }}>{formatCurrency(overview.totalPurchase?.value || 0)}</Typography>
                         </Stack>
                       </Stack>
@@ -876,11 +876,11 @@ export default function Dashboard() {
                                         </Avatar>
                                         <Box>
                                           <Typography sx={{ fontSize: "0.75rem", fontWeight: 600, color: "#1A2332", lineHeight: 1.2 }}>{item.customer}</Typography>
-                                          <Typography sx={{ fontSize: "0.62rem", color: T.slate }}>#{item.id || idx}</Typography>
+                                          <Typography sx={{ fontSize: "0.62rem" }}>#{item.id || idx}</Typography>
                                         </Box>
                                       </Stack>
                                     </TableCell>
-                                    <TableCell sx={{ ...tdSx, color: T.slate, fontSize: "0.7rem" }}>{formatDateShort(item.date)}</TableCell>
+                                    <TableCell sx={{ ...tdSx, fontSize: "0.7rem" }}>{formatDateShort(item.date)}</TableCell>
                                     <TableCell>
                                       <Chip label={item.status} size="small" sx={{ fontWeight: 700, fontSize: "0.62rem", borderRadius: 6, height: 18, bgcolor: sc.bg, color: sc.color }} />
                                     </TableCell>
@@ -916,7 +916,7 @@ export default function Dashboard() {
                               </Avatar>
                               <Box>
                                 <Typography sx={{ fontSize: "0.78rem", fontWeight: 600, color: "#1A2332", lineHeight: 1.2 }}>{item.name}</Typography>
-                                <Typography sx={{ fontSize: "0.63rem", color: T.slate }}>{item.country || "-"} · {item.orders} Orders</Typography>
+                                <Typography sx={{ fontSize: "0.63rem" }}>{item.country || "-"} · {item.orders} Orders</Typography>
                               </Box>
                             </Stack>
                             <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#1A2332" }}>{formatCurrency(item.totalSpent)}</Typography>
@@ -962,7 +962,7 @@ export default function Dashboard() {
                             <Stack key={i} direction="row" justifyContent="space-between" alignItems="center">
                               <Stack direction="row" alignItems="center" spacing={0.7}>
                                 <Box sx={{ width: 7, height: 7, borderRadius: "50%", bgcolor: CAT_COLORS[i % CAT_COLORS.length] }} />
-                                <Typography sx={{ fontSize: "0.72rem", color: T.slate }}>{cat.name}</Typography>
+                                <Typography sx={{ fontSize: "0.72rem" }}>{cat.name}</Typography>
                               </Stack>
                               <Typography sx={{ fontSize: "0.72rem", fontWeight: 700, color: "#1A2332" }}>{cat.salesAmount?.toLocaleString()}</Typography>
                             </Stack>
@@ -979,7 +979,7 @@ export default function Dashboard() {
                       ].map((s, i) => (
                         <Box key={i} sx={{ textAlign: "center" }}>
                           <Typography sx={{ fontWeight: 800, fontSize: "1rem", color: "#1A2332" }}>{s.value}</Typography>
-                          <Typography sx={{ fontSize: "0.65rem", color: T.slate }}>{s.label}</Typography>
+                          <Typography sx={{ fontSize: "0.65rem" }}>{s.label}</Typography>
                         </Box>
                       ))}
                     </Stack>
