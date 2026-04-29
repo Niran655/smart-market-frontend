@@ -136,7 +136,13 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
         };
       });
 
-      onLoadToCart(cartItems, sale.total || 0);
+      onLoadToCart({
+        cartItems,
+        total: sale.total || 0,
+        customerName: sale.customerName,
+        tableNumber: sale.tableNumber,
+        orderType: sale.orderType
+      });
       onClose();
     }
   };

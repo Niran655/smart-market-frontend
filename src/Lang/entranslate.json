@@ -437,6 +437,11 @@
   "update_table":"Update Table",
   "add_customer":"Add Customer",
   "update_customer":"Update Customer",
-  "view_sale_history":"View Sale History"
+  "view_sale_history":"View Sale History",
+  "configuration_modules":"Configuration Modules",
+  "modules":"Modules",
+  "manage_settings":"Manage Settings",
+  "all_stores":"All Stores",
+  "manage_stores":"Manage Stores"
   
 }

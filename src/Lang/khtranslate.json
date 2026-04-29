@@ -418,5 +418,10 @@
   "update_table":"កែប្រែតុ",
   "add_customer":"បន្ថែមអតិថិជន",
   "update_customer":"កែប្រែអតិថិជន",
-  "view_sale_history":"មើលប្រវត្តិការលក់"
+  "view_sale_history":"មើលប្រវត្តិការលក់",
+  "configuration_modules":"ម៉ូឌុលកំណត់រចនាសម្ព័ន្ធ",
+  "modules":"ម៉ូឌុល",
+  "manage_settings":"គ្រប់គ្រងការកំណត់",
+  "all_stores":"ហាងទាំងអស់",
+  "manage_stores":"គ្រប់គ្រងហាង"
 }

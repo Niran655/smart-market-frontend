@@ -943,8 +943,22 @@ const POS = () => {
   const removeFromCart = (id) => setCart((prev) => prev.filter((item) => item.id !== id));
   const clearCart = () => setCart([]);
 
-  const handleSelectPendingSale = (cartItems) => {
+  const handleSelectPendingSale = ({ cartItems, total, customerName, tableNumber, orderType }) => {
     setCart(cartItems);
+    if (customerName) {
+      setSelectedCustomer({ _id: "pending_customer", nameEn: customerName, nameKh: customerName });
+    } else {
+      setSelectedCustomer(GUEST);
+    }
+    if (orderType) {
+      setOrderType(orderType);
+    }
+    if (tableNumber) {
+      const table = tablesData?.getTableByShopId?.data?.find(t => t.number === tableNumber);
+      if (table) setSelectedTable(table);
+    } else {
+      setSelectedTable(null);
+    }
     setAlert(
       true, "info",
       language === "kh"

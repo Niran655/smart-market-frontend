@@ -61,6 +61,11 @@ const CartPanel = ({
   const activeTables = rawTables.filter((tbl) => tbl.active !== false);
   const customerOptions = [GUEST, ...rawCustomers.filter((c) => c.active !== false)];
 
+  // Include selectedCustomer if it's not in the options (e.g., from pending sale)
+  const allCustomerOptions = selectedCustomer && !customerOptions.find(c => c._id === selectedCustomer._id)
+    ? [...customerOptions, selectedCustomer]
+    : customerOptions;
+
   useEffect(() => {
     if (!selectedCustomer) setSelectedCustomer(GUEST);
   }, [selectedCustomer]);
@@ -81,7 +86,7 @@ const CartPanel = ({
 
   const handleCustomerChange = (e) => {
     const id = e.target.value;
-    const found = customerOptions.find((c) => c._id === id);
+    const found = allCustomerOptions.find((c) => c._id === id);
     setSelectedCustomer(found ?? GUEST);
   };
 
@@ -214,7 +219,7 @@ const CartPanel = ({
                 label={`  ${t("customer") || "Customer"}`}
                 onChange={handleCustomerChange}
               >
-                {customerOptions.map((c) => (
+                {allCustomerOptions.map((c) => (
                   <MenuItem key={c._id} value={c._id}>
                     {displayName(c)}
                     {c._id === "guest" && (
@@ -230,7 +235,7 @@ const CartPanel = ({
               </Select>
             </FormControl>
 
-            {/* Table Select (only for dine_in) */}
+         
             {orderType === "dine_in" && (
               <FormControl size="small" sx={{ flex: 1, minWidth: 180 }}>
                 <InputLabel>

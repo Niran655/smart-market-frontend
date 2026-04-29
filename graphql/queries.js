@@ -791,11 +791,12 @@ export const GET_SALES = gql`
             nameKh
             image
           }
-          subProductId 
-          # {
-          #   _id
-          #   productImg
-          # }
+          subProductId
+          subProduct {
+            _id
+            productImg
+            productDes
+          }
           name
           price
           quantity
