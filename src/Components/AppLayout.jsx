@@ -46,10 +46,9 @@ export default function AppLayout() {
     mobileShowLabels,
   } = useThemeContext();
   const { logout, language, changeLanguage } = useAuth();
-
+  const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isExtraSmall = useMediaQuery(theme.breakpoints.down("sm"));
   const { t } = translateLauguage(language);
@@ -63,9 +62,6 @@ export default function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userObject, setUserObject] = useState(null);
 
- 
-
-
   const sidebarWidth = layoutMode === "compact" ? 70 : 250;
 
   useEffect(() => {
@@ -74,7 +70,6 @@ export default function AppLayout() {
       setUserObject(JSON.parse(storedUser));
     }
   }, []);
-
 
   useEffect(() => {
     if (isPosPage) {
@@ -112,8 +107,7 @@ export default function AppLayout() {
     } else {
       document.exitFullscreen();
     }
-  }
-
+  };
 
   const toggleLanguage = () => {
     const newLang = language === "kh" ? "en" : "kh";
@@ -154,9 +148,13 @@ export default function AppLayout() {
     { key: "table", label: t("table"), link: `/store/table/${id}` },
   ];
 
-  return (
-    <Box sx={{ minHeight: "100vh", width: "100vw", position: "relative" }}>
+  
+  const sidebarBg = sidebarColor;
+  const isGlass = theme.palette.mode === "dark" && theme.components?.MuiDrawer?.styleOverrides?.paper?.backdropFilter;
 
+  return (
+    <Box sx={{ minHeight: "100vh", width: "100vw", position: "relative", bgcolor: theme.palette.background.default }}>
+       
       {!isPosPage && !isMobile && (
         <Box
           sx={{
@@ -165,17 +163,22 @@ export default function AppLayout() {
             top: 0,
             height: "100vh",
             width: sidebarWidth,
-            background: `linear-gradient(180deg, ${sidebarColor} 0%, #1c1c1c 100%)`,
-            color: "white",
-            borderRight: "1px solid rgba(255,255,255,0.1)",
+            bgcolor: sidebarBg,
+            color: theme.palette.getContrastText(sidebarBg),
+            borderRight: `1px solid ${theme.palette.divider}`,
             zIndex: theme.zIndex.drawer,
             overflow: "hidden",
+            transition: theme.transitions.create("width", {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.enteringScreen,
+            }),
           }}
         >
           <MenuNavbar />
         </Box>
       )}
 
+ 
       {!isPosPage && isMobile && (
         <Drawer
           anchor="left"
@@ -185,8 +188,9 @@ export default function AppLayout() {
           sx={{
             "& .MuiDrawer-paper": {
               width: mobileDrawerWidth,
-              background: `linear-gradient(180deg, ${sidebarColor} 0%, #1c1c1c 100%)`,
-              color: "white",
+              bgcolor: sidebarBg,
+              color: theme.palette.getContrastText(sidebarBg),
+              borderRight: `1px solid ${theme.palette.divider}`,
             },
           }}
         >
@@ -197,7 +201,7 @@ export default function AppLayout() {
         </Drawer>
       )}
 
-
+ 
       <Box
         sx={{
           marginLeft: !isPosPage && !isMobile ? `${sidebarWidth}px` : 0,
@@ -210,30 +214,29 @@ export default function AppLayout() {
           }),
         }}
       >
-
+      
         {!isPosPage && (
           <AppBar
             position="sticky"
             color="default"
             sx={{
-              backgroundColor: topbarColor,
-              borderBottom: "1px solid rgba(255,255,255,0.1)",
+              bgcolor: topbarColor,
+              borderBottom: `1px solid ${theme.palette.divider}`,
+              boxShadow: theme.shadows[1],
             }}
           >
             <Toolbar sx={{ justifyContent: "space-between" }}>
               {isMobile && (
-                <IconButton onClick={handleDrawerToggle} edge="start">
+                <IconButton onClick={handleDrawerToggle} edge="start" sx={{ color: theme.palette.getContrastText(topbarColor) }}>
                   <MenuIcon />
                 </IconButton>
               )}
 
-
               {!isMobile && (
-                <Box display="flex">
+                <Box display="flex" gap={1}>
                   {menuItems.map((item) => {
                     const IconComponent = item.icon;
                     const isActive = location.pathname.startsWith(item.path);
-
                     return (
                       <Link
                         key={item.path}
@@ -243,16 +246,13 @@ export default function AppLayout() {
                         <Button
                           startIcon={<IconComponent />}
                           sx={{
-                            borderRadius: 1,
-                            border: isActive ? "1.5px solid rgba(255,255,255,0.1)" : "none",
+                            borderRadius:1,
                             px: 2,
-                            color:
-                              topbarColor === "#FDFDFD" ? "black" : "white",
-                            backgroundColor: isActive
-                              ? topbarColor === "#FDFDFD"
-                                ? "rgba(0,0,0,0.1)"
-                                : "rgba(255,255,255,0.15)"
-                              : "transparent",
+                            color: theme.palette.getContrastText(topbarColor),
+                            bgcolor: isActive ? theme.palette.action.selected : "transparent",
+                            "&:hover": {
+                              bgcolor: theme.palette.action.hover,
+                            },
                           }}
                         >
                           {item.label}
@@ -263,34 +263,27 @@ export default function AppLayout() {
                 </Box>
               )}
 
-              {/* Spacer to push right items when nav is hidden on mobile */}
               {isMobile && <Box flex={1} />}
 
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <IconButton onClick={handleToggleFullscreen}>
-                  <Shrink className="link-icon" />
+                <IconButton onClick={handleToggleFullscreen} sx={{ color: theme.palette.getContrastText(topbarColor) }}>
+                  <Shrink size={20} />
                 </IconButton>
                 <Tooltip title={selectedLanguage}>
-                  <IconButton onClick={toggleLanguage}>
+                  <IconButton onClick={toggleLanguage} sx={{ color: theme.palette.getContrastText(topbarColor) }}>
                     <Avatar src={selectedFlag} sx={{ width: 30, height: 30 }} />
                   </IconButton>
                 </Tooltip>
 
-                <ButtonBase onClick={handleMenuOpen} sx={{ borderRadius: 1 }}>
+                <ButtonBase onClick={handleMenuOpen} sx={{ borderRadius: theme.shape.borderRadius }}>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <Avatar
                       sx={{ width: 32, height: 32 }}
                       src={userObject?.image}
                       alt={userObject?.nameKh}
                     />
-
                     {!isExtraSmall && (
-                      <Typography
-                        sx={{
-                          color:
-                            topbarColor === "#FDFDFD" ? "black" : "white",
-                        }}
-                      >
+                      <Typography sx={{ color: theme.palette.getContrastText(topbarColor) }}>
                         {userObject?.nameKh}
                       </Typography>
                     )}
@@ -302,11 +295,10 @@ export default function AppLayout() {
                   open={Boolean(anchorEl)}
                   onClose={handleMenuClose}
                   PaperProps={{
-                    elevation: 0,
                     sx: {
-                      overflow: "visible",
                       mt: 1.5,
-                      filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                      borderRadius: theme.shape.borderRadius,
+                      boxShadow: theme.shadows[4],
                     },
                   }}
                   transformOrigin={{ horizontal: "right", vertical: "top" }}
@@ -318,7 +310,6 @@ export default function AppLayout() {
                     </ListItemIcon>
                     Profile
                   </MenuItem>
-
                   <MenuItem onClick={handleLogout}>
                     <ListItemIcon>
                       <LogoutIcon fontSize="small" />
@@ -331,15 +322,16 @@ export default function AppLayout() {
           </AppBar>
         )}
 
-        {/* POS Topbar */}
+         
         {isPosPage && (
           <>
             <AppBar
               position="sticky"
               color="default"
               sx={{
-                backgroundColor: topbarColor,
-                borderBottom: "1px solid rgba(0,0,0,0.1)",
+                bgcolor: topbarColor,
+                borderBottom: `1px solid ${theme.palette.divider}`,
+                boxShadow: theme.shadows[1],
               }}
             >
               <Toolbar
@@ -352,16 +344,13 @@ export default function AppLayout() {
               >
  
                 <Stack direction="row" alignItems="center" spacing={1}>
-                  <Link to={`/store/pos/${id}`}>
-                    <Button>
-             
+                  <Link to={`/store/pos/${id}`} style={{ textDecoration: "none" }}>
+                    <Button sx={{ color: theme.palette.getContrastText(topbarColor) }}>
                       {!isExtraSmall && (
                         <Typography
                           sx={{
-                            color:
-                              topbarColor === "#FDFDFD" ? "black" : "white",
-                            fontSize: 20,
                             fontWeight: "bold",
+                            fontSize: "1.1rem",
                           }}
                         >
                           POS System
@@ -372,11 +361,11 @@ export default function AppLayout() {
                   <IconButton
                     onClick={handleOpen}
                     sx={{
-                      borderRadius: 10,
-                      color: topbarColor === "#FDFDFD" ? "black" : "white",
-                      backgroundColor: "rgba(255,255,255,0.15)",
+                      borderRadius: theme.shape.borderRadius,
+                      color: theme.palette.getContrastText(topbarColor),
+                      bgcolor: "rgba(255,255,255,0.1)",
                       "&:hover": {
-                        backgroundColor: "rgba(255,255,255,0.25)",
+                        bgcolor: "rgba(255,255,255,0.2)",
                       },
                     }}
                   >
@@ -384,25 +373,22 @@ export default function AppLayout() {
                   </IconButton>
                 </Stack>
 
-                {/* Center: scrollable tabs */}
+ 
                 <Box
                   sx={{
                     flex: { xs: "1 1 100%", sm: "0 1 auto" },
                     order: { xs: 3, sm: 2 },
                     overflowX: "auto",
                     whiteSpace: "nowrap",
-                    scrollbarWidth: "none",  
-                    "&::-webkit-scrollbar": { display: "none" }, 
+                    scrollbarWidth: "none",
+                    "&::-webkit-scrollbar": { display: "none" },
                     maxWidth: "100%",
                   }}
                 >
                   <Stack
                     direction="row"
                     spacing={1}
-                    sx={{
-                      display: "inline-flex",
-                      px: 1,
-                    }}
+                    sx={{ display: "inline-flex", px: 1 }}
                   >
                     {tabs.map((tab) => (
                       <Button
@@ -412,19 +398,21 @@ export default function AppLayout() {
                         component={Link}
                         to={tab.link}
                         sx={{
-                          borderRadius: 1,
-                          backgroundColor:
-                            activeTab === tab.key
-                              ? "#ffffff"
-                              : "transparent",
-                          color:
-                            activeTab === tab.key ? "#000" : "#fff",
+                          borderRadius: theme.shape.borderRadius,
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
+                          bgcolor:
+                            activeTab === tab.key
+                              ? theme.palette.primary.main
+                              : "transparent",
+                          color:
+                            activeTab === tab.key
+                              ? theme.palette.primary.contrastText
+                              : theme.palette.getContrastText(topbarColor),
                           "&:hover": {
-                            backgroundColor:
+                            bgcolor:
                               activeTab === tab.key
-                                ? "#f0f0f0"
+                                ? theme.palette.primary.dark
                                 : "rgba(255,255,255,0.1)",
                           },
                         }}
@@ -434,11 +422,7 @@ export default function AppLayout() {
                     ))}
                   </Stack>
                 </Box>
-
-
-
-
-                {/* Right section: language & profile */}
+ 
                 <Box
                   sx={{
                     display: "flex",
@@ -448,29 +432,20 @@ export default function AppLayout() {
                   }}
                 >
                   <Tooltip title={selectedLanguage}>
-                    <IconButton onClick={toggleLanguage}>
-                      <Avatar
-                        src={selectedFlag}
-                        sx={{ width: 30, height: 30 }}
-                      />
+                    <IconButton onClick={toggleLanguage} sx={{ color: theme.palette.getContrastText(topbarColor) }}>
+                      <Avatar src={selectedFlag} sx={{ width: 30, height: 30 }} />
                     </IconButton>
                   </Tooltip>
 
-                  <ButtonBase onClick={handleMenuOpen} sx={{ borderRadius: 1 }}>
+                  <ButtonBase onClick={handleMenuOpen} sx={{ borderRadius: theme.shape.borderRadius }}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <Avatar
                         sx={{ width: 32, height: 32 }}
                         src={userObject?.image}
                         alt={userObject?.nameKh}
                       />
-                      {/* Hide name on extra small */}
                       {!isExtraSmall && (
-                        <Typography
-                          sx={{
-                            color:
-                              topbarColor === "#FDFDFD" ? "black" : "white",
-                          }}
-                        >
+                        <Typography sx={{ color: theme.palette.getContrastText(topbarColor) }}>
                           {userObject?.nameKh}
                         </Typography>
                       )}
@@ -483,7 +458,7 @@ export default function AppLayout() {
           </>
         )}
 
-        {/* Main content (scrollable) */}
+ 
         <Box
           sx={{
             flex: 1,

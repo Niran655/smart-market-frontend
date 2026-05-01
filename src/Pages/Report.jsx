@@ -553,7 +553,7 @@ const ReportPage = ({ shopId = null }) => {
 
     return (
       <>
-     
+
         {currentTabValue === "sale" && saleDetailView !== "recentTransactions" && (
           <Grid container spacing={2.5} sx={{ mb: 3 }}>
             <Grid size={{ xs: 12, md: 4 }}>
@@ -583,7 +583,7 @@ const ReportPage = ({ shopId = null }) => {
           </Grid>
         )}
 
-     
+
         {currentTabValue === "pnl" && (
           <Grid container spacing={2.5} sx={{ mb: 3 }}>
             <Grid size={{ xs: 12, md: 6 }}>
@@ -695,9 +695,9 @@ const ReportPage = ({ shopId = null }) => {
                   ))}
                 </TableBody>
               ) : (
-                
-                      <EmptyData />
-            
+
+                <EmptyData />
+
               )}
             </Table>
           </TableContainer>
@@ -738,7 +738,7 @@ const ReportPage = ({ shopId = null }) => {
           maxWidth: "100%",
           mx: "auto",
           px: { xs: 1, sm: 2, md: 0 },
-          minHeight: "100vh",
+
           bgcolor: theme.palette.background.default,
         }}
       >

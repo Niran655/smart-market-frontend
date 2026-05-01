@@ -559,7 +559,7 @@ export default function Dashboard() {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <style>{`@media print{@page{size:A4 portrait;margin:1.2cm 0.8cm;}body *{visibility:hidden;}#pdr,#pdr *{visibility:visible;}#pdr{position:fixed;left:0;top:0;width:100%;background:#f4f6fb;}thead{display:table-header-group;}}`}</style>
 
-      <Box sx={{ width: "100%", minHeight: "100vh", bgcolor: theme.palette.background.default, pb: 5 }}>
+      <Box sx={{ width: "100%",  bgcolor: theme.palette.background.default, pb: 5 }}>
         <Box sx={{ "@media print": { display: "none" } }}>
 
           {/* Page Header */}

@@ -565,7 +565,7 @@ const Store = () => {
   const totalShops = data?.getAllShops?.length || 0;
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: theme.palette.background.default, px: { xs: 1, sm: 2, md: 0 } }}>
+    <Box >
 
  
       <Box
@@ -638,7 +638,6 @@ const Store = () => {
         </Stack>
       </Box>
 
- 
       <Box
         sx={{
           bgcolor: theme.palette.background.paper,
