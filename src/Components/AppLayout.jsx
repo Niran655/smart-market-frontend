@@ -297,7 +297,7 @@ export default function AppLayout() {
                   PaperProps={{
                     sx: {
                       mt: 1.5,
-                      borderRadius: theme.shape.borderRadius,
+                      
                       boxShadow: theme.shadows[4],
                     },
                   }}
