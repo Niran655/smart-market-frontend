@@ -31,6 +31,7 @@ import {
 } from "../../graphql/queries";
 import ErrorPage from "../include/ErrorPage";
 import Chart from "react-apexcharts";
+import DashboardSkeleton from "../Components/dashboard/DashboardSkeleton";
 
  
 const formatCurrency = (v) => (v != null ? `$${Number(v).toFixed(2)}` : "$0.00");
@@ -160,7 +161,7 @@ const PeriodDropdown = ({ active, onChange }) => {
       <Box
         onClick={(e) => setAnchor(e.currentTarget)}
         sx={{
-          px: 1.2, py: 0.45, border: `1px solid ${theme.palette.divider}`, borderRadius: 2,
+          px: 1.2, py: 0.45, border: `1px solid ${theme.palette.divider}`, borderRadius: 1,
           fontSize: "0.72rem", fontWeight: 600, cursor: "pointer", color: theme.palette.primary.main,
           display: "flex", alignItems: "center", gap: 0.4, bgcolor: theme.palette.action.hover,
           "&:hover": { bgcolor: theme.palette.action.selected, borderColor: theme.palette.primary.main },
@@ -175,7 +176,7 @@ const PeriodDropdown = ({ active, onChange }) => {
         onClose={() => setAnchor(null)}
         PaperProps={{
           sx: {
-            borderRadius: 2.5,
+            borderRadius:1,
             boxShadow: theme.shadows[8],
             border: `1px solid ${theme.palette.divider}`,
             minWidth: 140,
@@ -192,7 +193,7 @@ const PeriodDropdown = ({ active, onChange }) => {
               fontSize: "0.78rem",
               color: active === code ? theme.palette.primary.main : theme.palette.text.primary,
               fontWeight: active === code ? 700 : 400,
-              borderRadius: 1.5, mx: 0.5, my: 0.2,
+              borderRadius: 1 ,
               "&.Mui-selected": { bgcolor: theme.palette.action.selected },
               "&:hover": { bgcolor: theme.palette.action.hover, color: theme.palette.primary.main },
             }}
@@ -547,9 +548,10 @@ export default function Dashboard() {
 
    
   if (loading && !dashboard) return (
-    <Box sx={{ p: 4 }}>
-      <LinearProgress sx={{ borderRadius: 4, bgcolor: theme.palette.action.hover, "& .MuiLinearProgress-bar": { bgcolor: theme.palette.primary.main } }} />
-      <Typography sx={{ mt: 2, fontSize: "0.875rem", color: theme.palette.text.secondary }}>{t("loading") || "Loading..."}</Typography>
+    <Box >
+      {/* <LinearProgress sx={{ borderRadius: 4, bgcolor: theme.palette.action.hover, "& .MuiLinearProgress-bar": { bgcolor: theme.palette.primary.main } }} />
+      <Typography sx={{ mt: 2, fontSize: "0.875rem", color: theme.palette.text.secondary }}>{t("loading") || "Loading..."}</Typography> */}
+      <DashboardSkeleton/>
     </Box>
   );
   if (error) return <ErrorPage t={t} error={error} refetch={refetch} />;
@@ -816,7 +818,7 @@ export default function Dashboard() {
                     <Grid container sx={{ mb: 2 }}>
                       {[
                         { label: t("suppliers") || "Suppliers", value: overallInfo.suppliers, color: theme.palette.success.main },
-                        { label: t("customers") || "Customers", value: overallInfo.customers, color: theme.palette.primary.main },
+                        { label: t("customer") || "Customers", value: overallInfo.customers, color: theme.palette.primary.main },
                         { label: t("orders")    || "Orders",    value: overallInfo.orders,    color: theme.palette.warning.main },
                       ].map((item, i) => (
                         <Grid size={4} key={i}>

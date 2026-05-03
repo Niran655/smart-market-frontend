@@ -398,7 +398,7 @@ export default function AppLayout() {
                         component={Link}
                         to={tab.link}
                         sx={{
-                          borderRadius: theme.shape.borderRadius,
+                         
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
                           bgcolor:

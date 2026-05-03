@@ -477,7 +477,7 @@ const ShopCard = ({ shop, language, t, onJoin, onReport, shopActions }) => {
   );
 };
 
-// ─── Skeleton Loader (theme‑aware) ────────────────────────────
+ 
 const ShopSkeleton = () => {
   const theme = useTheme();
   return (
@@ -566,8 +566,6 @@ const Store = () => {
 
   return (
     <Box >
-
- 
       <Box
         sx={{
           background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 60%, ${theme.palette.primary.light} 100%)`,
@@ -648,16 +646,16 @@ const Store = () => {
           mb: 3,
         }}
       >
-        <Typography
-          variant="caption"
-          sx={{ fontWeight: 700, color: theme.palette.text.secondary, display: "block", mb: 0.8, letterSpacing: "0.06em", textTransform: "uppercase" }}
-        >
-          {t("search") || "Search"}
-        </Typography>
+        <Grid
+      container
+      spacing={2}
+    >
+       
+      <Grid item xs={12}>
         <TextField
           type="search"
           size="small"
-          placeholder={`${t("search") || "Search"} ${t("store") || "store"}...`}
+          placeholder={`${t("search")} ${t("store")}...`}
           fullWidth
           variant="outlined"
           value={keyword}
@@ -669,17 +667,12 @@ const Store = () => {
               </InputAdornment>
             ),
           }}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius:1,
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: theme.palette.primary.main },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: theme.palette.primary.main },
-            },
-          }}
         />
+      </Grid>
+    </Grid>
       </Box>
 
-      {/* ── Section Label ── */}
+  
       <Stack direction="row" alignItems="center" spacing={1.5} mb={2.5}>
         <Box sx={{ width: 4, height: 22, borderRadius: 1, bgcolor: theme.palette.primary.main }} />
         <Typography
@@ -693,7 +686,7 @@ const Store = () => {
         <Box sx={{ flex: 1, height: 1, bgcolor: theme.palette.divider }} />
       </Stack>
 
-      {/* ── Shop Grid ── */}
+    
       <Grid container spacing={2.5}>
         {loading
           ? Array.from({ length: 3 }).map((_, i) => (
