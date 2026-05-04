@@ -240,7 +240,7 @@ const Product = () => {
                     </TableCell>
                   </TableRow>
 
-                  {/* =================== SUB PRODUCT COLLAPSE =================== */}
+              
                   {expandedRow === row._id && (
                     <TableRow className="table-row">
                       <TableCell colSpan={6} sx={{ p: 0 }}>

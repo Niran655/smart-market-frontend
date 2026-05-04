@@ -548,7 +548,7 @@ export default function Dashboard() {
 
    
   if (loading && !dashboard) return (
-    <Box >
+    <Box    >
       {/* <LinearProgress sx={{ borderRadius: 4, bgcolor: theme.palette.action.hover, "& .MuiLinearProgress-bar": { bgcolor: theme.palette.primary.main } }} />
       <Typography sx={{ mt: 2, fontSize: "0.875rem", color: theme.palette.text.secondary }}>{t("loading") || "Loading..."}</Typography> */}
       <DashboardSkeleton/>
@@ -564,7 +564,7 @@ export default function Dashboard() {
       <Box sx={{ width: "100%",  bgcolor: theme.palette.background.default, pb: 5 }}>
         <Box sx={{ "@media print": { display: "none" } }}>
 
-          {/* Page Header */}
+        
           <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
             <Stack direction="row" alignItems="center" spacing={1.5}>
               <Box sx={{
@@ -930,7 +930,7 @@ export default function Dashboard() {
                 </Card>
               </Grid>
 
-              {/* Low Stock Products */}
+            
               <Grid size={{ xs: 12, md: 6 }}>
                 <Card sx={cardSx(theme)}>
                   <CardContent sx={{ pb: "12px !important", p: "20px !important" }}>
@@ -982,7 +982,7 @@ export default function Dashboard() {
               </Grid>
             </Grid>
 
-            {/* Sales Stats + Recent Transactions */}
+             
             <Grid container spacing={1.5} sx={{ mb: 1.5 }}>
               <Grid size={{ xs: 12, md: 7 }}>
                 <Card sx={cardSx(theme)}>
@@ -1121,7 +1121,7 @@ export default function Dashboard() {
               </Grid>
             </Grid>
 
-            {/* Bottom row: Top Customers, Top Categories, Order Statistics */}
+          
             <Grid container spacing={1.5}>
               <Grid size={{ xs: 12, md: 3 }}>
                 <Card sx={{ ...cardSx(theme), height: "100%" }}>
@@ -1235,7 +1235,7 @@ export default function Dashboard() {
           </Box>
         </Box>
 
-        {/* Print View (unchanged) */}
+    
         <Box id="pdr" sx={{ position: "fixed", left: "-10000px", top: 0, width: "100%", visibility: "hidden", "@media print": { position: "relative", left: 0, top: 0, visibility: "visible" } }}>
           <Box sx={{ bgcolor: theme.palette.background.default, p: 2 }}>
             <Box sx={{ background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`, color: "#fff", p: 2.5, borderRadius: "12px 12px 0 0" }}>

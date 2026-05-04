@@ -2,6 +2,8 @@ import { useMutation } from "@apollo/client/react";
 import {
   Box, Button, Paper, Stack, TextField, Typography,
   InputAdornment, IconButton, useTheme,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
@@ -12,6 +14,7 @@ import { LOGIN } from "../../graphql/mutation";
 import { useAuth } from "../Context/AuthContext";
 import loginBgDark from "../assets/Image/login-bg-dark.png";
 import loginBgLight from "../assets/Image/login-bg-light.png";
+import { translateLauguage } from "../function/translate";
 
 const validationSchema = Yup.object({
   email: Yup.string().email("Email មិនត្រឹមត្រូវ").required("សូមបញ្ចូល Email"),
@@ -20,20 +23,60 @@ const validationSchema = Yup.object({
 
 export default function Login() {
   const theme = useTheme();
-  const { login, user } = useAuth();
+  const { login, user, language } = useAuth();
   const [loginMutation, { loading, client }] = useMutation(LOGIN);
   const [showPassword, setShowPassword] = useState(false);
   const isDark = theme.palette.mode === "dark";
+  const [remember, setRemember] = useState(false);
+  const { t } = translateLauguage(language);
+
+
+  const [initialValues, setInitialValues] = useState({
+    email: "",
+    password: "",
+  });
+
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("remember_email");
+    const savedPassword = localStorage.getItem("remember_password");
+    if (savedEmail && savedPassword) {
+      setInitialValues({
+        email: savedEmail,
+        password: savedPassword,
+      });
+      setRemember(true);
+    } else if (savedEmail) {
+
+      setInitialValues({
+        email: savedEmail,
+        password: "",
+      });
+      setRemember(true);
+    }
+  }, []);
 
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
       const { data } = await loginMutation({ variables: values });
-      if (data?.login) login(data.login.token, data.login.user);
-    } catch {
+      if (data?.login) {
+        login(data.login.token, data.login.user);
+
+
+        if (remember) {
+          localStorage.setItem("remember_email", values.email);
+          localStorage.setItem("remember_password", values.password);
+        } else {
+          localStorage.removeItem("remember_email");
+          localStorage.removeItem("remember_password");
+        }
+      }
+    } catch (err) {
       setErrors({ password: "Email ឬ ពាក្យសម្ងាត់ មិនត្រឹមត្រូវ" });
     }
     setSubmitting(false);
   };
+
 
   useEffect(() => {
     if (user) client.resetStore();
@@ -72,8 +115,7 @@ export default function Login() {
           },
         }}
       >
-
-       
+ 
         <Box
           sx={{
             width: "50%",
@@ -85,11 +127,10 @@ export default function Login() {
             overflow: "hidden",
             backgroundImage: `url(${isDark ? loginBgDark : loginBgLight})`,
             backgroundSize: "cover",
-            backgroundPosition: "center",
+            // backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
           }}
         >
-       
           <Box
             sx={{
               position: "absolute",
@@ -100,8 +141,6 @@ export default function Login() {
               pointerEvents: "none",
             }}
           />
-
-           
           <Stack
             spacing={0.5}
             alignItems="center"
@@ -136,7 +175,8 @@ export default function Login() {
             </Typography>
           </Stack>
         </Box>
- 
+
+   
         <Box
           sx={{
             width: { xs: "100%", md: "50%" },
@@ -148,15 +188,12 @@ export default function Login() {
           }}
         >
           <Stack sx={{ width: "100%", maxWidth: 340 }}>
-
-           
             <Box
               component="img"
               src={logo}
               alt="LIKA"
               sx={{ width: 130, height: 52, objectFit: "contain", mb: 1.5, alignSelf: "center" }}
             />
-
             <Typography
               variant="body2"
               sx={{
@@ -169,7 +206,6 @@ export default function Login() {
               Logic Integrated Kiosk Application
             </Typography>
 
-            
             <Box
               sx={{
                 width: "100%", height: "1px", mb: 3,
@@ -180,27 +216,26 @@ export default function Login() {
             />
 
             <Typography variant="h6" sx={{ fontWeight: 700, color: "text.primary", mb: 0.5 }}>
-              Welcome back
+              {t(`welcome_back`)}
             </Typography>
             <Typography variant="body2" sx={{ color: "text.secondary", fontSize: "13px", mb: 3 }}>
-              Sign in to your account to continue
+              {t(`sign_in_to_your_account_to_continue`)}
             </Typography>
 
             <Formik
-              initialValues={{ email: "", password: "" }}
+              enableReinitialize
+              initialValues={initialValues}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
               {({ errors, touched, handleChange, values, isSubmitting }) => (
                 <Form style={{ width: "100%" }}>
-
- 
                   <Typography sx={{
                     mb: 0.75, fontWeight: 500, fontSize: "11px",
                     textTransform: "uppercase", letterSpacing: "0.8px", color: "text.secondary",
                     textAlign: "left",
                   }}>
-                    Email
+                    {t(`email`)}
                   </Typography>
                   <TextField
                     name="email"
@@ -230,13 +265,12 @@ export default function Login() {
                     }}
                   />
 
-             
                   <Typography sx={{
                     mb: 0.75, fontWeight: 500, fontSize: "11px",
                     textTransform: "uppercase", letterSpacing: "0.8px", color: "text.secondary",
                     textAlign: "left",
                   }}>
-                    Password
+                    {t(`password`)}
                   </Typography>
                   <TextField
                     name="password"
@@ -279,24 +313,36 @@ export default function Login() {
                       },
                     }}
                   />
-
-      
-                  <Typography sx={{
-                    textAlign: "right", fontSize: "12px", color: "primary.main",
-                    cursor: "pointer", mb: 3,
-                    "&:hover": { textDecoration: "underline" },
-                  }}>
-                    ភ្លេចពាក្យសម្ងាត់?
-                  </Typography>
-
-            
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={remember}
+                          onChange={(e) => setRemember(e.target.checked)}
+                          size="small"
+                        />
+                      }
+                      label={
+                        <Typography sx={{ fontSize: 12 }}>
+                          {t("remember_me")}
+                        </Typography>
+                      }
+                    />
+                    <Typography sx={{
+                      textAlign: "right", fontSize: "12px", color: "primary.main",
+                      cursor: "pointer",
+                      "&:hover": { textDecoration: "underline" },
+                    }}>
+                      {t(`forgot_password`)}
+                    </Typography>
+                  </Stack>
                   <Button
                     type="submit"
                     variant="contained"
                     fullWidth
                     disabled={loading || isSubmitting}
                     sx={{
-                      py: 1.3,
+                      py: 1,
                       fontWeight: 600,
                       fontSize: "15px",
                       borderRadius: 1,
@@ -319,7 +365,7 @@ export default function Login() {
                       transition: "all 0.25s ease",
                     }}
                   >
-                    {loading ? "Logging in..." : "Login"}
+                    {loading ? t(`logging_in`) : t(`login`)}
                   </Button>
                 </Form>
               )}
@@ -333,7 +379,6 @@ export default function Login() {
             </Typography>
           </Stack>
         </Box>
-
       </Paper>
     </Box>
   );

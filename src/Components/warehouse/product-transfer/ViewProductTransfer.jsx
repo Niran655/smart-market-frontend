@@ -236,7 +236,7 @@ export default function ViewProductTransfer({
       PaperProps={{ sx: { width: 620 } }}
     >
       <Stack p={3} spacing={2}>
-        {/* HEADER */}
+        
         <Stack direction="row" justifyContent="space-between">
           <Typography variant="h6">
             {t("view_product_transfer")}
@@ -254,7 +254,7 @@ export default function ViewProductTransfer({
 
         <Divider />
 
-        {/* INFO */}
+       
         <Stack direction="row" justifyContent="space-between">
           <Box>
             <Typography>
@@ -294,7 +294,7 @@ export default function ViewProductTransfer({
 
         <Divider />
 
-        {/* TABLE */}
+     
         <Table size="small">
           <TableHead>
             <TableRow>
@@ -331,7 +331,7 @@ export default function ViewProductTransfer({
 
         <Divider />
 
-        {/* SUMMARY */}
+    
         <Stack spacing={1} alignItems="flex-end">
           <Typography>
             <b>{t("total_qty")}:</b> {totalQty}

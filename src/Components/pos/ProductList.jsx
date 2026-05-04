@@ -23,6 +23,7 @@ const ProductList = ({
   setSearchKeyword,
   filteredProducts,
   onProductClick,
+  loading
 }) => {
   const [visibleCount, setVisibleCount] = useState(12);
 
@@ -37,7 +38,7 @@ const ProductList = ({
 
   return (
     <>
-      {/* HEADER */}
+   
       <Grid container className="product-list-header">
         <Grid size={{ xs: 6 }}>
           <Typography className="section-title">
@@ -64,7 +65,7 @@ const ProductList = ({
         </Grid>
       </Grid>
 
-      {/* CATEGORY */}
+ 
       <Box className="category-scroll-container">
         {categories.map((category) => {
           const { name } = getCategoryData(category, language);
@@ -85,7 +86,7 @@ const ProductList = ({
         })}
       </Box>
 
-      {/* PRODUCT GRID */}
+ 
       <Grid container spacing={1} className="product-grid">
         {filteredProducts
           ?.slice(0, visibleCount)
@@ -132,8 +133,7 @@ const ProductList = ({
             </Grid>
           ))}
       </Grid>
-
-      {/* LOAD MORE BUTTON */}
+ 
       {visibleCount < filteredProducts?.length && (
         <Box textAlign="center" mt={2} mb={10}>
           <Button variant="contained" onClick={handleLoadMore}>

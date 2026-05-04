@@ -7,7 +7,7 @@ import { useContext, useState } from "react";
 
 import CambodiaFlag from "../assets/Image/cambodiaflag.png";
 import EnglishFlag from "../assets/Image/englishflag.png";
-import MartLogo from "../assets/Image/mart-logo.png";
+ 
 import { AuthContext } from "../Context/AuthContext";
 import { translateLauguage } from "../Function/translate";
 import "./topnavbar.scss";
@@ -61,7 +61,7 @@ export default function TopNavbar({ width, toggleDrawer }) {
                 width < 1400 ? "image-container-mobile" : "image-container"
               }
             >
-              <img src={MartLogo} alt="logo" className="logo" />
+             
             </IconButton>
           </Stack>
           <Stack direction="column" justifyContent="center">

@@ -5,7 +5,7 @@ import { Avatar, Box, Collapse, List, ListItem, ListItemButton, ListItemIcon, St
 import { Bag2, Category, DocumentText1, HomeHashtag, Messages2, Tag, UserOctagon } from "iconsax-react";
 import { useState } from "react";
 
-import logo from "../assets/Image/logo.png";
+import logo from "../assets/Image/small-logo.png";
 import { useThemeContext } from "../Context/ThemeContext";
 import "./menuNavbar.scss";
 import { useAuth } from "../Context/AuthContext";
@@ -113,9 +113,9 @@ export default function MenuNavbar() {
             spacing={1.5}
             alignItems="center"
             justifyContent="center"
-            
+             
           >
-            <Avatar alt="logo" src={logo} sx={{ width: 48, height: 48 }} />
+            <Avatar alt="logo" src={logo} sx={{ width: 35, height: 35,borderRadius:0 }} />
             {layoutMode !== "compact" && (
               <Stack direction="column">
                 <Typography sx={{ fontWeight: 600, color: textColor }}>
@@ -162,7 +162,7 @@ export default function MenuNavbar() {
                   >
                     <ListItemButton
                       sx={{
-                        color: textColor,                     // dynamic text color
+                        color: textColor,                      
                         justifyContent:
                           layoutMode === "compact" ? "center" : "flex-start",
                         px: layoutMode === "compact" ? 0 : 2,
@@ -250,7 +250,7 @@ export default function MenuNavbar() {
           </List>
         </Stack>
 
-        {/* Settings at bottom */}
+ 
         <List sx={{ px: 2, pb: 2 }}>
           <ListItem
             disablePadding
@@ -262,6 +262,7 @@ export default function MenuNavbar() {
                   : "transparent",
               transition: "background-color 0.3s ease",
               textAlign: "center",
+              borderRadius: "8px",
               "&:hover": {
                 backgroundColor:
                   location.pathname === "/setting"

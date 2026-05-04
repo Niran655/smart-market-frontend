@@ -123,10 +123,7 @@ const StoreSetting = () => {
           </Breadcrumbs>
         </Box>
       </Stack>
-
-      {/* ==========================
-         SEARCH
-      ========================== */}
+ 
 
       <Box
         sx={{
@@ -181,15 +178,12 @@ const StoreSetting = () => {
           )}
         </Stack>
       </Box>
-
-      {/* ==========================
-         TABLE
-      ========================== */}
+ 
 
       <TableContainer className="table-container" sx={{ mt: 2 }}>
         <Table className="table">
 
-          {/* TABLE HEADER */}
+          
 
           <TableHead>
             <TableRow>
@@ -208,7 +202,7 @@ const StoreSetting = () => {
             </TableRow>
           </TableHead>
 
-          {/* TABLE BODY */}
+       
 
           {loading ? (
             <CircularIndeterminate />
@@ -276,9 +270,7 @@ const StoreSetting = () => {
           )}
         </Table>
 
-        {/* ==========================
-           PAGINATION
-        ========================== */}
+    
 
         <Stack
           direction="row"

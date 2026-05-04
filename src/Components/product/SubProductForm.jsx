@@ -354,7 +354,7 @@ export default function SubProductForm({
       <FormikProvider value={formik}>
         <form onSubmit={handleSubmit}>
           <DialogContent dividers>
-            {/* TAB 0 - Information */}
+           
             {tabIndex === 0 && (
               <Box>
                 <Grid container spacing={2}>
@@ -421,7 +421,7 @@ export default function SubProductForm({
               </Box>
             )}
 
-            {/* TAB 1 - Price */}
+            
             {tabIndex === 1 && (
               <Box>
                 <Grid container spacing={2}>
@@ -457,7 +457,7 @@ export default function SubProductForm({
               </Box>
             )}
 
-            {/* TAB 2 - Addition Price with nested children (sizes + sugar) */}
+             
             {tabIndex === 2 && (
               <Box>
                 <TableContainer component={Paper} variant="outlined">
@@ -548,7 +548,7 @@ export default function SubProductForm({
                             </TableCell>
                           </TableRow>
 
-                          {/* Child rows: Sugar Levels for this size */}
+               
                           <TableRow>
                             <TableCell colSpan={9} style={{ paddingBottom: 0, paddingTop: 0 }}>
                               <Collapse in={expandedRows[pIdx]} timeout="auto" unmountOnExit>
@@ -651,7 +651,7 @@ export default function SubProductForm({
               </Box>
             )}
 
-            {/* TAB 3 - Other */}
+ 
             {tabIndex === 3 && (
               <Box>
                 <Grid container spacing={2}>

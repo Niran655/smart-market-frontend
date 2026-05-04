@@ -133,7 +133,7 @@ const handleAddToCart = () => {
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogContent sx={{ p: 2 }}>
         <Grid container spacing={4}>
-          {/* Left Column: Image */}
+ 
           <Grid size={{ xs: 12, md: 5 }}>
             <Box sx={{ width: "100%", borderRadius: 1, overflow: "hidden", boxShadow: 1 }}>
               <CardMedia

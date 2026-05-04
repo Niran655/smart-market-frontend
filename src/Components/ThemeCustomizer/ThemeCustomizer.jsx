@@ -259,7 +259,7 @@ export default function ThemeCustomizer() {
             }}
           >
             <Stack spacing={3}>
-              {/* Theme Mode - Four buttons */}
+ 
               <Box>
                 <Typography
                   variant="subtitle2"
@@ -421,7 +421,7 @@ export default function ThemeCustomizer() {
                 }}
               />
 
-              {/* Mobile Drawer Width */}
+         
               <Box>
                 <Typography
                   variant="subtitle2"
@@ -497,7 +497,7 @@ export default function ThemeCustomizer() {
                 }}
               />
 
-              {/* Show Labels on Mobile */}
+ 
               <Box>
                 <Typography
                   variant="subtitle2"
@@ -560,7 +560,7 @@ export default function ThemeCustomizer() {
                 }}
               />
 
-              {/* Primary Color */}
+    
               <Box>
                 <Typography
                   variant="subtitle2"
@@ -620,7 +620,7 @@ export default function ThemeCustomizer() {
                 }}
               />
 
-              {/* Sidebar Color */}
+   
               <Box>
                 <Typography
                   variant="subtitle2"
@@ -685,7 +685,7 @@ export default function ThemeCustomizer() {
                 }}
               />
 
-              {/* Topbar Color */}
+               
               <Box>
                 <Typography
                   variant="subtitle2"
@@ -750,7 +750,7 @@ export default function ThemeCustomizer() {
                 }}
               />
 
-              {/* Layout Mode */}
+   
               <Box>
                 <FormControl component="fieldset">
                   <FormLabel component="legend">

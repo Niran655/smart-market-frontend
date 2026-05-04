@@ -107,7 +107,7 @@ const CartPanel = ({
   return (
     <Box>
       <Box className="cart-panel" sx={{ overflow: "auto", height: "100%" }}>
-        {/* Header */}
+        
         <Box className="cart-header">
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography className="cart-title">{t("current_order")}</Typography>
@@ -272,7 +272,7 @@ const CartPanel = ({
 
         <Divider className="section-divider" />
 
-        {/* Cart Items */}
+     
         <Box className="cart-items-container">
           {cart.length === 0 ? (
             <Typography className="empty-cart-message">{t("cart_empty")}</Typography>
@@ -328,8 +328,7 @@ const CartPanel = ({
         </Box>
 
         <Divider className="section-divider" />
-
-        {/* Order Summary */}
+ 
         <Box className="order-summary">
           <Box className="summary-row">
             <Typography className="summary-label">{t("subtotal")}</Typography>
@@ -350,7 +349,7 @@ const CartPanel = ({
           </Box>
         </Box>
 
-        {/* Action Buttons */}
+       
         <Stack direction="row" spacing={2} alignItems="center" sx={{ px: 1.5, pb: 1.5 }}>
           <Button
             fullWidth

@@ -402,7 +402,7 @@ const ShopCard = ({ shop, language, t, onJoin, onReport, shopActions }) => {
             </Box>
           </Stack>
 
-          {/* Report button */}
+      
           <Button
             size="small"
             variant="outlined"
@@ -425,10 +425,10 @@ const ShopCard = ({ shop, language, t, onJoin, onReport, shopActions }) => {
         </Stack>
       </Box>
 
-      {/* Divider */}
+    
       <Divider sx={{ borderColor: theme.palette.divider }} />
 
-      {/* Action Footer */}
+      
       <Box sx={{ p: 2, bgcolor: theme.palette.action.hover }}>
         <Stack direction="row" spacing={1} alignItems="center">
           <Button
@@ -739,7 +739,7 @@ const Store = () => {
             ))}
       </Grid>
 
-      {/* ── Create Shop Modal ── */}
+ 
       {open && (
         <ShopForm
           open={open}

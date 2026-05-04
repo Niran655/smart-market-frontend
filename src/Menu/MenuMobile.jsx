@@ -102,7 +102,7 @@ export default function MenuMobile({ onNavigate, showLabels }) {
         justifyContent="space-between"
         sx={{ flex: 1, py: 2 }}
       >
-        {/* Avatar and main menu */}
+ 
         <Stack direction="column" spacing={2} alignItems="center">
           <Avatar
             alt="logo"
@@ -171,8 +171,7 @@ export default function MenuMobile({ onNavigate, showLabels }) {
             })}
           </List>
         </Stack>
-
-        {/* Settings at bottom */}
+ 
         <List sx={{ width: "100%", px: 0 }}>
           <ListItem
             disablePadding

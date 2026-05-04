@@ -1086,6 +1086,7 @@ const POS = () => {
               setSearchKeyword={setSearchKeyword}
               filteredProducts={filteredProducts}
               onProductClick={handleOpenProductDialog}
+              loading={loading}
             />
           </Box>
         </Grid>

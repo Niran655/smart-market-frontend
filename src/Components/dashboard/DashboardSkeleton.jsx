@@ -5,7 +5,7 @@ import { useTheme } from "@mui/material/styles";
 const DashboardSkeleton = () => {
   const theme = useTheme();
 
-  // Helper: skeleton row for tables
+  
   const TableRowSkeleton = ({ cols = 3 }) => (
     <Stack direction="row" spacing={2} sx={{ py: 1.2, px: 2 }}>
       {Array.from({ length: cols }).map((_, i) => (
@@ -40,7 +40,7 @@ const DashboardSkeleton = () => {
         </Grid>
       </Box>
 
-      {/* Top 4 Banner Cards */}
+ 
       <Grid container spacing={1.5} sx={{ mb: 1.5 }}>
         {Array.from({ length: 4 }).map((_, i) => (
           <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
@@ -59,7 +59,7 @@ const DashboardSkeleton = () => {
         ))}
       </Grid>
 
-      {/* Secondary Stat Cards */}
+ 
       <Grid container spacing={1.5} sx={{ mb: 2 }}>
         {Array.from({ length: 4 }).map((_, i) => (
           <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
@@ -77,7 +77,7 @@ const DashboardSkeleton = () => {
         ))}
       </Grid>
 
-      {/* Sales & Purchase Chart + Overall Info */}
+    
       <Grid container spacing={1.5} sx={{ mb: 1.5 }}>
         <Grid size={{ xs: 12, md: 8 }}>
           <Card sx={{ p: 2 }}>
@@ -121,7 +121,7 @@ const DashboardSkeleton = () => {
         </Grid>
       </Grid>
 
-      {/* Top Selling + Low Stock */}
+ 
       <Grid container spacing={1.5} sx={{ mb: 1.5 }}>
         <Grid size={{ xs: 12, md: 6 }}>
           <Card sx={{ p: 2 }}>
@@ -151,7 +151,7 @@ const DashboardSkeleton = () => {
         </Grid>
       </Grid>
 
-      {/* Sales Stats + Recent Transactions */}
+    
       <Grid container spacing={1.5} sx={{ mb: 1.5 }}>
         <Grid size={{ xs: 12, md: 7 }}>
           <Card sx={{ p: 2 }}>
@@ -185,7 +185,7 @@ const DashboardSkeleton = () => {
         </Grid>
       </Grid>
 
-      {/* Bottom Row */}
+    
       <Grid container spacing={1.5}>
         <Grid size={{ xs: 12, md: 3 }}>
           <Card sx={{ p: 2, height: "100%" }}>

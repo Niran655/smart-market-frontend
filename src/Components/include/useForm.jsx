@@ -59,8 +59,7 @@ export default function ReusableForm({
 
   const { values, errors, touched, handleSubmit, getFieldProps, setFieldValue, setValues } = formik;
   
-  console.log("error::",errors);
-  console.log("values::",values);
+  
 
   useEffect(() => {
     setValues(initialValues);

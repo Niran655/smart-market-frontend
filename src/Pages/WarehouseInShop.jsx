@@ -482,12 +482,12 @@ const WarehouseInShop = () => {
                           />
                         </TableCell>
 
-                        {/* Date */}
+                      
                         <TableCell>
                           {new Date(row?.createdAt).toLocaleDateString()}
                         </TableCell>
 
-                        {/* Action */}
+                    
                         <TableCell>
                           <GetProductInShopAction
                             t={t}
@@ -547,24 +547,24 @@ const WarehouseInShop = () => {
                     {stockMovement?.map((row, index) => (
                       <TableRow className="table-row" key={index}>
 
-                        {/* No */}
+            
                         <TableCell>
                           {stockMovementPaginator?.slNo + index}
                         </TableCell>
 
-                        {/* Date */}
+                     
                         <TableCell>
                           {new Date(row?.createdAt).toLocaleString()}
                         </TableCell>
 
-                        {/* Product */}
+                       
                         <TableCell>
                           {language === "kh"
                             ? row?.product?.nameKh
                             : row?.product?.nameEn}
                         </TableCell>
 
-                        {/* Type */}
+                       
                         <TableCell>
                           <Chip
                             label={row?.type}
@@ -583,7 +583,7 @@ const WarehouseInShop = () => {
                           />
                         </TableCell>
 
-                        {/* Quantity */}
+                
                         <TableCell>
                           {row?.quantity}{" "}
                           {language === "kh"
@@ -591,13 +591,13 @@ const WarehouseInShop = () => {
                             : row?.subProduct?.unitId?.nameEn}
                         </TableCell>
 
-                        {/* Previous Stock */}
+            
                         <TableCell>{row?.previousStock}</TableCell>
 
-                        {/* New Stock */}
+                    
                         <TableCell>{row?.newStock}</TableCell>
 
-                        {/* Reason */}
+                     
                         <TableCell>{row?.reason || "-"}</TableCell>
 
 

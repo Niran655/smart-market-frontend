@@ -84,7 +84,7 @@ const RecentOrders = ({ selectedOrderType, setSelectedOrderType, t }) => {
 
   return (
     <Box mb={3}>
-      {/* Header Section */}
+ 
       <Grid container alignItems="center" spacing={2} mb={3}>
         <Grid size={{ sx: 12, md: 2 }}>
           <Typography variant="h6" fontWeight="bold">

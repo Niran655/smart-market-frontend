@@ -253,7 +253,7 @@ export default function PurchaseOrderView({
       PaperProps={{ sx: { width: 620 } }}
     >
       <Stack p={3} spacing={2}>
-        {/* HEADER */}
+    
         <Stack direction="row" justifyContent="space-between">
           <Typography variant="h6">
             {t("purchase_order_invoice")}
@@ -341,7 +341,7 @@ export default function PurchaseOrderView({
 
           <Divider sx={{ my: 2 }} />
 
-          {/* SUMMARY */}
+       
           <Stack spacing={1} alignItems="flex-end">
             <Typography>
               <b>{t("total_qty")}:</b> {totalQty}

@@ -176,9 +176,7 @@ const SummaryCard = ({ label, value, colorName = "primary", icon }) => {
   );
 };
 
-// ─────────────────────────────────────────────
-// Main Component
-// ─────────────────────────────────────────────
+
 const ReportPage = ({ shopId = null }) => {
   const theme = useTheme();
   const { language, user } = useAuth();
@@ -540,7 +538,11 @@ const ReportPage = ({ shopId = null }) => {
   const showDateFilter = !["supplier", "supplierDue", "productAlert", "annual"].includes(currentTabValue);
 
   const renderContent = () => {
-    if (loading) return <CircularIndeterminate />;
+    if (loading) return (
+      <Table>
+        <CircularIndeterminate />
+      </Table>
+    );
     if (error) return (
       <Alert severity="error" sx={{ my: 2, }}>
         {t("failed_to_load_report")}: {error.message}
@@ -605,7 +607,7 @@ const ReportPage = ({ shopId = null }) => {
           </Grid>
         )}
 
-        {/* Table */}
+  
         <Paper
           variant="outlined"
           sx={{
@@ -665,7 +667,7 @@ const ReportPage = ({ shopId = null }) => {
                             borderBottom: `1px solid ${theme.palette.divider}`,
                           }}
                         >
-                          {/* Chip for status cells */}
+                    
                           {typeof cell === "string" && ["paid", "unpaid", "pending", "overdue", "active", "inactive", "completed", "cancelled"].includes(cell.toLowerCase()) ? (
                             <Chip
                               label={cell}
@@ -703,17 +705,25 @@ const ReportPage = ({ shopId = null }) => {
           </TableContainer>
         </Paper>
 
-        {/* Pagination */}
+
         {paginator && totalDocs > 0 && totalPages > 0 && (
-          <FooterPagination
-            totalPages={totalPages}
-            totalDocs={totalDocs}
-            limit={limit}
-            page={page}
-            setPage={setPage}
-            handleLimit={handleLimitChange}
-            Type={currentTabValue}
-          />
+          <Stack
+            direction="row"
+            justifyContent="flex-end"
+            alignItems="center"
+            sx={{ padding: 2 }}
+          >
+            <FooterPagination
+              totalPages={totalPages}
+              totalDocs={totalDocs}
+              limit={limit}
+              page={page}
+              setPage={setPage}
+              handleLimit={handleLimitChange}
+              Type={currentTabValue}
+            />
+          </Stack>
+
         )}
       </>
     );
