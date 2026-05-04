@@ -28,9 +28,42 @@
 //   };
 //   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 // };
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext(null);
+const AUTH_LOGOUT_EVENT = "auth:logout";
+
+const parseJwtPayload = (token) => {
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return null;
+
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const decoded = atob(base64);
+    return JSON.parse(decoded);
+  } catch {
+    return null;
+  }
+};
+
+const getTokenExpirationTime = (token) => {
+  const payload = parseJwtPayload(token);
+  return typeof payload?.exp === "number" ? payload.exp * 1000 : null;
+};
+
+const getStoredToken = () => {
+  const storedToken = localStorage.getItem("token");
+  if (!storedToken) return null;
+
+  const expiresAt = getTokenExpirationTime(storedToken);
+  if (!expiresAt || expiresAt <= Date.now()) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    return null;
+  }
+
+  return storedToken;
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -40,12 +73,20 @@ export const useAuth = () => {
   return context;
 };
 
+// eslint-disable-next-line react/prop-types
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem("token") || null);
+  const [token, setToken] = useState(getStoredToken);
  
   const [user, setUser] = useState(() => {
+    if (!getStoredToken()) return null;
+
     const saved = localStorage.getItem("user");
-    return saved ? JSON.parse(saved) : null;
+    try {
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      localStorage.removeItem("user");
+      return null;
+    }
   });
   const userRole = user?.role || "";
   const handleGetLanguage = () => {
@@ -112,12 +153,43 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setToken(null);
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!token) return undefined;
+
+    const expiresAt = getTokenExpirationTime(token);
+    if (!expiresAt || expiresAt <= Date.now()) {
+      logout();
+      return undefined;
+    }
+
+    const timeout = window.setTimeout(logout, expiresAt - Date.now());
+    return () => window.clearTimeout(timeout);
+  }, [token, logout]);
+
+  useEffect(() => {
+    const handleForcedLogout = () => logout();
+
+    const handleStorageChange = (event) => {
+      if (event.key === "token" && !event.newValue) {
+        logout();
+      }
+    };
+
+    window.addEventListener(AUTH_LOGOUT_EVENT, handleForcedLogout);
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener(AUTH_LOGOUT_EVENT, handleForcedLogout);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [logout]);
 
   return (
     <AuthContext.Provider

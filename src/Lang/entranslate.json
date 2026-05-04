@@ -450,6 +450,8 @@
   "forgot_password":"Forgot Password?",
   "remember_me":"Remember Me",
   "no_stores_found":"No stores found. Please contact your administrator.",
-  "try_different_search":"Try a different search or check with your administrator if you think this should be here."
+  "try_different_search":"Try a different search or check with your administrator if you think this should be here.",
+  "custom_range":"Custom Range",
+  "logout":"Logout"
   
 }

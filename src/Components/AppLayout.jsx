@@ -308,13 +308,13 @@ export default function AppLayout() {
                     <ListItemIcon>
                       <PersonIcon fontSize="small" />
                     </ListItemIcon>
-                    Profile
+                    {t(`profile`)}
                   </MenuItem>
                   <MenuItem onClick={handleLogout}>
                     <ListItemIcon>
                       <LogoutIcon fontSize="small" />
                     </ListItemIcon>
-                    Logout
+                    {t(`logout`)}
                   </MenuItem>
                 </MuiMenu>
               </Box>
