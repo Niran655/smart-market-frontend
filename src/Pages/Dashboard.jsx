@@ -692,7 +692,7 @@ export default function Dashboard() {
                   value: overview.totalSales?.value || 0,
                   change: overview.totalSales?.percentageChange || 0,
                   trend: overview.totalSales?.trend || "up",
-                  bg: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+                  bg: `linear-gradient(135deg, ${theme.palette.primary.main} 0%)`,
                 },
                 {
                   title: t("total_sale_return") || "Total Sales Return",
@@ -1238,7 +1238,7 @@ export default function Dashboard() {
     
         <Box id="pdr" sx={{ position: "fixed", left: "-10000px", top: 0, width: "100%", visibility: "hidden", "@media print": { position: "relative", left: 0, top: 0, visibility: "visible" } }}>
           <Box sx={{ bgcolor: theme.palette.background.default, p: 2 }}>
-            <Box sx={{ background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`, color: "#fff", p: 2.5, borderRadius: "12px 12px 0 0" }}>
+            <Box sx={{ background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%)`, color: "#fff", p: 2.5, borderRadius: "12px 12px 0 0" }}>
               <Stack direction="row" justifyContent="space-between">
                 <Box>
                   <Typography variant="h6" fontWeight={800}>{printData.companyName}</Typography>

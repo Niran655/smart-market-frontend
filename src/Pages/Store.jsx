@@ -568,7 +568,7 @@ const Store = () => {
     <Box >
       <Box
         sx={{
-          background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 60%, ${theme.palette.primary.light} 100%)`,
+          background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 60%)`,
           borderRadius:1,
           px: 3,
           py: 2.5,

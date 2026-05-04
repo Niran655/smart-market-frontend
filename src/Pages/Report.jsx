@@ -757,7 +757,7 @@ const ReportPage = ({ shopId = null }) => {
           <Paper
             elevation={0}
             sx={{
-              background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 60%, ${theme.palette.primary.light} 100%)`,
+              background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 60%)`,
 
               px: 3,
               py: 2,
@@ -785,7 +785,7 @@ const ReportPage = ({ shopId = null }) => {
                   variant="h6"
                   sx={{ color: "white", fontWeight: 700, lineHeight: 1.2, fontSize: "1.1rem" }}
                 >
-                  {t("reports") || "Reports"}
+                  {t("reports")}
                 </Typography>
                 <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.75)" }}>
                   {tabs[activeTab].label}

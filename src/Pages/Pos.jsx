@@ -794,7 +794,7 @@ const POS = () => {
  
   const [getSubProduct] = useLazyQuery(GET_SUPPRODUCT_BY_ID);
 
-  const { data, loading } = useQuery(GET_PRODUCT_FOR_SALE_WITH_PAGINATION, {
+  const { data, loading, previousData } = useQuery(GET_PRODUCT_FOR_SALE_WITH_PAGINATION, {
     variables: {
       shopId,
       page: 1,
@@ -805,6 +805,8 @@ const POS = () => {
     },
     pollInterval: 1000,
   });
+  const productData = data ?? previousData;
+  const initialProductsLoading = loading && !productData;
 
   const { refetch: refetchCustomers } = useQuery(GET_CUSTOMERS_BY_SHOP_ID, { 
     variables: { shopId: [shopId] } 
@@ -837,9 +839,9 @@ const POS = () => {
 
   
   useEffect(() => {
-    if (data?.getProductForSaleWithPagination?.data) {
+    if (productData?.getProductForSaleWithPagination?.data) {
       const categoryMap = new Map();
-      data.getProductForSaleWithPagination.data
+      productData.getProductForSaleWithPagination.data
         .filter((item) => item.parentProductId?.categoryId)
         .forEach((item) => {
           const category = item.parentProductId.categoryId;
@@ -856,7 +858,7 @@ const POS = () => {
         ...Array.from(categoryMap.values()),
       ]);
     }
-  }, [data, language]);
+  }, [productData, language]);
 
  
   const handleScan = async (barcode) => {
@@ -1023,7 +1025,7 @@ const POS = () => {
   if (activeShopId !== shopId) return <Navigate to="/store" replace />;
 
  
-  const filteredProducts = data?.getProductForSaleWithPagination?.data?.filter((item) => {
+  const filteredProducts = productData?.getProductForSaleWithPagination?.data?.filter((item) => {
     const matchesSearch =
       item.parentProductId?.nameKh?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
       item.parentProductId?.nameEn?.toLowerCase().includes(searchKeyword.toLowerCase());
@@ -1086,7 +1088,7 @@ const POS = () => {
               setSearchKeyword={setSearchKeyword}
               filteredProducts={filteredProducts}
               onProductClick={handleOpenProductDialog}
-              loading={loading}
+              loading={initialProductsLoading}
             />
           </Box>
         </Grid>

@@ -199,7 +199,6 @@ const CartPanel = ({
                 size="small"
                 onClick={() => setOpenCustomerForm(true)}
                 sx={{ mt: 0.5, px: 0.5 }}
-                title={t("add_customer")}
               >
                 <SquarePlus fontSize="small" />
               </IconButton>

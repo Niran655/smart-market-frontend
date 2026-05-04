@@ -233,7 +233,7 @@ const CARD_META = [
 const SettingCard = ({ to, image, title, description, colorKey, muiIcon }) => {
   const theme = useTheme();
   const accentColor = theme.palette[colorKey]?.main || theme.palette.primary.main;
-  const bgColor = theme.palette[colorKey]?.light + "30" || theme.palette.primary.light + "30"; // 30 = 18% opacity
+  const bgColor = theme.palette[colorKey]?.light + "30" || theme.palette.primary.light + "30";  
 
   return (
     <Paper
@@ -401,7 +401,7 @@ export default function Settings() {
 
       <Box
         sx={{
-          background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 60%, ${theme.palette.primary.light} 100%)`,
+          background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 60%)`,
           borderRadius: 1,
           px: 3,
           py: 2,
