@@ -601,7 +601,7 @@ useEffect(() => {
             ? "#0f172a"
             : "#E2E8F0",
           paper: isKhmerNewYear
-            ? "rgba(13, 17, 23, 0.85)"   // semi-transparent dark for cards
+            ? "rgba(13, 17, 23, 0.85)"    
             : isGlass
             ? "rgba(30, 41, 59, 0.7)"
             : baseMode === "dark"

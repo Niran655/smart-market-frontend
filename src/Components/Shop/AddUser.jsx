@@ -1,15 +1,37 @@
 import { useMutation, useQuery } from "@apollo/client/react";
-import { Button, Chip, CircularProgress, Dialog, DialogContent, DialogContentText, DialogTitle, Divider, FormControl, Grid, IconButton, MenuItem, OutlinedInput, Select, Stack, Typography } from "@mui/material";
+import {
+  Button,
+  Chip,
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  FormControl,
+  IconButton,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { CircleX } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import "../../Styles/dialogStyle.scss";
-import { ADD_USER_CONTROLL_SHOP, DELETE_USER_FROM_SHOP } from "../../../graphql/mutation";
+import {
+  ADD_USER_CONTROLL_SHOP,
+  DELETE_USER_FROM_SHOP,
+} from "../../../graphql/mutation";
 import { useAuth } from "../../Context/AuthContext";
-import { GET_SHOP_BY_SHOP_ID, GET_USER_WITH_PAGINATION } from "../../../graphql/queries";
+import {
+  GET_SHOP_BY_SHOP_ID,
+  GET_USER_WITH_PAGINATION,
+} from "../../../graphql/queries";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
+
 const MenuProps = {
   PaperProps: {
     style: {
@@ -27,36 +49,24 @@ export default function AddUser({
   shopId,
   userId,
 }) {
-  const { setAlert } = useAuth();
+  const { setAlert, language } = useAuth();
+
   const [loading, setLoading] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const { language } = useAuth();
-  const {
-    data,
-    refetch,
-    loading: queryLoading,
-  } = useQuery(GET_USER_WITH_PAGINATION, {
-    variables: { page: 1, limit: 10, pagination: false, keyword: "", role: "" },
-  });
 
-  const [deleteUserFromShop] = useMutation(DELETE_USER_FROM_SHOP, {
-    onCompleted: ({ deleteUserFromShop }) => {
-      setDeleteLoading(false);
-      if (deleteUserFromShop?.isSuccess) {
-        setAlert(true, "success", deleteUserFromShop?.message);
-        setRefetch?.();
-        refetchShop();
-        refetch();
-      } else {
-        setAlert(true, "error", deleteUserFromShop?.message);
-      }
-    },
-    onError: (error) => {
-      setDeleteLoading(false);
-      console.error("Delete Error", error);
-    },
-  });
+  const { data, refetch, loading: queryLoading } = useQuery(
+    GET_USER_WITH_PAGINATION,
+    {
+      variables: {
+        page: 1,
+        limit: 10,
+        pagination: false,
+        keyword: "",
+        role: "",
+      },
+    }
+  );
 
   const {
     data: shopData,
@@ -64,7 +74,6 @@ export default function AddUser({
     refetch: refetchShop,
   } = useQuery(GET_SHOP_BY_SHOP_ID, {
     variables: { shopId: shopId, id: userId },
-    // skip: !shopId,
   });
 
   const [addUserControllShop] = useMutation(ADD_USER_CONTROLL_SHOP, {
@@ -83,25 +92,40 @@ export default function AddUser({
     },
     onError: (error) => {
       setLoading(false);
-      console.error("Error", error);
+      console.error(error);
       setAlert(true, "error", t("add_failed"));
     },
   });
 
+  const [deleteUserFromShop] = useMutation(DELETE_USER_FROM_SHOP, {
+    onCompleted: ({ deleteUserFromShop }) => {
+      setDeleteLoading(false);
+      if (deleteUserFromShop?.isSuccess) {
+        setAlert(true, "success", deleteUserFromShop?.message);
+        setRefetch?.();
+        refetchShop();
+        refetch();
+      } else {
+        setAlert(true, "error", deleteUserFromShop?.message);
+      }
+    },
+    onError: (error) => {
+      setDeleteLoading(false);
+      console.error(error);
+    },
+  });
+
   const existingUsers = shopData?.getShopByShopId?.user || [];
- 
-  const existingUserIds = existingUsers.map((user) => user._id || user.id);
+  const existingUserIds = existingUsers.map((u) => u._id || u.id);
 
   const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
+    const { value } = event.target;
     setSelectedUsers(typeof value === "string" ? value.split(",") : value);
   };
 
   const handleSubmit = () => {
     if (!shopId || selectedUsers.length === 0) {
-      setAlert(true, "error", t("missing_data") || "Missing data");
+      setAlert(true, "error", t("missing_data"));
       return;
     }
 
@@ -110,150 +134,127 @@ export default function AddUser({
     );
 
     if (newUsers.length === 0) {
-      setAlert(
-        true,
-        "error",
-        t("no_new_user_selected") || "No new users selected"
-      );
+      setAlert(true, "error", t("no_new_user_selected"));
       return;
     }
 
     setLoading(true);
     addUserControllShop({
-      variables: {
-        id: shopId,
-        userId: newUsers,
-      },
+      variables: { id: shopId, userId: newUsers },
     });
   };
 
-  const handleDeleteUser = (userIdToDelete) => {
-    
-    if (!shopId || !userIdToDelete) {
-      setAlert(true, "error", "Missing shop or user ID");
-      return;
-    }
+  const handleDeleteUser = (uid) => {
+    if (!shopId || !uid) return;
 
     setDeleteLoading(true);
     deleteUserFromShop({
-      variables: {
-        id: shopId,
-        userId: userIdToDelete,
-      },
+      variables: { id: shopId, userId: uid },
     });
   };
 
   useEffect(() => {
-    if (!open) {
-      setSelectedUsers([]);
-    }
+    if (!open) setSelectedUsers([]);
   }, [open]);
 
   return (
-    <Dialog
-      open={open}
-      className="dialog-container"
-      PaperProps={{
-        style: { position: "absolute", width: "450px", borderRadius: "8px" },
-      }}
-    >
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems={"center"}
-        >
+        <Stack direction="row" justifyContent="space-between">
           <Typography>{t("add_user")}</Typography>
           <IconButton onClick={onClose}>
-            <CircleX className="dialog-close-icon" />
+            <CircleX />
           </IconButton>
         </Stack>
       </DialogTitle>
+
       <Divider />
+
       <DialogContent>
-        <DialogContentText>
-          <Stack margin="0px 0px 20px 0px" spacing={3}>
+        <DialogContentText component="div">
+          <Stack spacing={3}>
+            {/* Current Users */}
             <Stack spacing={1}>
-              <Typography variant="subtitle1" fontWeight="bold">
-                {t("current_users") || "Current Users"}
+              <Typography fontWeight="bold">
+                {t("current_users")}
               </Typography>
+
               {shopLoading ? (
                 <CircularProgress size={20} />
               ) : existingUsers.length === 0 ? (
-                <Typography variant="body2" color="text.secondary">
+                <Typography color="text.secondary">
                   {t("no_users_assigned")}
                 </Typography>
               ) : (
-                <Stack spacing={1}>
-                  {existingUsers.map((user) => (
-                    <Stack
-                      key={user._id || user.id}
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      sx={{
-                        p: 1,
-                        border: 1,
-                        borderColor: "divider",
-                        borderRadius: 1,
-                      }}
+                existingUsers.map((user) => (
+                  <Stack
+                    key={user._id || user.id}
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{ p: 1, border: 1, borderRadius: 1 }}
+                  >
+                    <Typography>
+                      {language === "en" ? user.nameEn : user.nameKh}
+                    </Typography>
+
+                    <Typography>{user.role}</Typography>
+
+                    <Button
+                      color="error"
+                      size="small"
+                      onClick={() =>
+                        handleDeleteUser(user._id || user.id)
+                      }
                     >
-                      <Typography>
-                        {language == "en" ? user.nameEn : user.nameKh}
-                      </Typography>
-                      <Typography>{user.role || user.role}</Typography>
-                      <Button
-                        size="small"
-                        color="error"
-                        disabled={deleteLoading}
-                        onClick={() => handleDeleteUser(user._id || user.id)}
-                      >
-                        {deleteLoading ? (
-                          <CircularProgress size={16} />
-                        ) : (
-                          "Remove"
-                        )}
-                      </Button>
-                    </Stack>
-                  ))}
-                </Stack>
+                      {deleteLoading ? (
+                        <CircularProgress size={16} />
+                      ) : (
+                        "Remove"
+                      )}
+                    </Button>
+                  </Stack>
+                ))
               )}
             </Stack>
 
             <Divider />
 
+            {/* Add Users */}
             <Stack spacing={1}>
-              <Typography variant="subtitle1" fontWeight="bold">
+              <Typography fontWeight="bold">
                 {t("add_new_users")}
               </Typography>
+
               {queryLoading ? (
                 <CircularProgress />
               ) : (
-                <FormControl sx={{ width: "100%" }}>
+                <FormControl fullWidth>
                   <Select
                     multiple
-                    value={selectedUsers}
                     size="small"
+                    value={selectedUsers}
                     onChange={handleChange}
-                    input={<OutlinedInput id="select-multiple-chip" />}
+                    input={<OutlinedInput />}
                     renderValue={(selected) => (
-                      <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                      <Stack direction="row" flexWrap="wrap" gap={1}>
                         {selected.map((id) => {
-                          const user = data?.getUsersWithPagination?.data.find(
-                            (u) => u._id === id || u.id === id
-                          );
+                          const user =
+                            data?.getUsersWithPagination?.data.find(
+                              (u) => u._id === id || u.id === id
+                            );
+
                           return (
                             <Chip
                               key={id}
-                              label={user?.nameKh || user?.nameEn || id}
+                              label={
+                                user?.nameKh || user?.nameEn || id
+                              }
                               onDelete={() =>
                                 setSelectedUsers((prev) =>
-                                  prev.filter((uid) => uid !== id)
+                                  prev.filter((x) => x !== id)
                                 )
                               }
-                              onMouseDown={(event) => {
-                                event.stopPropagation();
-                              }}
                             />
                           );
                         })}
@@ -265,14 +266,15 @@ export default function AddUser({
                       const isAdded = existingUserIds.includes(
                         user._id || user.id
                       );
+
                       return (
                         <MenuItem
                           key={user._id || user.id}
                           value={user._id || user.id}
                           disabled={isAdded}
                         >
-                          {user.nameKh || user.nameEn || user._id}
-                          {isAdded ? " (Already added)" : ""}
+                          {user.nameKh || user.nameEn}
+                          {isAdded && " (Added)"}
                         </MenuItem>
                       );
                     })}
@@ -282,16 +284,15 @@ export default function AddUser({
             </Stack>
 
             <Button
-              className="btn-primary"
               fullWidth
+              variant="contained"
               onClick={handleSubmit}
               disabled={loading || selectedUsers.length === 0}
-              variant="contained"
             >
               {loading ? (
                 <CircularProgress size={20} />
               ) : (
-                <Typography className="txt-btn">{t("create")}</Typography>
+                t("create")
               )}
             </Button>
           </Stack>

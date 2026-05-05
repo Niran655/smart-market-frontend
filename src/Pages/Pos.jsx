@@ -747,6 +747,7 @@ import {
   GET_SUPPRODUCT_BY_ID,
   GET_TABLE_BY_SHOP_ID,
   GET_CUSTOMERS_BY_SHOP_ID,
+  GET_SHOP_BY_ID,
 } from "../../graphql/queries";
 
 import { CREATE_SALE } from "../../graphql/mutation";
@@ -818,6 +819,11 @@ const POS = () => {
 
   const { data: customersData } = useQuery(GET_CUSTOMERS_BY_SHOP_ID, {
     variables: { shopId },
+  });
+
+  const { data: shopData } = useQuery(GET_SHOP_BY_ID, {
+    variables: { id: shopId },
+    skip: !shopId,
   });
 
  
@@ -945,6 +951,147 @@ const POS = () => {
   const removeFromCart = (id) => setCart((prev) => prev.filter((item) => item.id !== id));
   const clearCart = () => setCart([]);
 
+  const printSaleInvoice = (sale) => {
+    if (!sale) return;
+
+    const shop = shopData?.getShopById;
+    const shopName = shop?.nameEn || shop?.nameKh || "Smart Market";
+    const shopAddress = shop?.address || "";
+    const shopLogoUrl = shop?.image || shop?.logo || "";
+    const exchangeRate = Number(shop?.exchangeRate || 4100);
+    const formatUsd = (value) => `$${Number(value || 0).toFixed(2)}`;
+    const formatKhr = (value) =>
+      `${Math.round(Number(value || 0) * exchangeRate).toLocaleString("en-US")} KHR`;
+    const escapeHtml = (value = "") =>
+      String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    const formatDate = (value) => {
+      const date = value ? new Date(value) : new Date();
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    };
+
+    const totalQty = (sale.items || []).reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+    const itemRows = (sale.items || [])
+      .map(
+        (item) => `
+          <tr>
+            <td>${escapeHtml(item.name)}</td>
+            <td class="right">${formatUsd(item.price)}</td>
+            <td class="right">${item.quantity}</td>
+            <td class="right">${formatUsd(item.total)}</td>
+          </tr>`
+      )
+      .join("");
+
+    const logoHtml = shopLogoUrl
+      ? `<img class="logo" src="${escapeHtml(shopLogoUrl)}" alt="${escapeHtml(shopName)}" />`
+      : `<div class="logo fallback">${escapeHtml(shopName.charAt(0))}</div>`;
+
+    const tableRow = sale.orderType === "dine_in"
+      ? `<div class="info-row"><span>Table</span><strong>${escapeHtml(sale.tableNumber || "-")}</strong></div>`
+      : "";
+
+    const invoiceHtml = `
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Invoice ${escapeHtml(sale.saleNumber || "")}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #fff;
+      color: #111;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+    }
+    .invoice { width: 80mm; max-width: 100%; margin: 0 auto; padding: 10px; font-size: 11px; }
+    .center { text-align: center; }
+    .logo { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; display: block; margin: 0 auto 6px; }
+    .fallback { background: #111; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; }
+    h1 { margin: 4px 0; font-size: 16px; }
+    .muted { color: #555; }
+    .divider { border: 0; border-top: 1px dashed #777; margin: 8px 0; }
+    .info-row, .summary-row { display: flex; justify-content: space-between; gap: 8px; margin: 3px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+    th, td { padding: 4px 0; vertical-align: top; border-bottom: 1px dashed #ddd; }
+    th { font-size: 10px; text-align: left; }
+    .right { text-align: right; }
+    .total { font-size: 15px; font-weight: 800; }
+    .footer { margin-top: 10px; text-align: center; font-size: 10px; }
+    @media print {
+      @page { size: auto; margin: 0; }
+      html, body { width: 100%; margin: 0; padding: 0; }
+      body { display: flex; justify-content: center; align-items: flex-start; }
+      .invoice { width: 80mm; max-width: 80mm; margin: 0 auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice">
+    <div class="center">
+      ${logoHtml}
+      <h1>${escapeHtml(shopName)}</h1>
+      <div class="muted">${escapeHtml(shopAddress)}</div>
+      <strong>Invoice #${escapeHtml(sale.saleNumber || "")}</strong>
+    </div>
+    <hr class="divider" />
+    <div class="info-row"><span>Date</span><strong>${formatDate(sale.createdAt)}</strong></div>
+    <div class="info-row"><span>Customer</span><strong>${escapeHtml(sale.customerName || "Guest")}</strong></div>
+    <div class="info-row"><span>Order type</span><strong>${escapeHtml(sale.orderType || "-")}</strong></div>
+    ${tableRow}
+    <hr class="divider" />
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th class="right">Price</th>
+          <th class="right">Qty</th>
+          <th class="right">Total</th>
+        </tr>
+      </thead>
+      <tbody>${itemRows}</tbody>
+    </table>
+    <div class="summary-row"><span>Items</span><strong>${totalQty}</strong></div>
+    <div class="summary-row"><span>Subtotal</span><strong>${formatUsd(sale.subtotal)}</strong></div>
+    <div class="summary-row"><span>Tax</span><strong>${formatUsd(sale.tax)}</strong></div>
+    <div class="summary-row"><span>Discount</span><strong>${formatUsd(sale.discount)}</strong></div>
+    <hr class="divider" />
+    <div class="summary-row total"><span>Total</span><span>${formatUsd(sale.total)}</span></div>
+    <div class="summary-row"><span>Total KHR</span><strong>${formatKhr(sale.total)}</strong></div>
+    <div class="summary-row"><span>Paid (${escapeHtml(sale.paymentMethod || "cash")})</span><strong>${formatUsd(sale.amountPaid)}</strong></div>
+    <div class="summary-row"><span>Change</span><strong>${formatUsd(sale.change)}</strong></div>
+    <div class="footer">Thank you. Please come again.</div>
+  </div>
+</body>
+</html>`;
+
+    const iframe = document.createElement("iframe");
+    iframe.style.cssText = "position:absolute;width:0;height:0;border:0;";
+    document.body.appendChild(iframe);
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(invoiceHtml);
+    doc.close();
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    }, 250);
+  };
+
   const handleSelectPendingSale = ({ cartItems, total, customerName, tableNumber, orderType }) => {
     setCart(cartItems);
     if (customerName) {
@@ -1016,7 +1163,19 @@ const POS = () => {
         status:        isPending ? "pending" : "completed",
       };
 
-      await createSale({ variables: { input } });
+      const result = await createSale({ variables: { input } });
+      const createdSale = result?.data?.createSale;
+
+      if (createdSale?.isSuccess && !isPending) {
+        printSaleInvoice({
+          ...input,
+          saleNumber: createdSale?.data?.saleNumber,
+          saleId: createdSale?.data?.saleId,
+          qrImage: createdSale?.data?.qrImage,
+          status: createdSale?.data?.status || input.status,
+          createdAt: new Date().toISOString(),
+        });
+      }
     } catch (error) {
       console.error("Error creating sale:", error);
     }
