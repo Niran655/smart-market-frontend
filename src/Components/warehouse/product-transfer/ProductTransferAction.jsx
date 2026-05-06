@@ -1,7 +1,9 @@
 import { IconButton, Stack, Tooltip } from "@mui/material";
+import { useQuery } from "@apollo/client/react";
 import { FilePenLine, ScanEye, Shuffle, Trash } from "lucide-react";
 import React, { useState } from "react";
 
+import { GET_WAREHOUSE_TRANSFER_BY_ID } from "../../../../graphql/queries";
 import ViewProductTransfer from "./ViewProductTransfer";
 
 export default function ProductTransferAction({ editData, t, language }) {
@@ -17,6 +19,14 @@ export default function ProductTransferAction({ editData, t, language }) {
   const handleOpenCancelTransfer = () => setCancelTransfer(true);
   const handleCloseCancelTransfer = () =>setCancelTransfer(false);
 
+  const { data: transferDetailData } = useQuery(GET_WAREHOUSE_TRANSFER_BY_ID, {
+    variables: { id: editData?._id },
+    skip: !openView || !editData?._id,
+    fetchPolicy: "cache-and-network",
+  });
+
+  const viewData = transferDetailData?.getWarehouseTransferById || editData;
+
 
   return (
     <div>
@@ -29,7 +39,7 @@ export default function ProductTransferAction({ editData, t, language }) {
         <ViewProductTransfer
           t={t}
           language={language}
-          viewData={editData}
+          viewData={viewData}
           open={openView}
           onClose={handleCloseView}
         />

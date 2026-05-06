@@ -236,7 +236,7 @@ export default function ViewProductTransferInShop({
                 <TableBody>
                   {items.map((row, index) => {
                     const price =
-                      row.subProduct?.costPrice || 0;
+                      row.costPrice || row.subProduct?.costPrice || 0;
                     const total = row.quantity * price;
 
                     return (
@@ -245,9 +245,9 @@ export default function ViewProductTransferInShop({
 
                         <TableCell>
                           {language === "en"
-                            ? row.subProduct?.parentProductId
+                            ? row.productNameEn || row.subProduct?.parentProductId
                                 ?.nameEn
-                            : row.subProduct?.parentProductId
+                            : row.productNameKh || row.subProduct?.parentProductId
                                 ?.nameKh}
                         </TableCell>
 

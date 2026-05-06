@@ -103,6 +103,7 @@ const WarehouseInShop = () => {
   const {
     productsWarehouseTransfer,
     loading: productWarehouseTransferLoading,
+    error: productWarehouseTransferError,
     refetch: transferRefetch,
     paginator: transferPaginator,
   } = useGetWarehouseTransferWithPagination({
@@ -411,6 +412,16 @@ const WarehouseInShop = () => {
 
               {productWarehouseTransferLoading ? (
                 <CircularIndeterminate />
+              ) : productWarehouseTransferError ? (
+                <TableBody>
+                  <TableRow>
+                    <TableCell colSpan={10}>
+                      <Typography color="error">
+                        {productWarehouseTransferError.message}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
               ) : productsWarehouseTransfer?.length === 0 ? (
                 <EmptyData />
               ) : (
@@ -424,7 +435,7 @@ const WarehouseInShop = () => {
 
                     const totalPrice = row.items.reduce(
                       (sum, item) =>
-                        sum + item.quantity * (item.subProduct?.costPrice || 0),
+                        sum + item.quantity * (item.costPrice || item.subProduct?.costPrice || 0),
                       0
                     );
 

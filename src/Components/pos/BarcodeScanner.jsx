@@ -18,7 +18,7 @@ export default function BarcodeScanner({ onScan }) {
         scanner.clear();    
       },
       (error) => {
-        // ignore errors
+        console.warn("QR code scan error:", error);
       }
     );
 

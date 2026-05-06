@@ -539,6 +539,7 @@ const Warehouse = () => {
   const {
     productsWarehouseTransfer,
     loading: productLoading,
+    error: productWarehouseTransferError,
     refetch: productsWarehouseTransferRefetch,
     paginator: productWarehouseTransferPaginator,
   } = useGetWarehouseTransferWithPagination({
@@ -547,7 +548,6 @@ const Warehouse = () => {
     pagination: true,
     keyword: productWarehouseTransferKeyword,
     status: productsWarehouseTransferStatus === "All" ? undefined : productsWarehouseTransferStatus
-
   });
 
   const {
@@ -931,6 +931,16 @@ const Warehouse = () => {
 
                     {productLoading ? (
                       <CircularIndeterminate />
+                    ) : productWarehouseTransferError ? (
+                      <TableBody>
+                        <TableRow>
+                          <TableCell colSpan={7}>
+                            <Typography color="error">
+                              {productWarehouseTransferError.message}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
                     ) : productsWarehouseTransfer?.length === 0 ? (
                       <EmptyData />
                     ) : (

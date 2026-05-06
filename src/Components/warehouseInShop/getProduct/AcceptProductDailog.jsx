@@ -104,15 +104,15 @@ export default function AcceptProductDialog({
           <Box mt={1}>
             <Stack direction="row" spacing={2} alignItems="center">
               <img
-                src={item?.subProduct?.productImg}
-                alt={item?.subProduct?.nameEn}
+                src={item?.productImg || item?.subProduct?.productImg}
+                alt={item?.productNameEn || item?.subProduct?.nameEn}
                 width={50}
                 height={50}
               />
               <Box>
                 {language === "en"
-                  ? item?.subProduct?.parentProductId?.nameEn
-                  : item?.subProduct?.parentProductId?.nameKh}
+                  ? item?.productNameEn || item?.subProduct?.parentProductId?.nameEn
+                  : item?.productNameKh || item?.subProduct?.parentProductId?.nameKh}
               </Box>
             </Stack>
 

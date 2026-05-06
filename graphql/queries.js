@@ -623,35 +623,6 @@ query GetWarehouseTransfersWithPagination($status: TransferStatus, $shopId: ID, 
       quantity
       subProduct {
         _id
-        saleType
-        qty
-        barCode
-        productDes
-        productImg
-        using
-        check
-        sell
-        servicePrice
-        salePrice
-        taxRate
-        costPrice
-        priceImg
-        totalPrice
-        priceDes
-        createdAt
-        updatedAt
-        stock
-        minStock
-        parentProductId {
-          nameEn
-          nameKh
-          _id
-        }
-        unitId {
-          _id
-          nameEn
-          nameKh
-        }
       }
       remainingQty
       receivedQty
@@ -673,6 +644,18 @@ query GetWarehouseTransfersWithPagination($status: TransferStatus, $shopId: ID, 
       role
       createdAt
       updatedAt
+    }
+    receivedHistory {
+      _id
+      receivedAt
+      receivedBy {
+        _id
+        nameEn
+        nameKh
+      }
+      items {
+        receivedQty
+      }
     }
     remark
     createdAt
@@ -704,6 +687,8 @@ query GetWarehouseTransferById($id: ID!) {
     }
     items {
       quantity
+      remainingQty
+      receivedQty
       subProduct {
         _id
         saleType
@@ -725,6 +710,16 @@ query GetWarehouseTransferById($id: ID!) {
         updatedAt
         stock
         minStock
+        parentProductId {
+          nameEn
+          nameKh
+          _id
+        }
+        unitId {
+          _id
+          nameEn
+          nameKh
+        }
       }
     }
     status
@@ -744,6 +739,30 @@ query GetWarehouseTransferById($id: ID!) {
       role
       createdAt
       updatedAt
+    }
+    receivedHistory {
+      _id
+      receivedAt
+      receivedBy {
+        _id
+        nameEn
+        nameKh
+      }
+      items {
+        receivedQty
+        subProduct {
+          _id
+          productImg
+          parentProductId {
+            nameEn
+            nameKh
+          }
+          unitId {
+            nameEn
+            nameKh
+          }
+        }
+      }
     }
     remark
     createdAt
@@ -1771,4 +1790,3 @@ export const GET_ORDER_CATEGORY_STATS = gql`
     }
   }
 `;
-

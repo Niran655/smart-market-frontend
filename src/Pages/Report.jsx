@@ -64,7 +64,24 @@ import { translateLauguage } from "../function/translate";
 import FooterPagination from "../include/FooterPagination";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
-
+import {
+  DollarSign,    
+  ShoppingCart, 
+  Package,      
+  Receipt,      
+  Factory,       
+  AlertTriangle, 
+  Users,         
+  Bell,         
+  Tag,          
+  Clock,        
+  AlertCircle,   
+  TrendingDown,  
+  TrendingUp,    
+  Landmark,      
+  BarChart2,     
+  CalendarDays,  
+} from "lucide-react";
 
 const formatCurrency = (value) =>
   value == null
@@ -95,10 +112,22 @@ const formatFileDate = (value = new Date()) => {
 
 
 const TAB_ICONS = {
-  sale: "💰", purchase: "🛒", inventory: "📦", invoice: "🧾",
-  supplier: "🏭", supplierDue: "⚠️", customer: "👥", customerDue: "🔔",
-  product: "🏷️", productExpiry: "⏰", productAlert: "🚨",
-  expense: "💸", income: "📈", tax: "🏛️", pnl: "📊", annual: "📅",
+  sale:         <DollarSign    size={16} />,
+  purchase:     <ShoppingCart  size={16} />,
+  inventory:    <Package       size={16} />,
+  invoice:      <Receipt       size={16} />,
+  supplier:     <Factory       size={16} />,
+  supplierDue:  <AlertTriangle size={16} />,
+  customer:     <Users         size={16} />,
+  customerDue:  <Bell          size={16} />,
+  product:      <Tag           size={16} />,
+  productExpiry:<Clock         size={16} />,
+  productAlert: <AlertCircle   size={16} />,
+  expense:      <TrendingDown  size={16} />,
+  income:       <TrendingUp    size={16} />,
+  tax:          <Landmark      size={16} />,
+  pnl:          <BarChart2     size={16} />,
+  annual:       <CalendarDays  size={16} />,
 };
 
 
@@ -437,7 +466,7 @@ const ReportPage = ({ shopId = null }) => {
     const companyName = user?.companyName || user?.shopName || user?.nameEn || "Smart Market";
     const phone = user?.phone || "";
     const email = user?.email || "";
-    const address = user?.address || "Phnom Penh, Cambodia";
+    const address = user?.address || "Cambodia";
     const headers = getTableHeaders();
     const rows = getTableRows();
     const totalRevenue = reportData?.totalRevenue || reportData?.totalIncome || 0;
@@ -861,17 +890,17 @@ const ReportPage = ({ shopId = null }) => {
                 },
               }}
             >
-              {tabs.map((tab, idx) => (
-                <Tab
-                  key={idx}
-                  label={
-                    <Stack direction="row" alignItems="center" spacing={0.5}>
-                      <span style={{ fontSize: "1rem" }}>{TAB_ICONS[tab.value]}</span>
-                      <span>{tab.label}</span>
-                    </Stack>
-                  }
-                />
-              ))}
+             {tabs.map((tab, idx) => (
+  <Tab
+    key={idx}
+    label={
+      <Stack direction="row" alignItems="center" spacing={0.5}>
+        {TAB_ICONS[tab.value]}
+        <span>{tab.label}</span>
+      </Stack>
+    }
+  />
+))}
             </Tabs>
           </Paper>
 

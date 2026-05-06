@@ -37,7 +37,7 @@ export default function ViewProductTransfer({
 
   const totalQty = items.reduce((s, i) => s + i.quantity, 0);
   const totalAmount = items.reduce(
-    (s, i) => s + i.quantity * i.subProduct.costPrice,
+    (s, i) => s + i.quantity * (i.subProduct?.costPrice || 0),
     0
   );
 
@@ -185,13 +185,13 @@ export default function ViewProductTransfer({
                   <td>${idx + 1}</td>
                   <td>${
                     language === "en"
-                      ? i.subProduct.parentProductId.nameEn
-                      : i.subProduct.parentProductId.nameKh
+                      ? i.subProduct?.parentProductId?.nameEn || "-"
+                      : i.subProduct?.parentProductId?.nameKh || "-"
                   }</td>
                   <td class="right">${i.quantity}</td>
-                  <td class="right">${i.subProduct.costPrice}</td>
+                  <td class="right">${i.subProduct?.costPrice || 0}</td>
                   <td class="right">${(
-                    i.quantity * i.subProduct.costPrice
+                    i.quantity * (i.subProduct?.costPrice || 0)
                   ).toLocaleString()}</td>
                 </tr>
               `
@@ -312,16 +312,16 @@ export default function ViewProductTransfer({
                 <TableCell>{i + 1}</TableCell>
                 <TableCell>
                   {language === "en"
-                    ? row.subProduct.parentProductId.nameEn
-                    : row.subProduct.parentProductId.nameKh}
+                    ? row.subProduct?.parentProductId?.nameEn || "-"
+                    : row.subProduct?.parentProductId?.nameKh || "-"}
                 </TableCell>
                 <TableCell align="right">{row.quantity}</TableCell>
                 <TableCell align="right">
-                  {row.subProduct.costPrice}
+                  {row.subProduct?.costPrice || 0}
                 </TableCell>
                 <TableCell align="right">
                   {(
-                    row.quantity * row.subProduct.costPrice
+                    row.quantity * (row.subProduct?.costPrice || 0)
                   ).toLocaleString()}
                 </TableCell>
               </TableRow>

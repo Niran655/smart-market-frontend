@@ -56,8 +56,13 @@ export default function GetProductIntoWarehouseInShop({
   refetch,
   productWarehouseInShopRefetch
 }) {
+  const [acceptWarehouseTransfer] = useMutation(ACCEPT_WAREHOUSE_TRANSFER);
+  const [rejectWarehouseTransfer] = useMutation(REJECT_WAREHOUSE_TRANSFER);
 
-  if (!editData) return null;
+  const [quantities, setQuantities] = useState({});
+  const [openRejectDialog, setOpenRejectDialog] = useState(false);
+  const [openHistoryDialog, setOpenHistoryDialog] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
 
   const {
     toShop,
@@ -68,9 +73,36 @@ export default function GetProductIntoWarehouseInShop({
     createdAt,
     acceptedAt,
     items = [],
-  } = editData;
+    receivedHistory = [],
+  } = editData || {};
 
-  console.log("editData",editData)
+  const historyEntries = receivedHistory?.length
+    ? receivedHistory
+    : acceptedBy && acceptedAt
+      ? [
+          {
+            _id: "accepted-history",
+            receivedBy: acceptedBy,
+            receivedAt: acceptedAt,
+            items: items
+              .filter((item) => item?.receivedQty > 0)
+              .map((item) => ({
+                subProduct: item?.subProduct,
+                receivedQty: item?.receivedQty,
+              })),
+          },
+        ]
+      : [];
+
+  const getHistorySubProduct = (historyItem) => {
+    const subProductId =
+      historyItem?.subProductId || historyItem?.subProduct?._id || historyItem?.subProduct;
+    return (
+      historyItem?.subProduct?.parentProductId
+        ? historyItem.subProduct
+        : items.find((item) => item?.subProduct?._id === subProductId)?.subProduct
+    );
+  };
 
   const isPending = status === "pending";
   const isPartialAccepted = status === "partial_accepted";
@@ -78,15 +110,6 @@ export default function GetProductIntoWarehouseInShop({
 
   const canAcceptAll = isPending || isPartialAccepted;
   const canRejectAll = isPending || isPartialAccepted;
-
-  const [acceptWarehouseTransfer] = useMutation(ACCEPT_WAREHOUSE_TRANSFER);
-  const [rejectWarehouseTransfer] = useMutation(REJECT_WAREHOUSE_TRANSFER);
-
-  const [quantities, setQuantities] = useState({});
-
-
-  const [openRejectDialog, setOpenRejectDialog] = useState(false);
-  const [rejectReason, setRejectReason] = useState("");
 
   useEffect(() => {
     if (items?.length) {
@@ -98,6 +121,7 @@ export default function GetProductIntoWarehouseInShop({
     }
   }, [items]);
 
+  if (!editData) return null;
 
   const handleAcceptAll = async () => {
     try {
@@ -200,32 +224,42 @@ export default function GetProductIntoWarehouseInShop({
                 {remark || "-"}
               </Typography>
 
-              {!isFinalStatus && (
-                <Stack spacing={2} mt={4}>
+              <Stack spacing={2} mt={4}>
+                {!isFinalStatus && (
+                  <>
 
-                  {canRejectAll && (
-                    <Button
-                      variant="contained"
-                      color="error"
-                      fullWidth
-                      onClick={handleOpenReject}
-                    >
-                      {t("reject_all_product")}
-                    </Button>
-                  )}
+                    {canRejectAll && (
+                      <Button
+                        variant="contained"
+                        color="error"
+                        fullWidth
+                        onClick={handleOpenReject}
+                      >
+                        {t("reject_all_product")}
+                      </Button>
+                    )}
 
-                  {canAcceptAll && (
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      onClick={handleAcceptAll}
-                    >
-                      {t("confirm_getting_all_product")}
-                    </Button>
-                  )}
+                    {canAcceptAll && (
+                      <Button
+                        variant="contained"
+                        fullWidth
+                        onClick={handleAcceptAll}
+                      >
+                        {t("confirm_getting_all_product")}
+                      </Button>
+                    )}
+                  </>
+                )}
 
-                </Stack>
-              )}
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => setOpenHistoryDialog(true)}
+                  disabled={historyEntries.length === 0}
+                >
+                  {t("history_product_received")}
+                </Button>
+              </Stack>
 
             </Box>
 
@@ -263,32 +297,32 @@ export default function GetProductIntoWarehouseInShop({
                             <Stack direction="row" spacing={2} alignItems="center">
 
                               <img
-                                src={row.subProduct?.productImg}
-                                alt={row.subProduct?.nameEn}
+                                src={row.productImg || row.subProduct?.productImg}
+                                alt={row.productNameEn || row.subProduct?.nameEn}
                                 width={50}
                                 height={50}
                               />
 
                               <Box>
                                 {language === "en"
-                                  ? row.subProduct?.parentProductId?.nameEn
-                                  : row.subProduct?.parentProductId?.nameKh}
+                                  ? row.productNameEn || row.subProduct?.parentProductId?.nameEn
+                                  : row.productNameKh || row.subProduct?.parentProductId?.nameKh}
                               </Box>
 
                             </Stack>
                           </TableCell>
 
-                          <TableCell>$ {row.subProduct?.costPrice}</TableCell>
+                          <TableCell>$ {row.costPrice || row.subProduct?.costPrice}</TableCell>
 
                           <TableCell>
                             {quantities[index] || 0}{" "}
                             {language === "en"
-                              ? row.subProduct?.unitId?.nameEn
-                              : row.subProduct?.unitId?.nameKh}
+                              ? row.unitNameEn || row.subProduct?.unitId?.nameEn
+                              : row.unitNameKh || row.subProduct?.unitId?.nameKh}
                           </TableCell>
 
                           <TableCell>
-                            ${(quantities[index] || 0) * row.subProduct?.costPrice}
+                            ${(quantities[index] || 0) * (row.costPrice ? parseFloat(row.costPrice.toFixed(2)) : 0) || row.subProduct?.costPrice || 0}
                           </TableCell>
 
                           <TableCell>{row?.receivedQty || 0}</TableCell>
@@ -353,6 +387,69 @@ export default function GetProductIntoWarehouseInShop({
             {t("confirm_reject")}
           </Button>
         </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openHistoryDialog}
+        onClose={() => setOpenHistoryDialog(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          {t("history_product_received")}
+          <IconButton
+            aria-label="close"
+            onClick={() => setOpenHistoryDialog(false)}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent>
+          <TableContainer className="table-container">
+            <Table size="small" className="table">
+              <TableHead className="table-header">
+                <TableRow>
+                  <TableCell>{t("no")}</TableCell>
+                  <TableCell>{t("received_at")}</TableCell>
+                  <TableCell>{t("received_by")}</TableCell>
+                  <TableCell>{t("product")}</TableCell>
+                  <TableCell align="right">{t("quantity")}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {historyEntries.flatMap((history, historyIndex) =>
+                  (history?.items?.length ? history.items : [{}]).map((item, itemIndex) => {
+                    const subProduct = getHistorySubProduct(item);
+
+                    return (
+                      <TableRow key={`${history?._id || historyIndex}-${itemIndex}`}>
+                        <TableCell>{historyIndex + 1}</TableCell>
+                        <TableCell>
+                          {history?.receivedAt
+                            ? new Date(history.receivedAt).toLocaleString()
+                            : "-"}
+                        </TableCell>
+                        <TableCell>
+                          {language === "kh"
+                            ? history?.receivedBy?.nameKh || history?.receivedBy?.nameEn || "-"
+                            : history?.receivedBy?.nameEn || history?.receivedBy?.nameKh || "-"}
+                        </TableCell>
+                        <TableCell>
+                          {language === "kh"
+                            ? subProduct?.parentProductId?.nameKh || item?.productNameKh || "-"
+                            : subProduct?.parentProductId?.nameEn || item?.productNameEn || "-"}
+                        </TableCell>
+                        <TableCell align="right">{item?.receivedQty || "-"}</TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
       </Dialog>
 
     </>

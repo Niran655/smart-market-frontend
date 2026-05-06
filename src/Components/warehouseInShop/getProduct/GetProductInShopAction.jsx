@@ -1,7 +1,9 @@
 import { IconButton, Stack, Tooltip } from "@mui/material";
-import { CircleOff, ScanEye, Shuffle, Warehouse, X } from "lucide-react";
+import { useQuery } from "@apollo/client/react";
+import { ScanEye, Warehouse } from "lucide-react";
 import React, { useState } from "react";
 
+import { GET_WAREHOUSE_TRANSFER_BY_ID } from "../../../../graphql/queries";
 import GetProductIntoWarehouseInShop from "./GetProductIntoWarehouseInShop";
 import ViewProductTransferInShop from "./ViewProductTransferInShop";
 
@@ -15,6 +17,17 @@ export default function GetProductInShopAction({
 }) {
   const [openView, setOpenView] = useState(false);
   const [openGetProduct, setOpenGetProduct] = useState(false);
+
+  const { data: transferDetailData, loading: transferDetailLoading } = useQuery(
+    GET_WAREHOUSE_TRANSFER_BY_ID,
+    {
+      variables: { id: editData?._id },
+      skip: (!openView && !openGetProduct) || !editData?._id,
+      fetchPolicy: "cache-and-network",
+    },
+  );
+
+  const transferData = transferDetailData?.getWarehouseTransferById || editData;
 
   const handleOpenview = () => setOpenView(true);
   const handleCloseView = () => setOpenView(false);
@@ -34,7 +47,7 @@ export default function GetProductInShopAction({
         <ViewProductTransferInShop
           t={t}
           language={language}
-          viewData={editData}
+          viewData={transferData}
           open={openView}
           onClose={handleCloseView}
         />
@@ -48,10 +61,10 @@ export default function GetProductInShopAction({
         <GetProductIntoWarehouseInShop
           t={t}
           language={language}
-          editData={editData}
+          editData={transferData}
           open={openGetProduct}
           onClose={handleCloseGetProduct}
-          loading={loading}
+          loading={loading || transferDetailLoading}
           refetch={refetch}
           productWarehouseInShopRefetch={productWarehouseInShopRefetch}
         />

@@ -32,7 +32,7 @@ const DashboardSkeleton = () => {
       </Stack>
 
        
-      <Box sx={{ bgcolor: theme.palette.background.paper, borderRadius: 3, p: 2, mb: 2.5 }}>
+      <Box sx={{ bgcolor: theme.palette.background.paper, borderRadius: 1, p: 2, mb: 2.5 }}>
         <Grid container spacing={1.5} alignItems="center">
           <Grid size={{ xs: 12, md: 2 }}>
             <Skeleton variant="rounded" height={40} />

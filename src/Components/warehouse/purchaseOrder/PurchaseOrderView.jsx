@@ -168,7 +168,7 @@ export default function PurchaseOrderView({
           <div class="col">
             <h4>Seller</h4>
             <div>POS System</div>
-            <div>Phnom Penh</div>
+           
           </div>
 
           <div class="col">

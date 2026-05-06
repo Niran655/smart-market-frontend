@@ -478,7 +478,7 @@ export default function Dashboard() {
     const companyName   = user?.companyName || user?.shopName || "Smart Market";
     const phone         = user?.phone || "(000) 000-0000";
     const email         = user?.email || "support@smartmarket.com";
-    const address       = user?.address || "Phnom Penh, Cambodia";
+    const address       = user?.address || "Cambodia";
     const invoiceNumber = `DASH-${dayjs().format("YYYYMMDD")}-${String(savedStoreId || "ALL").slice(-4).toUpperCase()}`;
     const periodText    = period === "custom" && customStart && customEnd
       ? `${formatDateLong(customStart)} – ${formatDateLong(customEnd)}`
