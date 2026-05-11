@@ -29,8 +29,8 @@ const useGetWarehouseTransferWithPagination = ({
         shopId: normalizedShopId,
         status: normalizedStatus,
       },
-      // fetchPolicy: "cache-and-network",
-      // notifyOnNetworkStatusChange: true,
+      fetchPolicy: "cache-and-network",
+      notifyOnNetworkStatusChange: true,
     },
   );
 

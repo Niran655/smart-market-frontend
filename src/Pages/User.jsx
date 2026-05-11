@@ -29,7 +29,7 @@ const User = () => {
   const [keyword, setKeyword] = useState("");
   const [role, setRole] = useState("All");
   const { mode } = useThemeContext();
-const isKhmer = mode === "khmerNewYear";
+  const isKhmer = mode === "khmerNewYear";
 
 
   const { data, refetch, loading, } = useQuery(GET_USER_WITH_PAGINATION, {
@@ -155,17 +155,17 @@ const isKhmer = mode === "khmerNewYear";
         <Stack direction="row" spacing={2} mt={3}>
           <Button
             variant="contained"
-          startIcon={
-  isKhmer ? (
-    <img
-      src={star}
-      alt="Khmer"
-      style={{ width: "20px", height: "20px" }}
-    />
-  ) : (
-    <LibraryAddOutlinedIcon sx={{ fontSize: "1rem" }} />
-  )
-}
+            startIcon={
+              isKhmer ? (
+                <img
+                  src={star}
+                  alt="Khmer"
+                  style={{ width: "20px", height: "20px" }}
+                />
+              ) : (
+                <LibraryAddOutlinedIcon sx={{ fontSize: "1rem" }} />
+              )
+            }
             onClick={handleOpen}
           >
             {t("create")}

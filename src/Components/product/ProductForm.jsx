@@ -19,6 +19,7 @@ import { CREATE_PRODUCT, UPDATE_PRODUCT } from "../../../graphql/mutation";
 import { useAuth } from "../../Context/AuthContext";
 import { GET_CATEGORY, GET_UNIT } from "../../../graphql/queries";
 import UploadImage from "../../utils/UploadImage";
+import { supabase } from "../../supabaseClient";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {

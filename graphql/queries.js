@@ -1435,6 +1435,11 @@ export const GET_ANNUAL_REPORT = gql`
       netProfit
       totalSalesOrders
       averageMonthlyRevenue
+      monthlyData {
+        month
+        revenue
+        orders
+      }
       topMonth {
         month
         revenue

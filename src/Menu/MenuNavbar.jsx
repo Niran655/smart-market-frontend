@@ -48,11 +48,7 @@ export default function MenuNavbar() {
       pageIcon: <Tag className="icon" />,
       matchPaths: ["/order", "/order/view-order-detail"],
     },
-    {
-      pageTitle: t(`message`),
-      routeTo: "/chat",
-      pageIcon: <Messages2 className="icon" />,
-    },
+    
     {
       pageTitle: t(`sale`),
       routeTo: "/on-sale",

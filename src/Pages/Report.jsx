@@ -418,12 +418,13 @@ const ReportPage = ({ shopId = null }) => {
         ];
       }
       case "annual": {
-        const monthly = [];
-        for (let i = 1; i <= 12; i++) {
-          const monthName = new Date(d.year, i - 1, 1).toLocaleString("default", { month: "long" });
-          monthly.push([monthName, formatCurrency(0), "-"]);
-        }
-        return monthly;
+        return (d.monthlyData || []).map((month) => {
+          const monthIndex = Number(month.month?.split("-")[1]) - 1;
+          const monthName = Number.isInteger(monthIndex)
+            ? new Date(d.year, monthIndex, 1).toLocaleString("default", { month: "long" })
+            : month.month;
+          return [monthName, formatCurrency(month.revenue || 0), month.orders || 0];
+        });
       }
       default: return [];
     }

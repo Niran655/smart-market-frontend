@@ -1199,8 +1199,8 @@ export default function Dashboard() {
                     <Divider sx={{ my: 1.8, borderColor: theme.palette.divider }} />
                     <Stack direction="row" justifyContent="space-around">
                       {[
-                        { label: t("total_categories") || "Categories", value: catStats.totalCategories },
-                        { label: t("total_products")   || "Products",   value: catStats.totalProducts   },
+                        { label: t("category"), value: catStats.totalCategories },
+                        { label: t("product"),   value: catStats.totalProducts   },
                       ].map((s, i) => (
                         <Box key={i} sx={{ textAlign: "center" }}>
                           <Typography sx={{ fontWeight: 800, fontSize: "1.05rem", color: theme.palette.primary.main, letterSpacing: "-0.02em" }}>{s.value}</Typography>
