@@ -1,11 +1,29 @@
 import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
 import React from "react";
 import { useAuth } from "../../Context/AuthContext";
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+const STATUS_CONFIG = {
+  info: {
+    color: "#4FC3F7",
+    bg: "rgba(79, 195, 247, 0.12)",
+    border: "#4FC3F7",
+  },
+  success: {
+    color: "#00C9A7",
+    bg: "rgba(0, 201, 167, 0.12)",
+    border: "#00C9A7",
+  },
+  warning: {
+    color: "#FFA500",
+    bg: "rgba(255, 165, 0, 0.12)",
+    border: "#FFA500",
+  },
+  error: {
+    color: "#FF6F91",
+    bg: "rgba(255, 111, 145, 0.12)",
+    border: "#FF6F91",
+  },
+};
 
 export default function AlertMessage() {
   const { alert, setAlert, language } = useAuth();
@@ -19,18 +37,7 @@ export default function AlertMessage() {
     setAlert(false, "", "");
   };
 
-  const getColor = () => {
-    switch (status) {
-      case "success":
-        return "#00C9A7";
-      case "error":
-        return "#FF6F91";
-      case "warning":
-        return "#FFA500";
-      default:
-        return "#333";
-    }
-  };
+  const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.info;
 
   return (
     <Snackbar
@@ -39,25 +46,47 @@ export default function AlertMessage() {
       onClose={handleClose}
       anchorOrigin={{ vertical: "top", horizontal: "center" }}
     >
-      <Alert
-        onClose={handleClose}
-        severity={status}
-        sx={{
-          borderRadius: "999px",
-          backgroundColor: getColor(),
-          color: "#fff",
-          px: 3,
-          py: 1,
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          minWidth: 220,
+          maxWidth: 360,
+          padding: "14px 20px",
+          borderRadius: 8,
+          backgroundColor: cfg.bg,
+          border: `1px solid ${cfg.border}33`,
+  
+          color: cfg.color,
           fontSize: "0.9rem",
           fontWeight: 500,
-          boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
-          alignItems: "center",
+          fontFamily: "'Segoe UI', sans-serif",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+        
+          gap: 12,
         }}
       >
-        {language === "en"
-          ? message?.messageEn
-          : message?.messageKh}
-      </Alert>
+        <span style={{ flex: 1 }}>
+          {language === "en" ? message?.messageEn : message?.messageKh}
+        </span>
+        <button
+          onClick={handleClose}
+          style={{
+            background: "none",
+            border: "none",
+            color: cfg.color,
+            cursor: "pointer",
+            fontSize: "1rem",
+            opacity: 0.7,
+            padding: 0,
+            lineHeight: 1,
+            flexShrink: 0,
+          }}
+          aria-label="close"
+        >
+          ✕
+        </button>
+      </div>
     </Snackbar>
   );
 }

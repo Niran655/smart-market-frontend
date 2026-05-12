@@ -353,7 +353,7 @@ export default function AppLayout() {
                             fontSize: "1.1rem",
                           }}
                         >
-                          POS System
+                          {t("pos_system")}
                         </Typography>
                       )}
                     </Button>
@@ -361,7 +361,7 @@ export default function AppLayout() {
                   <IconButton
                     onClick={handleOpen}
                     sx={{
-                      borderRadius: theme.shape.borderRadius,
+                      borderRadius: 1,
                       color: theme.palette.getContrastText(topbarColor),
                       bgcolor: "rgba(255,255,255,0.1)",
                       "&:hover": {

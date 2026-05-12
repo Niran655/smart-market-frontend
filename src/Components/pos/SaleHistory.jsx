@@ -1014,7 +1014,7 @@ const handlePrintReceipt = (sale) => {
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography variant="h6">{t("sale_history")}</Typography>
+            <Typography >{t("sale_history")}</Typography>
             <IconButton onClick={onClose}>
               <X color="red" />
             </IconButton>

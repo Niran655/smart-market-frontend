@@ -1,34 +1,47 @@
 import { useNavigate } from "react-router-dom";
-import { Button, Stack } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 
-import ImageNotFound from "../assets/Image/not-found.png";
 import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 
 export default function NotFound() {
   const navigate = useNavigate();
-  const {language} =  useAuth();
-  const {t} = translateLauguage(language)
+  const { language } = useAuth();
+  const { t } = translateLauguage(language);
+
   return (
     <Stack
       direction="column"
       justifyContent="center"
       alignItems="center"
-      sx={{ height: "70vh" }}
-      spacing={3}
+      sx={{ height: "70vh", textAlign: "center" }}
+      spacing={2}
     >
-      <img
-        src={ImageNotFound}
-        alt="Not Found"
-        style={{
-          width: "500px",
-          maxWidth: "100%",
-          height: "auto",
-          display: "block",
+      {/* 404 Text */}
+      <Typography
+        variant="h1"
+        sx={{
+          fontSize: { xs: "100px", md: "180px" },
+          fontWeight: "bold",
+          color: "#1976d2",
+          lineHeight: 1,
         }}
-      />
-      <Button variant="contained" color="primary"  onClick={() => navigate(-1)}>
-       {t(`go_back`)}
+      >
+        404
+      </Typography>
+
+      {/* Message */}
+      <Typography variant="h5" color="text.secondary">
+        {t("page_not_found")}
+      </Typography>
+
+      {/* Button */}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => navigate(-1)}
+      >
+        {t("go_back")}
       </Button>
     </Stack>
   );

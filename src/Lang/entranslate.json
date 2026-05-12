@@ -455,6 +455,10 @@
   "no_stores_found":"No stores found. Please contact your administrator.",
   "try_different_search":"Try a different search or check with your administrator if you think this should be here.",
   "custom_range":"Custom Range",
-  "logout":"Logout"
-  
+  "logout":"Logout",
+  "page_not_found":"Page Not Found",
+  "base_price":"Base Price",
+  "additions":"Additions",
+  "pos_system":"POS System"
+   
 }

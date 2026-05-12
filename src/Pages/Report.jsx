@@ -81,6 +81,7 @@ import {
   Landmark,      
   BarChart2,     
   CalendarDays,  
+  
 } from "lucide-react";
 
 const formatCurrency = (value) =>
@@ -643,7 +644,6 @@ const ReportPage = ({ shopId = null }) => {
           sx={{
             mb: 2,
             border: `1px solid ${theme.palette.divider}`,
-
             overflow: "hidden",
             boxShadow: theme.shadows[1],
           }}
@@ -651,17 +651,14 @@ const ReportPage = ({ shopId = null }) => {
           <TableContainer sx={{ overflowX: "auto" }}>
             <Table size="small">
               <TableHead>
-                <TableRow sx={{ background: `linear-gradient(90deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)` }}>
+                <TableRow >
                   {headers.map((h, idx) => (
                     <TableCell
                       key={idx}
                       sx={{
-                        color: theme.palette.common.white,
-                        fontWeight: 700,
+                      
                         py: 1.8,
                         px: 2,
-                        fontSize: "0.8rem",
-                        letterSpacing: "0.04em",
                         textTransform: "uppercase",
                         borderBottom: "none",
                         whiteSpace: "nowrap",
@@ -936,8 +933,8 @@ const ReportPage = ({ shopId = null }) => {
               {showDateFilter && (
                 <>
                   <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <Typography variant="caption" sx={{ fontWeight: 600, color: theme.palette.text.secondary, display: "block", mb: 0.5 }}>
-                      {t("start_date") || "Start Date"}
+                    <Typography sx={{textAlign: "left"}}>
+                      {t("start_date")}
                     </Typography>
                     <DatePicker
                       value={dateRange.start}
@@ -952,8 +949,8 @@ const ReportPage = ({ shopId = null }) => {
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <Typography variant="caption" sx={{ fontWeight: 600, color: theme.palette.text.secondary, display: "block", mb: 0.5 }}>
-                      {t("end_date") || "End Date"}
+                    <Typography sx={{textAlign: "left"}}>
+                      {t("end_date")}
                     </Typography>
                     <DatePicker
                       value={dateRange.end}
@@ -977,8 +974,8 @@ const ReportPage = ({ shopId = null }) => {
 
               {currentTabValue === "annual" && (
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: theme.palette.text.secondary, display: "block", mb: 0.5 }}>
-                    {t("year") || "Year"}
+                  <Typography sx={{textAlign: "left"}}>
+                    {t("year")}
                   </Typography>
                   <TextField
                     type="number"
@@ -993,8 +990,8 @@ const ReportPage = ({ shopId = null }) => {
 
               {currentTabValue === "productExpiry" && (
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: theme.palette.text.secondary, display: "block", mb: 0.5 }}>
-                    {t("days_threshold") || "Days Threshold"}
+                  <Typography sx={{textAlign:'left'}}>
+                    {t("days_threshold")}
                   </Typography>
                   <TextField
                     type="number"
@@ -1009,8 +1006,8 @@ const ReportPage = ({ shopId = null }) => {
 
               {currentTabValue === "product" && (
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: theme.palette.text.secondary, display: "block", mb: 0.5 }}>
-                    {t("category") || "Category"}
+                  <Typography sx={{textAlign: "left"}}>
+                    {t("category")}
                   </Typography>
                   <TextField
                     size="small"
@@ -1025,7 +1022,7 @@ const ReportPage = ({ shopId = null }) => {
 
               {currentTabValue === "sale" && (
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: theme.palette.text.secondary, display: "block", mb: 0.5 }}>
+                  <Typography>
                     {t("view") || "View"}
                   </Typography>
                   <FormControl fullWidth size="small">
@@ -1044,13 +1041,14 @@ const ReportPage = ({ shopId = null }) => {
 
 
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: theme.palette.text.secondary, display: "block", mb: 0.5 }}>
-                  {t("search") || "Search"}
+                <Typography sx={{textAlign: "left"}}>
+                  {t("search")}
                 </Typography>
                 <TextField
                   fullWidth
                   size="small"
-                  placeholder={t("search") || "Search..."}
+                  placeholder={t("search")}
+                  
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   InputProps={{

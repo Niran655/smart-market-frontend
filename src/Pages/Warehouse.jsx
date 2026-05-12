@@ -747,7 +747,7 @@ const Warehouse = () => {
                                   width={40}
                                   height={40}
                                   style={{
-                                    borderRadius: "100%",
+                                    borderRadius: 2,
                                     objectFit: "cover",
                                   }}
                                   alt="product"
@@ -780,22 +780,16 @@ const Warehouse = () => {
                                   icon={<WarningAmberOutlinedIcon />}
                                   label={t("low_stock")}
                                   size="small"
-                                  sx={{
-                                    fontWeight: 600,
-                                    bgcolor: "#df4a6fff",
-                                    color: "white",
-                                  }}
+                                  color= "warning"
+                                  fontWeight= "600"
                                 />
                               ) : (
                                 <Chip
                                   icon={<CheckOutlinedIcon />}
                                   label={t("in_stock")}
                                   size="small"
-                                  sx={{
-                                    fontWeight: 600,
-                                    bgcolor: "#0097A7",
-                                    color: "white",
-                                  }}
+                                  color= "success"                    
+                                  fontWeight= "600"
                                 />
                               )}
                             </TableCell>

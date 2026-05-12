@@ -186,6 +186,7 @@
 //   );
 // }
 // Settings.js — Theme‑aware with compact cards
+
 import { Link as RouterLink } from "react-router-dom";
 import {
   Box,

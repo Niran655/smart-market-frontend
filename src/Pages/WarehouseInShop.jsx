@@ -21,7 +21,7 @@ const getStatusStyle = (status) => {
   switch (status) {
     case "pending":
       return {
-        backgroundColor: "#FFF3E0",
+        backgroundColor: "warning",
         color: "#EF6C00",
         "& .MuiChip-icon": { color: "#EF6C00" },
         fontWeight: 500,
@@ -29,7 +29,7 @@ const getStatusStyle = (status) => {
       };
     case "accepted":
       return {
-        backgroundColor: "#E8F5E9",
+        backgroundColor: "success",
         color: "#2E7D32",
         "& .MuiChip-icon": { color: "#2E7D32" },
         fontWeight: 500,
@@ -37,7 +37,7 @@ const getStatusStyle = (status) => {
       };
     case "rejected":
       return {
-        backgroundColor: "#FFEBEE",
+        backgroundColor: "error",
         color: "#C62828",
         "& .MuiChip-icon": { color: "#C62828" },
         fontWeight: 500,
@@ -45,7 +45,7 @@ const getStatusStyle = (status) => {
       };
     case "partial_accepted":
       return {
-        backgroundColor: "#E3F2FD",
+        backgroundColor: "info",
         color: "#1565C0",
         "& .MuiChip-icon": { color: "#1565C0" },
         fontWeight: 500,
@@ -156,11 +156,10 @@ const WarehouseInShop = () => {
 
       <Breadcrumbs separator="/">
         <Typography
-          variant="h6"
+           
           sx={{
             borderLeft: "3px solid #1D4592",
             pl: 1.5,
-            fontWeight: 600,
           }}
         >
           {t("warehouse_in_shop")}
@@ -355,11 +354,8 @@ const WarehouseInShop = () => {
                               icon={<CheckOutlinedIcon />}
                               label={t("in_stock")}
                               size="small"
-                              sx={{
-                                backgroundColor: "#E8F5E9",
-                                color: "#2E7D32",
-                                fontWeight: 500,
-                              }}
+                              fontWeight={600}
+                              color="success"
                             />
                           )}
                         </TableCell>
@@ -490,6 +486,7 @@ const WarehouseInShop = () => {
                                 : undefined
                             }
                             sx={getStatusStyle(row?.status)}
+                            
                           />
                         </TableCell>
 
@@ -580,15 +577,16 @@ const WarehouseInShop = () => {
                           <Chip
                             label={row?.type}
                             size="small"
+                               color={
+                                row?.type === "in"
+                                  ? "success"
+                                  : row?.type === "out"
+                                    ? "error"
+                                    : "warning"}
                             sx={{
                               width: 50,
-                              bgcolor:
-                                row?.type === "in"
-                                  ? "#4CAF50"
-                                  : row?.type === "out"
-                                    ? "#F44336"
-                                    : "#FF9800",
-                              color: "#fff",
+                           
+                         
                               fontWeight: 600,
                             }}
                           />

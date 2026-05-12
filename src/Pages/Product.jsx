@@ -375,7 +375,7 @@ const Product = () => {
                                             width={40}
                                             height={40}
                                             style={{
-                                              borderRadius: "100%",
+                                              borderRadius: 2,
                                               objectFit: "cover",
                                             }}
                                           />

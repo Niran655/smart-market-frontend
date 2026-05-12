@@ -804,7 +804,7 @@ const POS = () => {
       keyword: "",
       categoryId: "",
     },
-    pollInterval: 1000,
+    pollInterval: 30000,
   });
   const productData = data ?? previousData;
   const initialProductsLoading = loading && !productData;
