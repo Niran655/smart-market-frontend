@@ -87,7 +87,7 @@ const RecentOrders = ({ selectedOrderType, setSelectedOrderType, t }) => {
  
       <Grid container alignItems="center" spacing={2} mb={3}>
         <Grid size={{ sx: 12, md: 2 }}>
-          <Typography variant="h6" fontWeight="bold">
+          <Typography  fontWeight="bold">
             {t("recent_orders")}
           </Typography>
         </Grid>

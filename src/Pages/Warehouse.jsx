@@ -638,7 +638,7 @@ const Warehouse = () => {
         <Box textAlign="start">
           <Breadcrumbs aria-label="breadcrumb" separator="/">
             <Typography
-              variant="h6"
+           
               sx={{
                 textDecoration: "none",
                 borderLeft: "3px solid #1D4592",
@@ -1203,15 +1203,16 @@ const Warehouse = () => {
                             <Chip
                               label={row?.type}
                               size="small"
+                               color={ row?.type === "in"
+                                    ? "success"
+                                    : row?.type === "out"
+                                      ? "error"
+                                      : "warning"}
+                                 
                               sx={{
                                 width: 50,
-                                bgcolor:
-                                  row?.type === "in"
-                                    ? "#4CAF50"
-                                    : row?.type === "out"
-                                      ? "#F44336"
-                                      : "#FF9800",
-                                color: "#fff",
+                               
+                               
                                 fontWeight: 600,
                               }}
                             />

@@ -431,12 +431,12 @@ export default function Settings() {
           </Box>
           <Box>
             <Typography
-              variant="h6"
+              
               sx={{ color: "white", fontWeight: 700, lineHeight: 1.2, fontSize: "1rem" }}
             >
               {t("setting") || "Settings"}
             </Typography>
-            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.75)", fontSize: "0.7rem" }}>
+            <Typography   sx={{ color: "rgba(255,255,255,0.75)", fontSize: "0.7rem" }}>
               {t("manage_settings") || "Manage your system configuration"}
             </Typography>
           </Box>
@@ -458,16 +458,16 @@ export default function Settings() {
       <Stack direction="row" alignItems="center" spacing={1.5} mb={2}>
         <Box sx={{ width: 3, height: 18, borderRadius: 0.5, bgcolor: theme.palette.primary.main }} />
         <Typography
-          variant="body2"
+      
           sx={{
             fontWeight: 700,
             color: theme.palette.text.secondary,
             letterSpacing: "0.08em",
             textTransform: "uppercase",
-            fontSize: "0.7rem",
+ 
           }}
         >
-          {t("configuration_modules") || "Configuration Modules"}
+          {t("configuration_modules")}
         </Typography>
         <Box sx={{ flex: 1, height: 1, bgcolor: theme.palette.divider }} />
       </Stack>

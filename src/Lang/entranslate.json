@@ -459,6 +459,12 @@
   "page_not_found":"Page Not Found",
   "base_price":"Base Price",
   "additions":"Additions",
-  "pos_system":"POS System"
+  "pos_system":"POS System",
+  "start_hour":"Start Hour",
+  "end_hour":"End Hour",
+  "start_minute":"Start Minute",
+  "end_minute":"End Minute",
+  "opening_cash":"Opening Cash",
+  "closing_cash":"Closing Cash"
    
 }

@@ -389,14 +389,13 @@ const ShopCard = ({ shop, language, t, onJoin, onReport, shopActions }) => {
               <Chip
                 label={t("active") || "Active"}
                 size="small"
+                      color= 'success'
                 sx={{
                   mt: 0.5,
                   height: 20,
                   fontSize: "0.65rem",
                   fontWeight: 700,
-                  bgcolor: theme.palette.success.light + "30",
-                  color: theme.palette.success.main,
-                  border: "none",
+       
                 }}
               />
             </Box>

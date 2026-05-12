@@ -304,7 +304,7 @@ const TX_TABS = [
   { key: "invoice",   label: "Invoice"   },
 ];
 
-// ─── Main Component ────────────────────────────────────────────────────────────
+ 
 export default function Dashboard() {
   const theme = useTheme();
   const { language, user } = useAuth();

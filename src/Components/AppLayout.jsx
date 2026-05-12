@@ -345,7 +345,7 @@ export default function AppLayout() {
  
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <Link to={`/store/pos/${id}`} style={{ textDecoration: "none" }}>
-                    <Button sx={{ color: theme.palette.getContrastText(topbarColor) }}>
+                    <Button >
                       {!isExtraSmall && (
                         <Typography
                           sx={{

@@ -100,7 +100,7 @@ const StoreSetting = () => {
             <Typography
               component={RouterLink}
               to="/store"
-              variant="h6"
+             
               sx={{
                 textDecoration: "none",
                 borderLeft: "3px solid #1D4592",
@@ -112,7 +112,7 @@ const StoreSetting = () => {
             </Typography>
 
             <Typography
-              variant="h6"
+             
               sx={{ fontWeight: 600 }}
               color="text.primary"
             >

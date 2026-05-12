@@ -440,6 +440,12 @@
   "page_not_found":"ទំព័រមិនត្រូវបានរកឃើញ",
   "base_price":"តម្លៃដើម",
   "additions":"បន្ថែម",
-  "pos_system":"ប្រព័ន្ធលក់"
+  "pos_system":"ប្រព័ន្ធលក់",
+    "start_hour": "ម៉ោងចាប់ផ្តើម",
+  "end_hour": "ម៉ោងបញ្ចប់",
+  "start_minute": "នាទីចាប់ផ្តើម",
+  "end_minute": "នាទីបញ្ចប់",
+  "opening_cash": "ប្រាក់សាច់ដើមថ្ងៃ",
+  "closing_cash": "ប្រាក់សាច់បញ្ចប់ថ្ងៃ"
 
 }

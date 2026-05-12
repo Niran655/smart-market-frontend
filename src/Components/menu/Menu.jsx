@@ -16,6 +16,7 @@ import { Link as RouterLink } from "react-router-dom";
 
 import {
   CornerUpLeft,
+  Grid2X2,
   ScrollText,
   ShoppingCart,
   Users,
@@ -64,6 +65,14 @@ export default function MenuModal({ open, onClose }) {
       to: `/store/pos/${id}/warehouse-in-shop`,
       // bgColor: "#FFC107",
       textColor: "#ffffff",
+    },
+      {
+      title: t("dashboard"),
+      description: "View dashboard",
+      icon: <Grid2X2 size={32} color="#5f03f4" />,
+      to: `/store/pos/${id}/dashboard-in-shop`,
+      // bgColor: "#03A9F4",
+      textColor: "#fff",
     },
     {
       title: t("report"),
