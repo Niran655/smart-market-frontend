@@ -465,14 +465,14 @@ export default function SubProductForm({
                     <TableHead>
                       <TableRow>
                         <TableCell width="5%"></TableCell>
-                        <TableCell>Name Khmer (Size)</TableCell>
-                        <TableCell>Name English (Size)</TableCell>
-                        <TableCell>Type</TableCell>
-                        <TableCell>Price ($)</TableCell>
-                        <TableCell>Tax ($)</TableCell>
-                        <TableCell>Service ($)</TableCell>
-                        <TableCell>Total ($)</TableCell>
-                        <TableCell align="center">Actions</TableCell>
+                        <TableCell>{t(`khmer_name`)}</TableCell>
+                        <TableCell>{t(`english_name`)}</TableCell>
+                        <TableCell>{t(`type`)}</TableCell>
+                        <TableCell>{t(`price`)} ($)</TableCell>
+                        <TableCell>{t(`tax`)} ($)</TableCell>
+                        <TableCell>{t(`service`)} ($)</TableCell>
+                        <TableCell>{t(`total`)} ($)</TableCell>
+                        <TableCell align="center">{t(`action`)}</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -559,12 +559,12 @@ export default function SubProductForm({
                                   <Table size="small">
                                     <TableHead>
                                       <TableRow>
-                                        <TableCell>Option Name (optional)</TableCell>
-                                        <TableCell>Sugar Level</TableCell>
-                                        <TableCell>Price ($)</TableCell>
-                                        <TableCell>Tax ($)</TableCell>
-                                        <TableCell>Service ($)</TableCell>
-                                        <TableCell>Total ($)</TableCell>
+                                        <TableCell>{t(`option_name`)}</TableCell>
+                                        <TableCell>{t(`surgar_lavel`)}</TableCell>
+                                        <TableCell>{t(`price`)} ($)</TableCell>
+                                        <TableCell>{t(`tax`)} ($)</TableCell>
+                                        <TableCell>{t(`service`)} ($)</TableCell>
+                                        <TableCell>{t(`total`)} ($)</TableCell>
                                         <TableCell align="center">Actions</TableCell>
                                       </TableRow>
                                     </TableHead>
@@ -627,8 +627,8 @@ export default function SubProductForm({
                                       ))}
                                       <TableRow>
                                         <TableCell colSpan={7}>
-                                          <Button size="small" startIcon={<AddIcon />} onClick={() => handleAddChildRow(pIdx)}>
-                                            Add Sugar Level
+                                          <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={() => handleAddChildRow(pIdx)}>
+                                            {t(`add_surgar_lavel`)}
                                           </Button>
                                         </TableCell>
                                       </TableRow>
@@ -645,7 +645,7 @@ export default function SubProductForm({
                 </TableContainer>
                 <Box sx={{ mt: 2 }}>
                   <Button variant="outlined" startIcon={<AddIcon />} onClick={handleAddParentRow}>
-                    Add New Size
+                    {t(`add_new_size`)}
                   </Button>
                 </Box>
               </Box>

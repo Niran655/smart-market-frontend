@@ -465,6 +465,10 @@
   "start_minute":"Start Minute",
   "end_minute":"End Minute",
   "opening_cash":"Opening Cash",
-  "closing_cash":"Closing Cash"
+  "closing_cash":"Closing Cash",
+  "option_name":"Option Name",
+  "surgar_lavel" :"Surgar lavel",
+  "add_surgar_lavel":"Add Surgar Lavel",
+  "add_new_size":"Add New Size"
    
 }

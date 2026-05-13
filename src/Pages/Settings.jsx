@@ -369,14 +369,7 @@ const SettingCard = ({ to, image, title, description, colorKey, muiIcon }) => {
         </Typography>
 
 
-        <Box
-          sx={{
-            mt: 1.5,
-            height: 1.5,
-            borderRadius: 1,
-            background: `linear-gradient(90deg, ${accentColor}40 0%, transparent 100%)`,
-          }}
-        />
+        
       </Box>
     </Paper>
   );
@@ -434,10 +427,10 @@ export default function Settings() {
               
               sx={{ color: "white", fontWeight: 700, lineHeight: 1.2, fontSize: "1rem" }}
             >
-              {t("setting") || "Settings"}
+              {t("setting") }
             </Typography>
             <Typography   sx={{ color: "rgba(255,255,255,0.75)", fontSize: "0.7rem" }}>
-              {t("manage_settings") || "Manage your system configuration"}
+              {t("manage_settings") }
             </Typography>
           </Box>
         </Stack>

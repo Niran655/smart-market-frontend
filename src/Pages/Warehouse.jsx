@@ -435,6 +435,7 @@
 // };
 
 // export default Warehouse;
+
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
@@ -504,6 +505,7 @@ const Warehouse = () => {
   const [productWarehousePage, setProductWarehousePage] = useState(1);
   const [productWarehouseLimit, setProductWarehouseLimit] = useState(5);
   const [productWarehouseKeyword, setProductWarehouseKeyword] = useState("");
+  const [productWarehouseStatus, setProductWarehouseStatus] = useState("All");
 
   const [productWarehouseTransferPage, setProductWarehouseTransferPage] = useState(1);
   const [productWarehouseTransferLimit, setProductWarehouseTransferLimit] = useState(5);
@@ -534,6 +536,9 @@ const Warehouse = () => {
     limit: productWarehouseLimit,
     pagination: true,
     keyword: productWarehouseKeyword,
+    status: productWarehouseStatus === "All"
+      ? undefined
+      : productWarehouseStatus,
   });
 
   const {
@@ -578,9 +583,27 @@ const Warehouse = () => {
   });
 
 
+
+
   const handleProductTransferStatusChange = (e) => {
     setProductsWarehouseTransferStatus(e.target.value);
     setProductWarehouseTransferPage(1);
+  };
+
+  const handleProductTransferSearchChange = (e) =>{
+    setProductWarehouseTransferKeyword(e.target.value);
+  }
+
+  const handleProductWarehouseStatusChange = (e) => {
+    setProductWarehouseStatus(e.target.value);
+    setProductWarehousePage(1);
+  };
+
+  const handleProductWarehouseSearchChange = (e) => {
+    const value = e.target.value;
+
+    setProductWarehousePage(1);
+    setProductWarehouseKeyword(value);
   };
 
   const handlePurchaseOrderStatusChange = (e) => {
@@ -588,7 +611,9 @@ const Warehouse = () => {
     setPurchaseOrderPage(1);
   };
 
-
+  const handlePurchaseOrderSearchChange = (e) =>{
+    setPurchaseOrderKeyword(e.target.value);
+  }
 
   const handleLimit = (e) => {
     const newLimit = parseInt(e.target.value, 10);
@@ -638,7 +663,7 @@ const Warehouse = () => {
         <Box textAlign="start">
           <Breadcrumbs aria-label="breadcrumb" separator="/">
             <Typography
-           
+
               sx={{
                 textDecoration: "none",
                 borderLeft: "3px solid #1D4592",
@@ -716,6 +741,80 @@ const Warehouse = () => {
           <Box>
             {activeTab === "1" && (
               <Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 2,
+                    mb: 2,
+                  }}
+                >
+                  <Grid
+                    container
+                    spacing={2}
+                    alignItems="center"
+                    textAlign={"start"}
+                    sx={{ flex: 1 }}
+                  >
+                    <Grid size={{ xs: 3 }}>
+                      <Typography variant="body2" fontWeight={500} mb={0.5}>
+                        {t("search")}
+                      </Typography>
+                      <TextField
+                        type="search"
+                        size="small"
+                        value={productWarehouseKeyword}
+                        onChange={handleProductWarehouseSearchChange}
+                        placeholder={t("search") + "..."}
+                        fullWidth
+                        variant="outlined"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Search />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 3 }}>
+                      <Typography className="search-head-title">{t("status")}</Typography>
+                      <TextField
+                        select
+                        fullWidth
+                        size="small"
+                        value={productWarehouseStatus}
+                        onChange={handleProductWarehouseStatusChange}
+                      >
+                        <MenuItem value="All">{t("all")}</MenuItem>
+                        <MenuItem value="in_stock">{t("in_stock")}</MenuItem>
+                        <MenuItem value="low_stock">{t("low_stock")}</MenuItem>
+                      </TextField>
+                    </Grid>
+                  </Grid>
+
+                  <Stack direction="row" spacing={2}>
+                    <Button
+                      variant="contained"
+                      startIcon={<LibraryAddOutlinedIcon size={18} />}
+                      onClick={handleOpenTransfer}
+                    >
+                      {t("create_transfer")}
+                    </Button>
+                    {openTransfer && (
+                      <ProductTransferForm
+                        t={t}
+                        open={openTransfer}
+                        onClose={handleCloseTransfer}
+                        dialogTitle={"Create"}
+                        language={language}
+                        setRefetch={productsWarehouseTransferRefetch}
+                      />
+                    )}
+                  </Stack>
+                </Box>
                 <TableContainer className="table-container">
                   <Table className="table"  >
                     <TableHead  >
@@ -780,16 +879,16 @@ const Warehouse = () => {
                                   icon={<WarningAmberOutlinedIcon />}
                                   label={t("low_stock")}
                                   size="small"
-                                  color= "warning"
-                                  fontWeight= "600"
+                                  color="warning"
+                                  fontWeight="600"
                                 />
                               ) : (
                                 <Chip
                                   icon={<CheckOutlinedIcon />}
                                   label={t("in_stock")}
                                   size="small"
-                                  color= "success"                    
-                                  fontWeight= "600"
+                                  color="success"
+                                  fontWeight="600"
                                 />
                               )}
                             </TableCell>
@@ -852,6 +951,8 @@ const Warehouse = () => {
                       <TextField
                         type="search"
                         size="small"
+                        value={productWarehouseTransferKeyword}
+                        onChange={handleProductTransferSearchChange}
                         placeholder={t("search") + "..."}
                         fullWidth
                         variant="outlined"
@@ -1027,6 +1128,8 @@ const Warehouse = () => {
                         size="small"
                         placeholder={t("search") + "..."}
                         fullWidth
+                        value={purchaseOrderKeyword}
+                        onChange={handlePurchaseOrderSearchChange}
                         variant="outlined"
                         InputProps={{
                           startAdornment: (
@@ -1181,44 +1284,44 @@ const Warehouse = () => {
                       {stockMovement?.map((row, index) => (
                         <TableRow className="table-row" key={index}>
 
-                       
+
                           <TableCell>
                             {stockMovementPaginator?.slNo + index}
                           </TableCell>
 
-                        
+
                           <TableCell>
                             {new Date(row?.createdAt).toLocaleString()}
                           </TableCell>
 
-                    
+
                           <TableCell>
                             {language === "kh"
                               ? row?.product?.nameKh
                               : row?.product?.nameEn}
                           </TableCell>
 
-                        
+
                           <TableCell>
                             <Chip
                               label={row?.type}
                               size="small"
-                               color={ row?.type === "in"
-                                    ? "success"
-                                    : row?.type === "out"
-                                      ? "error"
-                                      : "warning"}
-                                 
+                              color={row?.type === "in"
+                                ? "success"
+                                : row?.type === "out"
+                                  ? "error"
+                                  : "warning"}
+
                               sx={{
                                 width: 50,
-                               
-                               
+
+
                                 fontWeight: 600,
                               }}
                             />
                           </TableCell>
 
-                   
+
                           <TableCell>
                             {row?.quantity}{" "}
                             {language === "kh"
@@ -1226,13 +1329,13 @@ const Warehouse = () => {
                               : row?.subProduct?.unitId?.nameEn}
                           </TableCell>
 
-                
+
                           <TableCell>{row?.previousStock}</TableCell>
 
-                       
+
                           <TableCell>{row?.newStock}</TableCell>
 
-                     
+
                           <TableCell>{row?.reason || "-"}</TableCell>
 
 

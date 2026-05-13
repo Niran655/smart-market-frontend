@@ -8,20 +8,21 @@ const useGetProductWarehouseWithPagination = ({
   limit = 10,
   pagination = true,
   keyword = "",
+  status,
 }) => {
   const [productWarehouseWithPagination, setProductwarehouseWithPagination] = useState([]);
   const [paginator, setPaginator] = useState(true);
   const { data, loading, error, refetch } = useQuery(
     GET_PRDUCT_WAREHOUSE_WITH_PAGINATION,
     {
-      variables: { page, limit, pagination, keyword },
+      variables: { page, limit, pagination, keyword, status },
       fetchPolicy: "cache-and-network",
     },
   );
   useEffect(() => {
     if (data?.getProductWareHouseWithPagination) {
       setProductwarehouseWithPagination(data?.getProductWareHouseWithPagination?.data);
-     setPaginator(data?.getProductWareHouseWithPagination?.paginator);
+      setPaginator(data?.getProductWareHouseWithPagination?.paginator);
 
     }
   }, [data]);

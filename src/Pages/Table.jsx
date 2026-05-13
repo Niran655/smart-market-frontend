@@ -87,16 +87,21 @@ const TablePage = () => {
     <Box>
       <Stack direction="row" justifyContent="space-between">
         <Breadcrumbs separator="/">
+        <Typography
+              component={RouterLink}
+              to="/setting"
+               
+              sx={{
+                textDecoration: "none",
+                borderLeft: "3px solid #1D4592",
+                pl: 1.5,
+                fontWeight: 600,
+              }}
+            >
+              {t("setting")}
+            </Typography>
           <Typography
-            component={RouterLink}
-            to="/"
-            variant="h6"
-            sx={{
-              textDecoration: "none",
-              borderLeft: "3px solid #1D4592",
-              pl: 1.5,
-              fontWeight: 600,
-            }}
+             
           >
             {t("table")}
           </Typography>

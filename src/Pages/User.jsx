@@ -69,7 +69,7 @@ const User = () => {
             <Typography
               component={RouterLink}
               to="/setting"
-              variant="h6"
+              
               sx={{
                 textDecoration: "none",
                 borderLeft: "3px solid #1D4592",
@@ -85,7 +85,7 @@ const User = () => {
                 textDecoration: "none",
                 fontWeight: 600,
               }}
-              variant="h6"
+              
               color="text.primary"
             >
               {t("user")}

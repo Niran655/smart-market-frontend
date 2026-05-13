@@ -446,6 +446,10 @@
   "start_minute": "នាទីចាប់ផ្តើម",
   "end_minute": "នាទីបញ្ចប់",
   "opening_cash": "ប្រាក់សាច់ដើមថ្ងៃ",
-  "closing_cash": "ប្រាក់សាច់បញ្ចប់ថ្ងៃ"
+  "closing_cash": "ប្រាក់សាច់បញ្ចប់ថ្ងៃ",
+    "option_name":"ឈ្មោះជម្រើស",
+  "surgar_lavel" :"កម្រិតស្ករ",
+  "add_surgar_lavel":"បន្ថែមកម្រិត",
+  "add_new_size":"បន្ថែមទំហំថ្មី"
 
 }

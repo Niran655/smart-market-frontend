@@ -54,7 +54,7 @@ const Unit = () => {
             <Typography
               component={RouterLink}
               to="/setting"
-              variant="h6"
+               
               sx={{
                 textDecoration: "none",
                 borderLeft: "3px solid #1D4592",
@@ -65,7 +65,7 @@ const Unit = () => {
               {t("setting")}
             </Typography>
 
-            <Typography variant="h6" sx={{
+            <Typography   sx={{
               textDecoration: "none",
               fontWeight: 600,
             }} color="text.primary">

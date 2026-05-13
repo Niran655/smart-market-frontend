@@ -38,7 +38,7 @@ const Supplier = () => {
           <Typography
             component={RouterLink}
             to="/setting"
-            variant="h6"
+             
             sx={{
               textDecoration: "none",
               borderLeft: "3px solid #1D4592",
@@ -48,7 +48,7 @@ const Supplier = () => {
           >
             {t("setting")}
           </Typography>
-          <Typography variant="h6" fontWeight={600}>
+          <Typography   fontWeight={600}>
             {t("suppliers")}
           </Typography>
         </Breadcrumbs>

@@ -86,7 +86,7 @@ const Product = () => {
             <Typography
               component={RouterLink}
               to="/setting"
-              variant="h6"
+               
               sx={{
                 textDecoration: "none",
                 borderLeft: "3px solid #1D4592",
@@ -97,7 +97,7 @@ const Product = () => {
               {t("setting")}
             </Typography>
 
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            <Typography   sx={{ fontWeight: 600 }}>
               {t("product")}
             </Typography>
           </Breadcrumbs>

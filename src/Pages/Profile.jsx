@@ -44,7 +44,7 @@ const Profile = () => {
         <Box textAlign="start">
           <Breadcrumbs separator="/">
             <Typography
-              variant="h6"
+               
               sx={{
                 borderLeft: "3px solid #1D4592",
                 pl: 1.5,

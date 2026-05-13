@@ -515,8 +515,8 @@ query GetSubProductById($subProductId: ID!) {
 `
 
 export const GET_PRDUCT_WAREHOUSE_WITH_PAGINATION = gql`
-query GetProductWareHouseWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
-  getProductWareHouseWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+query GetProductWareHouseWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $status: String) {
+  getProductWareHouseWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, status: $status) {
    data {
     _id
       stock
