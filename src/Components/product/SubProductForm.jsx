@@ -12,6 +12,8 @@ import { FormikProvider, useFormik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import AddIcon from "@mui/icons-material/Add";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import DeleteIcon from "@mui/icons-material/Delete";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -30,6 +32,22 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
  
 const calcTotal = (price, tax, service) =>
   (Number(price) || 0) + (Number(tax) || 0) + (Number(service) || 0);
+
+const ADDITION_PRICES_CLIPBOARD_KEY = "subProductAdditionPricesClipboard";
+
+const normalizeAdditionPrices = (items = []) =>
+  items.map((item) => ({
+    nameKhmer: item.nameKhmer || "",
+    nameEnglish: item.nameEnglish || "",
+    priceType: item.priceType || "single",
+    price: item.price ?? 0,
+    tax: item.tax ?? 0,
+    service: item.service ?? 0,
+    total: calcTotal(item.price, item.tax, item.service),
+    sizeName: item.sizeName || "",
+    sugarLevel: item.sugarLevel || "",
+    children: normalizeAdditionPrices(item.children || []),
+  }));
 
 export default function SubProductForm({
   open,
@@ -367,6 +385,33 @@ export default function SubProductForm({
     setFieldValue("additionPrices", updated);
   };
 
+  const handleCopyAdditionPrices = () => {
+    const copiedPrices = normalizeAdditionPrices(values.additionPrices || []);
+    localStorage.setItem(ADDITION_PRICES_CLIPBOARD_KEY, JSON.stringify(copiedPrices));
+    setAlert(true, "success", "Addition price options copied");
+  };
+
+  const handlePasteAdditionPrices = () => {
+    const copiedPrices = localStorage.getItem(ADDITION_PRICES_CLIPBOARD_KEY);
+    if (!copiedPrices) {
+      setAlert(true, "warning", "No copied addition price options found");
+      return;
+    }
+
+    try {
+      const parsedPrices = JSON.parse(copiedPrices);
+      const normalizedPrices = normalizeAdditionPrices(Array.isArray(parsedPrices) ? parsedPrices : []);
+      setFieldValue("additionPrices", normalizedPrices);
+      setExpandedRows(
+        normalizedPrices.reduce((rows, _item, idx) => ({ ...rows, [idx]: true }), {})
+      );
+      setAlert(true, "success", "Addition price options pasted");
+    } catch (err) {
+      console.error(err);
+      setAlert(true, "error", "Copied addition price options are invalid");
+    }
+  };
+
   const toggleExpand = (idx) => {
     setExpandedRows(prev => ({ ...prev, [idx]: !prev[idx] }));
   };
@@ -516,6 +561,28 @@ export default function SubProductForm({
              
             {tabIndex === 2 && (
               <Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, mb: 2, flexWrap: "wrap" }}>
+                  <Button variant="outlined" startIcon={<AddIcon />} onClick={handleAddParentRow}>
+                    {t(`add_new_size`)}
+                  </Button>
+                  <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                    <Button
+                      variant="outlined"
+                      startIcon={<ContentCopyIcon />}
+                      onClick={handleCopyAdditionPrices}
+                      disabled={!values.additionPrices?.length}
+                    >
+                      Copy options
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      startIcon={<ContentPasteIcon />}
+                      onClick={handlePasteAdditionPrices}
+                    >
+                      Paste options
+                    </Button>
+                  </Box>
+                </Box>
                 <TableContainer component={Paper} variant="outlined">
                   <Table size="small">
                     <TableHead>
@@ -699,11 +766,6 @@ export default function SubProductForm({
                     </TableBody>
                   </Table>
                 </TableContainer>
-                <Box sx={{ mt: 2 }}>
-                  <Button variant="outlined" startIcon={<AddIcon />} onClick={handleAddParentRow}>
-                    {t(`add_new_size`)}
-                  </Button>
-                </Box>
               </Box>
             )}
 
