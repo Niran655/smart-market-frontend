@@ -1,10 +1,10 @@
 import { useMutation } from "@apollo/client/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 
 import { CREATE_USER, UPDATE_USER } from "../../../graphql/mutation";
 import { useAuth } from "../../Context/AuthContext";
-import { supabase } from "../../supabaseClient";
+import { deleteImageFromStorage } from "../../utils/supabaseImageStorage";
 import ReusableForm from "../include/useForm";
 
 export default function UserForm({
@@ -17,7 +17,8 @@ export default function UserForm({
 }) {
   const { setAlert } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [uploadedFilePath, setUploadedFilePath] = useState(null);
+  const [pendingImagePath, setPendingImagePath] = useState(null);
+  const [oldImageUrl, setOldImageUrl] = useState("");
 
   const [formValues, setFormValues] = useState({
     nameKh: "",
@@ -30,33 +31,49 @@ export default function UserForm({
     active: true,
     password: "",
   });
+  const submittedValuesRef = useRef(formValues);
 
   const [createUser] = useMutation(CREATE_USER, {
     onCompleted: ({ createUser }) => {
       setLoading(false);
       if (createUser?.isSuccess) {
         setAlert(true, "success", createUser.message);
+        setPendingImagePath(null);
         onClose();
         setRefetch();
-      } else setAlert(true, "error", createUser.message);
+      } else {
+        if (pendingImagePath) deleteImageFromStorage(pendingImagePath).catch(console.error);
+        setAlert(true, "error", createUser.message);
+      }
     },
     onError: (err) => {
       setLoading(false);
+      if (pendingImagePath) deleteImageFromStorage(pendingImagePath).catch(console.error);
       setAlert(true, "error", err.message);
     },
   });
 
   const [updateUser] = useMutation(UPDATE_USER, {
-    onCompleted: ({ updateUser }) => {
+    onCompleted: async ({ updateUser }) => {
       setLoading(false);
       if (updateUser?.isSuccess) {
+        const submittedImage = submittedValuesRef.current?.image || "";
+        if (oldImageUrl && oldImageUrl !== submittedImage) {
+          await deleteImageFromStorage(oldImageUrl).catch(console.error);
+        }
         setAlert(true, "success", updateUser.message);
+        setPendingImagePath(null);
+        setOldImageUrl(submittedImage);
         onClose();
         setRefetch();
-      } else setAlert(true, "error", updateUser.message);
+      } else {
+        if (pendingImagePath) deleteImageFromStorage(pendingImagePath).catch(console.error);
+        setAlert(true, "error", updateUser.message);
+      }
     },
     onError: (error) => {
       setLoading(false);
+      if (pendingImagePath) deleteImageFromStorage(pendingImagePath).catch(console.error);
       setAlert(true, "error", {
         messageEn: error.message,
         messageKh: error.message,
@@ -77,10 +94,8 @@ export default function UserForm({
         active: userData.active ?? true,
         password: "",
       });
-
-      if (userData.image) {
-        setUploadedFilePath(userData.image.split("/").pop());
-      }
+      setOldImageUrl(userData.image || "");
+      setPendingImagePath(null);
     }
   }, [userData]);
 
@@ -96,6 +111,8 @@ export default function UserForm({
 
   const handleSubmit = (values) => {
     setLoading(true);
+    submittedValuesRef.current = values;
+    setFormValues(values);
     if (dialogTitle === "Create") {
       createUser({ variables: { input: values } });
     } else {
@@ -104,16 +121,24 @@ export default function UserForm({
   };
 
   const handleClose = async () => {
-    if (dialogTitle === "Create" && uploadedFilePath) {
-      await supabase.storage.from("images").remove([uploadedFilePath]);
+    if (pendingImagePath) {
+      await deleteImageFromStorage(pendingImagePath).catch(console.error);
+      setPendingImagePath(null);
     }
     onClose();
+  };
+
+  const handleUploadedPath = async (path) => {
+    if (pendingImagePath && pendingImagePath !== path) {
+      await deleteImageFromStorage(pendingImagePath).catch(console.error);
+    }
+    setPendingImagePath(path);
   };
 
   const tabs = [
     {
       fields: [
-        { name: "image", label: t("image"), type: "image", grid: { xs: 12 } },
+        { name: "image", label: t("image"), type: "image", grid: { xs: 12 }, setFilePath: handleUploadedPath },
         { name: "nameKh", label: t("khmer_name"), grid: { xs: 12, md: 6 } },
         { name: "nameEn", label: t("english_name"), grid: { xs: 12, md: 6 } },
         {

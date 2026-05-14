@@ -70,7 +70,13 @@ export default function ReusableForm({
 
     switch (field.type) {
       case "image":
-        return <UploadImage value={values[field.name]} onChange={(url) => setFieldValue(field.name, url)} />;
+        return (
+          <UploadImage
+            value={values[field.name]}
+            onChange={(url) => setFieldValue(field.name, url)}
+            setFilePath={field.setFilePath}
+          />
+        );
 
       case "autocomplete":
         return (

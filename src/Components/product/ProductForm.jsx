@@ -19,7 +19,9 @@ import { CREATE_PRODUCT, UPDATE_PRODUCT } from "../../../graphql/mutation";
 import { useAuth } from "../../Context/AuthContext";
 import { GET_CATEGORY, GET_UNIT } from "../../../graphql/queries";
 import UploadImage from "../../utils/UploadImage";
-import { supabase } from "../../supabaseClient";
+import {
+  deleteImageFromStorage,
+} from "../../utils/supabaseImageStorage";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -43,43 +45,52 @@ export default function ProductForm({
   const [loading, setLoading] = React.useState(false);
   const { setAlert } = useAuth();
  
-  const [uploadedFilePath, setUploadedFilePath] = React.useState(null);
+  const [pendingImagePath, setPendingImagePath] = React.useState(null);
+  const [oldImageUrl, setOldImageUrl] = React.useState("");
 
   const [createProduct] = useMutation(CREATE_PRODUCT, {
     onCompleted: ({ createProduct }) => {
-     
       if (createProduct?.isSuccess) {
         setLoading(false);
         setRefetch();
         onClose();
-        setUploadedFilePath(null);
+        setPendingImagePath(null);
         setAlert(true, "success", createProduct?.message);
       } else {
         setLoading(false);
+        if (pendingImagePath) deleteImageFromStorage(pendingImagePath).catch(console.error);
         setAlert(true, "error", createProduct?.message);
       }
     },
     onError: (error) => {
       setLoading(false);
+      if (pendingImagePath) deleteImageFromStorage(pendingImagePath).catch(console.error);
       console.error("Error", error);
       setAlert(true, "error", error.message);
     },
   });
 
   const [updateProduct] = useMutation(UPDATE_PRODUCT, {
-    onCompleted: ({ updateProduct }) => {
+    onCompleted: async ({ updateProduct }) => {
       if (updateProduct?.isSuccess) {
+        if (oldImageUrl && oldImageUrl !== formik.values.image) {
+          await deleteImageFromStorage(oldImageUrl).catch(console.error);
+        }
         setLoading(false);
         setRefetch();
         setAlert(true, "success", updateProduct?.message);
+        setPendingImagePath(null);
+        setOldImageUrl(formik.values.image || "");
         onClose?.();
       } else {
         setLoading(false);
+        if (pendingImagePath) deleteImageFromStorage(pendingImagePath).catch(console.error);
         setAlert(true, "error", updateProduct?.message);
       }
     },
     onError: (error) => {
       setLoading(false);
+      if (pendingImagePath) deleteImageFromStorage(pendingImagePath).catch(console.error);
       console.error("Error", error);
       setAlert(true, "error", error.message);
     },
@@ -160,20 +171,29 @@ export default function ProductForm({
           remark: productData.remark || "",
           active: productData.active !== undefined ? productData.active : true,
         });
-        if (productData?.image)
-          setUploadedFilePath(productData.image.split("/").pop());
+        setOldImageUrl(productData?.image || "");
+        setPendingImagePath(null);
       } else {
+        setOldImageUrl("");
+        setPendingImagePath(null);
         resetForm();
       }
     }
   }, [open, productData, dialogTitle, setValues, resetForm]);
 
   const handleClose = async () => {
-    if (dialogTitle === "Create" && uploadedFilePath) {
-      await supabase.storage.from("images").remove([uploadedFilePath]);
-      setUploadedFilePath(null);
+    if (pendingImagePath) {
+      await deleteImageFromStorage(pendingImagePath).catch(console.error);
+      setPendingImagePath(null);
     }
     onClose();
+  };
+
+  const handleUploadedPath = async (path) => {
+    if (pendingImagePath && pendingImagePath !== path) {
+      await deleteImageFromStorage(pendingImagePath).catch(console.error);
+    }
+    setPendingImagePath(path);
   };
 
   return (
@@ -209,7 +229,7 @@ export default function ProductForm({
                 <UploadImage
                   value={formik.values.image}
                   onChange={(url) => setFieldValue("image", url)}
-                  setFilePath={setUploadedFilePath}
+                  setFilePath={handleUploadedPath}
                 />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>

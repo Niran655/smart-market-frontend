@@ -70,6 +70,7 @@ export default function SubProductAction({
         onClose={handleCloseDelete}
         subProductId={subProductId}
         supProductName={supProductName}
+        imageUrls={[subProductData?.productImg, subProductData?.priceImg]}
       />
 
       <SubProductBarcode

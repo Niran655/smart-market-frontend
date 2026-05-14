@@ -49,6 +49,7 @@ export default function ProductAction({
         onClose={handleCloseDelete}
         productId={productId}
         productName={productName}
+        imageUrl={productData?.image}
       />
     </div>
   );

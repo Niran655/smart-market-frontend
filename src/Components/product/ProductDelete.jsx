@@ -7,12 +7,14 @@ import "../../Styles/dialogStyle.scss";
 import { DELETE_PRODUCT } from "../../../graphql/mutation";
 import { useAuth } from "../../Context/AuthContext";
 import { translateLauguage } from "../../function/translate";
+import { deleteImageFromStorage } from "../../utils/supabaseImageStorage";
 
 export default function ProductDelete({
   open,
   onClose,
   productId,
   productName,
+  imageUrl,
   setRefetch,
 }) {
 
@@ -23,9 +25,10 @@ export default function ProductDelete({
   const { t } = translateLauguage(language);
 
   const [deleteProduct] = useMutation(DELETE_PRODUCT, {
-    onCompleted: ({ deleteProduct }) => {
+    onCompleted: async ({ deleteProduct }) => {
       setLoading(false);
       if (deleteProduct?.isSuccess) {
+        if (imageUrl) await deleteImageFromStorage(imageUrl).catch(console.error);
         onClose?.();
         setAlert(true, "success", deleteProduct?.message);
         setRefetch();

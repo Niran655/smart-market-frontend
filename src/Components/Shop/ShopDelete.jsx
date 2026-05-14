@@ -6,12 +6,14 @@ import { useState } from "react";
 import "../../Styles/dialogStyle.scss";
 import { DELETE_SHOP } from "../../../graphql/mutation";
 import { useAuth } from "../../Context/AuthContext";
+import { deleteImageFromStorage } from "../../utils/supabaseImageStorage";
 
 export default function ShopDelete({
   open,
   onClose,
   shopId,
   shopName,
+  imageUrl,
   setRefetch,
   t, 
 }) {
@@ -21,9 +23,10 @@ export default function ShopDelete({
   const [loading, setLoading] = useState(false);
 
   const [deleteShop] = useMutation(DELETE_SHOP, {
-    onCompleted: ({ deleteShop }) => {
+    onCompleted: async ({ deleteShop }) => {
       setLoading(false);
       if (deleteShop?.isSuccess) {
+        if (imageUrl) await deleteImageFromStorage(imageUrl).catch(console.error);
         onClose?.();
         setAlert(true, "success", deleteShop?.message);
         setRefetch();

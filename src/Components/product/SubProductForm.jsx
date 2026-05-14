@@ -9,7 +9,7 @@ import {
   TableContainer, TableHead, TableRow, Paper, Collapse
 } from "@mui/material";
 import { FormikProvider, useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -20,6 +20,7 @@ import { CREATE_SUB_PRODUCT, UPDATE_SUB_PRODUCT } from "../../../graphql/mutatio
 import { useAuth } from "../../Context/AuthContext";
 import { GET_ALL_SHOP, GET_UNIT } from "../../../graphql/queries";
 import UploadImage from "../../utils/UploadImage";
+import { deleteImagesFromStorage, deleteImageFromStorage } from "../../utils/supabaseImageStorage";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": { padding: theme.spacing(2) },
@@ -45,6 +46,9 @@ export default function SubProductForm({
   const [loadingLocal, setLoadingLocal] = useState(false);
   const [userObject, setUserObject] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
+  const [pendingImagePaths, setPendingImagePaths] = useState({});
+  const [oldImageUrls, setOldImageUrls] = useState({ productImg: "", priceImg: "" });
+  const submittedValuesRef = useRef(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -64,31 +68,52 @@ export default function SubProductForm({
       setLoadingLocal(false);
       if (createSubProduct?.isSuccess) {
         setAlert(true, "success", createSubProduct.message);
+        setPendingImagePaths({});
         setRefetch?.();
         onClose();
       } else {
+        deleteImagesFromStorage(Object.values(pendingImagePaths)).catch(console.error);
         setAlert(true, "error", createSubProduct?.message);
       }
     },
     onError: (err) => {
       setLoadingLocal(false);
+      deleteImagesFromStorage(Object.values(pendingImagePaths)).catch(console.error);
       setAlert(true, "error", err.message);
     },
   });
 
   const [updateSubProduct] = useMutation(UPDATE_SUB_PRODUCT, {
-    onCompleted: ({ updateSubProduct }) => {
+    onCompleted: async ({ updateSubProduct }) => {
       setLoadingLocal(false);
       if (updateSubProduct?.isSuccess) {
+        const submittedValues = submittedValuesRef.current || {};
+        const imagesToDelete = [];
+        if (oldImageUrls.productImg && oldImageUrls.productImg !== submittedValues.productImg) {
+          imagesToDelete.push(oldImageUrls.productImg);
+        }
+        if (oldImageUrls.priceImg && oldImageUrls.priceImg !== submittedValues.priceImg) {
+          imagesToDelete.push(oldImageUrls.priceImg);
+        }
+        if (imagesToDelete.length) {
+          await deleteImagesFromStorage(imagesToDelete).catch(console.error);
+        }
         setAlert(true, "success", updateSubProduct.message);
+        setPendingImagePaths({});
+        setOldImageUrls({
+          productImg: submittedValues.productImg || "",
+          priceImg: submittedValues.priceImg || "",
+        });
         setRefetch?.();
         onClose();
       } else {
+        deleteImagesFromStorage(Object.values(pendingImagePaths)).catch(console.error);
         setAlert(true, "error", updateSubProduct?.message);
       }
     },
     onError: (err) => {
       setLoadingLocal(false);
+      deleteImagesFromStorage(Object.values(pendingImagePaths)).catch(console.error);
       setAlert(true, "error", err.message);
     },
   });
@@ -142,6 +167,7 @@ export default function SubProductForm({
     validationSchema,
     onSubmit: async (values) => {
       setLoadingLocal(true);
+      submittedValuesRef.current = values;
 
  
       const processAdditionPrices = (items) => {
@@ -243,7 +269,14 @@ export default function SubProductForm({
             })),
           })),
         });
+        setOldImageUrls({
+          productImg: subProductData?.productImg || "",
+          priceImg: subProductData?.priceImg || "",
+        });
+        setPendingImagePaths({});
       } else {
+        setOldImageUrls({ productImg: "", priceImg: "" });
+        setPendingImagePaths({});
         resetForm();
         setFieldValue("parentProductId", parentProductId || "");
       }
@@ -251,6 +284,21 @@ export default function SubProductForm({
       resetForm();
     }
   }, [open, subProductData, parentProductId, setValues, resetForm, setFieldValue]);
+
+  const handleClose = async () => {
+    await deleteImagesFromStorage(Object.values(pendingImagePaths)).catch(console.error);
+    setPendingImagePaths({});
+    resetForm();
+    onClose();
+  };
+
+  const handleUploadedPath = async (fieldName, path) => {
+    const previousPath = pendingImagePaths[fieldName];
+    if (previousPath && previousPath !== path) {
+      await deleteImageFromStorage(previousPath).catch(console.error);
+    }
+    setPendingImagePaths((prev) => ({ ...prev, [fieldName]: path }));
+  };
 
  
   const handleAddParentRow = () => {
@@ -340,7 +388,7 @@ export default function SubProductForm({
       <DialogTitle sx={{ m: 0, p: 2 }}>
         {dialogTitle === "Create" ? t("add_product") : t("edit_product")}
       </DialogTitle>
-      <IconButton onClick={() => { resetForm(); onClose(); }} sx={{ position: "absolute", right: 8, top: 8 }}>
+      <IconButton onClick={handleClose} sx={{ position: "absolute", right: 8, top: 8 }}>
         <CloseIcon color="error" />
       </IconButton>
       <Divider />
@@ -393,7 +441,11 @@ export default function SubProductForm({
                   </Grid>
                   <Grid size={{ xs: 12, md: 6 }}>
                     <Typography variant="body2">{t("image")}</Typography>
-                    <UploadImage value={values.productImg} onChange={(url) => setFieldValue("productImg", url)} />
+                    <UploadImage
+                      value={values.productImg}
+                      onChange={(url) => setFieldValue("productImg", url)}
+                      setFilePath={(path) => handleUploadedPath("productImg", path)}
+                    />
                   </Grid>
                   {values.check && (
                     <Grid size={{ xs: 12, md: 3 }}>
@@ -447,7 +499,11 @@ export default function SubProductForm({
                   </Grid>
                   <Grid size={{ xs: 12, md: 6 }}>
                     <Typography variant="body2">{t("image")}</Typography>
-                    <UploadImage value={values.priceImg} onChange={(url) => setFieldValue("priceImg", url)} />
+                    <UploadImage
+                      value={values.priceImg}
+                      onChange={(url) => setFieldValue("priceImg", url)}
+                      setFilePath={(path) => handleUploadedPath("priceImg", path)}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <Typography variant="body2">{t("description")}</Typography>

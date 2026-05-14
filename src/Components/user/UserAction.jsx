@@ -8,6 +8,7 @@ import { useAuth } from "../../Context/AuthContext";
 import UseDeleteForm from "../include/useDeleteForm";
 import UserForm from "./UserForm";
 import { useNavigate } from "react-router-dom";
+import { deleteImageFromStorage } from "../../utils/supabaseImageStorage";
 
 
 export default function UserAction({
@@ -32,9 +33,10 @@ export default function UserAction({
   const { setAlert } = useAuth();
 
   const [deleteUser] = useMutation(DELETE_USER, {
-    onCompleted: ({ deleteUser }) => {
+    onCompleted: async ({ deleteUser }) => {
       setLoading(false);
       if (deleteUser?.isSuccess) {
+        if (userData?.image) await deleteImageFromStorage(userData.image).catch(console.error);
         handleCloseDelete();
         setAlert(true, "success", deleteUser?.message);
         setRefetch();

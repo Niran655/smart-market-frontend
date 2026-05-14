@@ -9,7 +9,7 @@ import * as Yup from "yup";
 import { CREATE_SHOP, UPDATE_SHOP } from "../../../graphql/mutation";
 import { useAuth } from "../../Context/AuthContext";
 import UploadImage from "../../utils/UploadImage";
-import { supabase } from "../../supabaseClient";
+import { deleteImageFromStorage } from "../../utils/supabaseImageStorage";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": { padding: theme.spacing(2) },
@@ -26,20 +26,25 @@ export default function ShopForm({
 }) {
   const { setAlert } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [uploadedFilePath, setUploadedFilePath] = useState(null);
+  const [pendingImagePath, setPendingImagePath] = useState(null);
+  const [oldImageUrl, setOldImageUrl] = useState("");
 
   const [createShop] = useMutation(CREATE_SHOP, {
     onCompleted: ({ createShop }) => {
       setLoading(false);
       if (createShop?.isSuccess) {
         setAlert(true, "success", createShop?.message);
-        setUploadedFilePath(null);
+        setPendingImagePath(null);
         onClose();
         setRefetch();
-      } else setAlert(true, "error", createShop?.message);
+      } else {
+        if (pendingImagePath) deleteImageFromStorage(pendingImagePath).catch(console.error);
+        setAlert(true, "error", createShop?.message);
+      }
     },
     onError: (error) => {
       setLoading(false);
+      if (pendingImagePath) deleteImageFromStorage(pendingImagePath).catch(console.error);
       setAlert(true, "error", {
         messageEn: error.message,
         messageKh: error.message,
@@ -48,16 +53,22 @@ export default function ShopForm({
   });
 
   const [updateShop] = useMutation(UPDATE_SHOP, {
-    onCompleted: ({ updateShop }) => {
+    onCompleted: async ({ updateShop }) => {
       setLoading(false);
       if (updateShop?.isSuccess) {
+        if (oldImageUrl && oldImageUrl !== formik.values.image) {
+          await deleteImageFromStorage(oldImageUrl).catch(console.error);
+        }
         setAlert(true, "success", updateShop?.message);
+        setPendingImagePath(null);
+        setOldImageUrl(formik.values.image || "");
         onClose();
         setRefetch();
       } else setAlert(true, "error", updateShop?.message);
     },
     onError: (error) => {
       setLoading(false);
+      if (pendingImagePath) deleteImageFromStorage(pendingImagePath).catch(console.error);
       setAlert(true, "error", {
         messageEn: error.message,
         messageKh: error.message,
@@ -116,16 +127,24 @@ export default function ShopForm({
         address: shopData?.address || "",
         active: shopData?.active ?? true,
       });
-      if (shopData?.image) setUploadedFilePath(shopData.image.split("/").pop());
+      setOldImageUrl(shopData?.image || "");
+      setPendingImagePath(null);
     }
   }, [shopData, setValues]);
 
   const handleClose = async () => {
-    if (dialogTitle === "Create" && uploadedFilePath) {
-      await supabase.storage.from("images").remove([uploadedFilePath]);
-      setUploadedFilePath(null);
+    if (pendingImagePath) {
+      await deleteImageFromStorage(pendingImagePath).catch(console.error);
+      setPendingImagePath(null);
     }
     onClose();
+  };
+
+  const handleUploadedPath = async (path) => {
+    if (pendingImagePath && pendingImagePath !== path) {
+      await deleteImageFromStorage(pendingImagePath).catch(console.error);
+    }
+    setPendingImagePath(path);
   };
 
   return (
@@ -160,7 +179,7 @@ export default function ShopForm({
                 <UploadImage
                   value={formik.values.image}
                   onChange={(url) => setFieldValue("image", url)}
-                  setFilePath={setUploadedFilePath}
+                  setFilePath={handleUploadedPath}
                 />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>

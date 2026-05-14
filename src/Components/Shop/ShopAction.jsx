@@ -88,6 +88,7 @@ const ShopAction = ({ t, shopData, setRefetch,shopName,shopId,userId }) => {
           onClose={handleCloseDelete}
           shopName={shopName}
           shopId={shopId}
+          imageUrl={shopData?.image}
         />
       )}
       {
