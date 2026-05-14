@@ -2,6 +2,11 @@
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import PercentIcon from "@mui/icons-material/Percent";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import BarChartIcon from "@mui/icons-material/BarChart";
 import {
   Download as DownloadIcon,
   Print as PrintIcon,
@@ -588,55 +593,58 @@ const ReportPage = ({ shopId = null }) => {
       <>
 
         {currentTabValue === "sale" && saleDetailView !== "recentTransactions" && (
-          <Grid container spacing={2.5} sx={{ mb: 3 }}>
-            <Grid size={{ xs: 12, md: 4 }}>
-              <SummaryCard
-                label={t("total_revenue") || "Total Revenue"}
-                value={formatCurrency(reportData.totalRevenue)}
-                colorName="primary"
-                icon="💰"
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 4 }}>
-              <SummaryCard
-                label={t("total_orders") || "Total Orders"}
-                value={reportData.totalSalesCount || 0}
-                colorName="success"
-                icon="🛒"
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 4 }}>
-              <SummaryCard
-                label={t("average_order_value") || "Avg Order Value"}
-                value={formatCurrency(reportData.averageOrderValue)}
-                colorName="warning"
-                icon="📊"
-              />
-            </Grid>
-          </Grid>
-        )}
+  <Grid container spacing={2.5} sx={{ mb: 3 }}>
+    <Grid size={{ xs: 12, md: 4 }}>
+      <SummaryCard
+        label={t("total_revenue") || "Total Revenue"}
+        value={formatCurrency(reportData.totalRevenue)}
+        colorName="primary"
+        icon={<AttachMoneyIcon />}
+      />
+    </Grid>
+
+    <Grid size={{ xs: 12, md: 4 }}>
+      <SummaryCard
+        label={t("total_orders") || "Total Orders"}
+        value={reportData.totalSalesCount || 0}
+        colorName="success"
+        icon={<ShoppingCartIcon />}
+      />
+    </Grid>
+
+    <Grid size={{ xs: 12, md: 4 }}>
+      <SummaryCard
+        label={t("average_order_value") || "Avg Order Value"}
+        value={formatCurrency(reportData.averageOrderValue)}
+        colorName="warning"
+        icon={<BarChartIcon />}
+      />
+    </Grid>
+  </Grid>
+)}
 
 
-        {currentTabValue === "pnl" && (
-          <Grid container spacing={2.5} sx={{ mb: 3 }}>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <SummaryCard
-                label={t("net_profit") || "Net Profit"}
-                value={formatCurrency(reportData.netProfit)}
-                colorName="primary"
-                icon="📈"
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <SummaryCard
-                label={t("profit_margin") || "Profit Margin"}
-                value={`${reportData.profitMargin?.toFixed(2)}%`}
-                colorName="success"
-                icon="🎯"
-              />
-            </Grid>
-          </Grid>
-        )}
+{currentTabValue === "pnl" && (
+  <Grid container spacing={2.5} sx={{ mb: 3 }}>
+    <Grid size={{ xs: 12, md: 6 }}>
+      <SummaryCard
+        label={t("net_profit") || "Net Profit"}
+        value={formatCurrency(reportData.netProfit)}
+        colorName="primary"
+        icon={<TrendingUpIcon />}
+      />
+    </Grid>
+
+    <Grid size={{ xs: 12, md: 6 }}>
+      <SummaryCard
+        label={t("profit_margin") || "Profit Margin"}
+        value={`${reportData.profitMargin?.toFixed(2)}%`}
+        colorName="success"
+        icon={<PercentIcon />}
+      />
+    </Grid>
+  </Grid>
+)}
 
   
         <Paper

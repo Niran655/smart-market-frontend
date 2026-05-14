@@ -62,7 +62,7 @@ export default function ViewProductTransferInShop({
           alignItems="center"
           mb={2}
         >
-          <Typography variant="h6" fontWeight={600}>
+          <Typography   fontWeight={600}>
             {t("view_product_transfer_detail")}
           </Typography>
 
@@ -178,9 +178,7 @@ export default function ViewProductTransferInShop({
                   <Typography fontWeight={700}>
                     {t("my_company")}
                   </Typography>
-                  <Typography variant="body2">
-                    {t("phnom_penh")}
-                  </Typography>
+            
                 </Box>
 
                 <Box textAlign="right">

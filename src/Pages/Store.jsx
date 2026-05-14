@@ -307,7 +307,7 @@ import { GET_ALL_SHOP, GET_OPEN_SHIFT } from "../../graphql/queries";
 import { translateLauguage } from "../function/translate";
 import { useAuth } from "../Context/AuthContext";
 
-// ─── Shop Card (theme‑aware) ──────────────────────────────────
+ 
 const ShopCard = ({ shop, language, t, onJoin, onReport, shopActions }) => {
   const theme = useTheme();
   const initials = (shop.nameEn || "S").slice(0, 2).toUpperCase();

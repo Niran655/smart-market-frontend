@@ -249,21 +249,7 @@ const SettingCard = ({ to, image, title, description, colorKey, muiIcon }) => {
         cursor: "pointer",
         bgcolor: theme.palette.background.paper,
         boxShadow: theme.shadows[1],
-        "&:hover": {
-          transform: "translateY(-3px)",
-          boxShadow: theme.shadows[4],
-          borderColor: accentColor,
-          "& .card-arrow": { opacity: 1, transform: "translateX(0)" },
-          "& .card-image": { transform: "scale(1.05)" },
-          "& .card-accent-bar": { height: "3px" },
-        },
-        "&::before": {
-          content: '""',
-          display: "block",
-          height: "3px",
-          background: `linear-gradient(90deg, ${accentColor} 0%, ${accentColor}80 100%)`,
-          transition: "height 0.2s ease",
-        },
+        
       }}
     >
 

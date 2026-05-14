@@ -11,9 +11,13 @@ import {
   TableRow,
   Button,
   Box,
+  Chip,
+  Paper,
 } from "@mui/material";
 import { X, Printer } from "lucide-react";
 import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
+import "../../warehouseInShop/getProduct/invoice.scss";
 
 export default function PurchaseOrderView({
   open,
@@ -23,348 +27,235 @@ export default function PurchaseOrderView({
   t,
 }) {
   const printRef = useRef();
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+  });
 
   if (!purchaseOrder) return null;
 
+  const supplierName =
+    language === "en"
+      ? purchaseOrder.supplier?.nameEn
+      : purchaseOrder.supplier?.nameKh;
 
-  const totalQty = purchaseOrder.items.reduce(
-    (sum, i) => sum + i.quantity,
-    0
-  );
+  const totalQty = purchaseOrder.items.reduce((sum, i) => sum + i.quantity, 0);
 
   const totalAmount = purchaseOrder.items.reduce(
     (sum, i) => sum + i.quantity * i.costPrice,
     0
   );
 
-
-  const handlePrint = () => {
-    const win = window.open("", "", "width=900,height=700");
-
-    const supplierName =
-      language === "en"
-        ? purchaseOrder.supplier?.nameEn
-        : purchaseOrder.supplier?.nameKh;
-
-    const totalAmount = purchaseOrder.items.reduce(
-      (sum, i) => sum + i.quantity * i.costPrice,
-      0
-    );
-
-    win.document.write(`
-    <html>
-      <head>
-        <title>Invoice</title>
-        <style>
-          @page { size: A4; margin: 20mm; }
-
-          body {
-            font-family: Arial, sans-serif;
-            color: #000;
-            font-size: 12px;
-          }
-
-          .header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-          }
-
-          .invoice-title {
-            font-size: 28px;
-            font-weight: bold;
-          }
-
-          .info small {
-            display: block;
-            margin-bottom: 4px;
-          }
-
-          .row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-          }
-
-          .col {
-            width: 32%;
-          }
-
-          .col h4 {
-            margin-bottom: 6px;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-          }
-
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-          }
-
-          th {
-            background: #000;
-            color: #fff;
-            padding: 8px;
-            font-size: 12px;
-            text-align: left;
-          }
-
-          td {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-          }
-
-          td.right, th.right {
-            text-align: right;
-          }
-
-          .summary {
-            width: 40%;
-            margin-left: auto;
-            margin-top: 20px;
-          }
-
-          .summary div {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-          }
-
-          .summary .total {
-            border-top: 2px solid #000;
-            font-weight: bold;
-            font-size: 14px;
-          }
-
-          .footer {
-            margin-top: 50px;
-            text-align: center;
-            font-size: 11px;
-          }
-
-          .line {
-            height: 6px;
-            background: #000;
-            margin-top: 10px;
-          }
-        </style>
-      </head>
-
-      <body>
-
-        <!-- HEADER -->
-        <div class="header">
-          <div class="info">
-            <small><b>Invoice No:</b> ${purchaseOrder._id.slice(-6)}</small>
-            <small><b>Date:</b> ${new Date(purchaseOrder.createdAt).toLocaleDateString()}</small>
-          </div>
-          <div class="invoice-title">INVOICE</div>
-        </div>
-
-        <!-- SELLER / BILL TO / PAYMENT -->
-        <div class="row">
-          <div class="col">
-            <h4>Seller</h4>
-            <div>POS System</div>
-           
-          </div>
-
-          <div class="col">
-            <h4>Bill To</h4>
-            <div>${supplierName}</div>
-          </div>
-
-          <div class="col">
-            <h4>Payment Details</h4>
-            <div>Status: ${purchaseOrder.status}</div>
-          </div>
-        </div>
-
-        <!-- TABLE -->
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Description</th>
-              <th class="right">Qty</th>
-              <th class="right">Unit Price</th>
-              <th class="right">Subtotal</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${purchaseOrder.items
-        .map(
-          (item, i) => `
-                <tr>
-                  <td>${i + 1}</td>
-                  <td>${language === "en"
-              ? item.subProduct.parentProductId.nameEn
-              : item.subProduct.parentProductId.nameKh
-            }</td>
-                  <td class="right">${item.quantity}</td>
-                  <td class="right">${item.costPrice.toLocaleString()}</td>
-                  <td class="right">${(
-              item.quantity * item.costPrice
-            ).toLocaleString()}</td>
-                </tr>
-              `
-        )
-        .join("")}
-          </tbody>
-        </table>
-
-        <!-- SUMMARY -->
-        <div class="summary">
-          <div>
-            <span>Subtotal</span>
-            <span>${totalAmount.toLocaleString()}</span>
-          </div>
-          <div>
-            <span>Tax</span>
-            <span>0</span>
-          </div>
-          <div class="total">
-            <span>Total</span>
-            <span>${totalAmount.toLocaleString()}</span>
-          </div>
-        </div>
-
-        <div class="footer">
-          <div class="line"></div>
-          THANK YOU FOR YOUR BUSINESS
-        </div>
-
-      </body>
-    </html>
-  `);
-
-    win.document.close();
-    win.focus();
-    win.print();
-    win.close();
-  };
   return (
-    <Drawer
-      anchor="right"
-      open={open}
-      onClose={onClose}
-      PaperProps={{ sx: { width: 620 } }}
-    >
-      <Stack p={3} spacing={2}>
-    
-        <Stack direction="row" justifyContent="space-between">
-          <Typography variant="h6">
-            {t("purchase_order_invoice")}
-          </Typography>
+    <Drawer anchor="top" open={open} onClose={onClose}>
+      <Box sx={{ height: "100vh", p: 2 }}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+        >
+          <Typography fontWeight={600}>{t("purchase_order_invoice")}</Typography>
           <Stack direction="row" spacing={1}>
-            <IconButton onClick={handlePrint}>
-              <Printer />
-            </IconButton>
+            <Button
+              variant="contained"
+              startIcon={<Printer size={16} />}
+              onClick={handlePrint}
+            >
+              {t("print")}
+            </Button>
             <IconButton onClick={onClose}>
               <X />
             </IconButton>
           </Stack>
         </Stack>
 
-        <Divider />
+        <Divider sx={{ mb: 2 }} />
 
-
-        <Box ref={printRef}>
-
-          <Stack spacing={1} direction={"row"} justifyContent={"space-between"} >
-            <Box>
-              <Typography>
-                <b>{t("suppliers")}:</b>{" "}
-                {language === "en"
-                  ? purchaseOrder.supplier?.nameEn
-                  : purchaseOrder.supplier?.nameKh}
-              </Typography>
-
-              <Typography>
-                <b>{t("status")}:</b> {purchaseOrder.status}
-              </Typography>
-            </Box>
-
-            <Box>
-              <Typography>
-                <b>{t("date")}:</b>{" "}
-                {new Date(purchaseOrder.createdAt).toLocaleDateString()}
-              </Typography>
-
-              {purchaseOrder.remark && (
-                <Typography>
-                  <b>{t("remark")}:</b> {purchaseOrder.remark}
-                </Typography>
-              )}
-            </Box>
-
-          </Stack>
-
-          <Divider sx={{ my: 2 }} />
-
-
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>{t(`no`)}</TableCell>
-                <TableCell>{t("product")}</TableCell>
-                <TableCell align="right">{t("quantity")}</TableCell>
-                <TableCell align="right">{t("received")}</TableCell>
-                <TableCell align="right">{t("price")}</TableCell>
-                <TableCell align="right">{t("total_price")}</TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {purchaseOrder.items.map((item, i) => (
-                <TableRow key={i}>
-                  <TableCell>{i + 1}</TableCell>
-                  <TableCell>
-                    {language === "en"
-                      ? item.subProduct?.parentProductId?.nameEn
-                      : item.subProduct?.parentProductId?.nameKh}
-                  </TableCell>
-                  <TableCell align="right">{item.quantity}</TableCell>
-                  <TableCell align="right">{item.receivedQty}</TableCell>
-                  <TableCell align="right">
-                    {item.costPrice.toLocaleString()}
-                  </TableCell>
-                  <TableCell align="right">
-                    {(item.quantity * item.costPrice).toLocaleString()}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          <Divider sx={{ my: 2 }} />
-
-       
-          <Stack spacing={1} alignItems="flex-end">
-            <Typography>
-              <b>{t("total_qty")}:</b> {totalQty}
-            </Typography>
-            <Typography  >
-              <b>{t("total_price")}:</b>{" "}
-              {totalAmount.toLocaleString()}
-            </Typography>
-          </Stack>
-        </Box>
-
-        <Divider />
-
-
-        <Button
-          fullWidth
-          variant="contained"
-          startIcon={<Printer />}
-          onClick={handlePrint}
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={2}
+          sx={{ height: "calc(100% - 80px)" }}
         >
-          {t("print")}
-        </Button>
-      </Stack>
+          <Box
+            sx={{
+              width: { xs: "100%", md: 320 },
+              p: 2,
+              borderRight: "1px solid #eee",
+            }}
+          >
+            <Typography fontWeight={600} mb={1}>
+              {t("purchase_order_invoice")}
+            </Typography>
+
+            <InfoRow label={t("suppliers")} value={supplierName} />
+            <InfoRow
+              label={t("status")}
+              value={<Chip size="small" label={purchaseOrder.status} />}
+            />
+            <InfoRow
+              label={t("invoice_num")}
+              value={purchaseOrder._id?.slice(-6)}
+            />
+            <InfoRow
+              label={t("create_at")}
+              value={new Date(purchaseOrder.createdAt).toLocaleString()}
+            />
+            <InfoRow
+              label={t("received")}
+              value={
+                purchaseOrder.receivedAt
+                  ? new Date(purchaseOrder.receivedAt).toLocaleString()
+                  : "-"
+              }
+            />
+
+            <Divider sx={{ my: 1 }} />
+
+            <Typography fontWeight={600}>{t("remark")}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              {purchaseOrder.remark || "-"}
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              flex: 1,
+              overflow: "auto",
+              scrollbarWidth: "thin",
+              p: 2,
+            }}
+          >
+            <Paper
+              ref={printRef}
+              sx={{
+                width: "210mm",
+                minHeight: "297mm",
+                margin: "auto",
+                p: 3,
+              }}
+            >
+              <Box
+                sx={{
+                  background: "#0077ff82",
+                  color: "#fff",
+                  p: 2,
+                  borderRadius: 0.5,
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Box>
+                  <Typography fontWeight={700}>{t("my_company")}</Typography>
+                  <Typography variant="body2">
+                    {t("invoice_num")}: {purchaseOrder._id?.slice(-6)}
+                  </Typography>
+                </Box>
+
+                <Box textAlign="right">
+                  <Typography variant="h5" fontWeight={700}>
+                    {t("invoice")}
+                  </Typography>
+                  <Typography variant="body2">
+                    {new Date(purchaseOrder.createdAt).toLocaleDateString()}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Stack direction="row" justifyContent="space-between" mt={2}>
+                <Box>
+                  <Typography fontWeight={600}>{t("invoice_to")}</Typography>
+                  <Typography>{supplierName || "-"}</Typography>
+                </Box>
+
+                <Box textAlign="right">
+                  <Typography>
+                    {t("status")}: {purchaseOrder.status}
+                  </Typography>
+                  <Typography>
+                    {t("received")}:{" "}
+                    {purchaseOrder.receivedAt
+                      ? new Date(purchaseOrder.receivedAt).toLocaleDateString()
+                      : "-"}
+                  </Typography>
+                </Box>
+              </Stack>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{t("no")}</TableCell>
+                    <TableCell>{t("product")}</TableCell>
+                    <TableCell align="right">{t("quantity")}</TableCell>
+                    <TableCell align="right">{t("received")}</TableCell>
+                    <TableCell align="right">{t("price")}</TableCell>
+                    <TableCell align="right">{t("total_price")}</TableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {purchaseOrder.items.map((item, index) => {
+                    const price = item.costPrice || 0;
+                    const total = item.quantity * price;
+
+                    return (
+                      <TableRow key={index}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>
+                          {language === "en"
+                            ? item.subProduct?.parentProductId?.nameEn || "-"
+                            : item.subProduct?.parentProductId?.nameKh || "-"}
+                        </TableCell>
+                        <TableCell align="right">{item.quantity}</TableCell>
+                        <TableCell align="right">{item.receivedQty}</TableCell>
+                        <TableCell align="right">${price.toFixed(2)}</TableCell>
+                        <TableCell align="right">${total.toFixed(2)}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Stack alignItems="flex-end" spacing={0.5}>
+                <Typography>
+                  {t("total_qty")}: {totalQty}
+                </Typography>
+                <Typography variant="h6">
+                  {t("total_price")}: ${totalAmount.toFixed(2)}
+                </Typography>
+              </Stack>
+
+              <Stack direction="row" justifyContent="space-between" mt={6}>
+                <Box textAlign="center">
+                  <Typography>{t("suppliers")}</Typography>
+                  <Box mt={4}>____________</Box>
+                </Box>
+
+                <Box textAlign="center">
+                  <Typography>{t("accepted_by")}</Typography>
+                  <Box mt={4}>____________</Box>
+                </Box>
+              </Stack>
+            </Paper>
+          </Box>
+        </Stack>
+      </Box>
     </Drawer>
+  );
+}
+
+function InfoRow({ label, value }) {
+  return (
+    <Stack direction="row" justifyContent="space-between" mb={0.5}>
+      <Typography variant="body2" color="text.secondary">
+        {label}
+      </Typography>
+      <Typography variant="body2" fontWeight={500}>
+        {value || "-"}
+      </Typography>
+    </Stack>
   );
 }

@@ -145,14 +145,14 @@ function IDCardDialog({ open, onClose, profile, language, t }) {
                 mb: 1.5,
               }}
             >
-              Smart Market System
+              Logic Integrated Kiosk Application
             </Typography>
 
-            {/* Name */}
+     
             <Typography
               sx={{
                 fontFamily: "'Bebas Neue', cursive",
-                fontSize: 40,
+                fontSize: 20,
                 color: "#fff",
                 lineHeight: 1.05,
                 whiteSpace: "pre-line",
@@ -161,8 +161,7 @@ function IDCardDialog({ open, onClose, profile, language, t }) {
             >
               {displayName?.replace(" ", "\n")}
             </Typography>
-
-            {/* Role pill */}
+ 
             <Box
               sx={{
                 display: "inline-block",
@@ -172,7 +171,7 @@ function IDCardDialog({ open, onClose, profile, language, t }) {
                 fontWeight: 700,
                 px: 1.75,
                 py: 0.5,
-                borderRadius: 5,
+                borderRadius: 1,
                 mt: 1.25,
                 letterSpacing: "0.04em",
               }}
@@ -222,9 +221,9 @@ function IDCardDialog({ open, onClose, profile, language, t }) {
             </Box>
           </Box>
 
-          {/* ── BOTTOM WHITE SECTION ── */}
+          
           <Box sx={{ bgcolor: "#fff", px: 2.5, pt: 2, pb: 2.5 }}>
-            {/* ID Row */}
+        
             <Stack direction="row" alignItems="center" spacing={1.25} mb={1.75}>
               <Box
                 sx={{
@@ -263,7 +262,7 @@ function IDCardDialog({ open, onClose, profile, language, t }) {
                 <Typography
                   sx={{
                     fontFamily: "'Bebas Neue', cursive",
-                    fontSize: 22,
+                    fontSize: 10,
                     color: "#1a1030",
                     letterSpacing: "0.06em",
                     lineHeight: 1.1,
@@ -437,7 +436,7 @@ const Profile = () => {
                     onClick={() => setOpen(true)}
                   />
 
-                  <Typography variant="h6">
+                  <Typography >
                     {language === "en" ? profile?.nameEn : profile?.nameKh}
                   </Typography>
 

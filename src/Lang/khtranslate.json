@@ -209,7 +209,7 @@
   "lastMonth": "ខែមុន",
   "custom": "ជួរថ្ងៃកំណត់ផ្ទាល់ខ្លួន",
   "today": "ថ្ងៃនេះ",
-  "total_orders": "ការលក់សរុប",
+  "total_orders": "ការបញ្ជាទិញសរុប",
   "total_sales": "ការលក់សរុប",
   "average_value": "តម្លៃមធ្យម",
   "reservations": "ការកក់",
@@ -352,7 +352,7 @@
   "total": "សរុប",
   "paid": "បានបង់",
   "due": "នៅសល់",
-  "total_purchased": "ទិញសរុប",
+  "total_purchased": "តម្លៃសរុប",
   "last_order_date": "កាលបរិច្ឆេទចុងក្រោយ",
   "due_amount": "ចំនួនទឹកប្រាក់ត្រូវបង់",
   "overdue_days": "ថ្ងៃហួសកំណត់",
@@ -450,6 +450,10 @@
     "option_name":"ឈ្មោះជម្រើស",
   "surgar_lavel" :"កម្រិតស្ករ",
   "add_surgar_lavel":"បន្ថែមកម្រិត",
-  "add_new_size":"បន្ថែមទំហំថ្មី"
+  "add_new_size":"បន្ថែមទំហំថ្មី",
+    "crop_image":"ច្រឹបរូបភាព",
+  "cancel":"បោះបង់",
+  "uploading":"កំពុងដំណើរការ...",
+  "crop_&_upload":"ច្រឹប & បញ្ចូន"
 
 }

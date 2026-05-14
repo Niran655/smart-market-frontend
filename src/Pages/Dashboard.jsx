@@ -1,4 +1,4 @@
-// Dashboard.js — Theme‑aware Modern Dashboard
+ 
 import { useState, useMemo, useCallback } from "react";
 import {
   Box, Button, Card, CardContent, Chip, Grid, Stack,
@@ -60,7 +60,7 @@ const getStatusStyle = (status, theme) => {
   return { bg: theme.palette.action.hover, color: theme.palette.text.secondary };
 };
 
-// ─── Shared SX helpers that use theme ──────────────────────────────────────────
+ 
 const cardSx = (theme) => ({
   borderRadius: "16px",
   boxShadow: theme.shadows[1],
@@ -87,7 +87,7 @@ const tdSx = (theme) => ({
   py: 1.1,
 });
 
-// ─── Skeleton Components ──────────────────────────────────────────────────────
+ 
 const SkeletonRows = ({ count = 5, cols = 3, opacity = 0.25 }) => {
   const theme = useTheme();
   return Array.from({ length: count }).map((_, i) => (
@@ -115,7 +115,7 @@ const SkeletonCustomerRows = ({ count = 5 }) => {
   ));
 };
 
-// ─── Period Pills (theme aware) ─────────────────────────────────────────────
+ 
 const PeriodPills = ({ active, onChange }) => {
   const theme = useTheme();
   return (
@@ -361,7 +361,7 @@ export default function Dashboard() {
 
   const filterLabel = { today:"Today", week:"Week", month:"Month", year:"Year", custom:"Custom" }[period] || period;
 
-  // ─── Chart Options (theme aware) ────────────────────────────────────────────
+ 
   const commonChartBase = {
     toolbar: { show: false },
     background: "transparent",
@@ -462,7 +462,7 @@ export default function Dashboard() {
     noData: { text: "No data available", align: "center", verticalAlign: "middle", style: { color: theme.palette.text.secondary, fontSize: "13px" } },
   };
 
-  // ─── Actions ──────────────────────────────────────────────────────────────────
+ 
   const handlePeriodChange = (p) => {
     setPeriod(p);
     if (p !== "custom") refetch({ shopId: savedStoreId, period: p, startDate: null, endDate: null });
@@ -473,7 +473,7 @@ export default function Dashboard() {
   };
   const handlePrint = () => setTimeout(() => window.print(), 80);
 
-  // ─── Print Data (unchanged logic) ────────────────────────────────────────────
+ 
   const printData = useMemo(() => {
     const companyName   = user?.companyName || user?.shopName || "Smart Market";
     const phone         = user?.phone || "(000) 000-0000";

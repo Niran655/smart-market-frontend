@@ -100,7 +100,7 @@ const StoreSetting = () => {
             <Typography
               component={RouterLink}
               to="/store"
-             
+
               sx={{
                 textDecoration: "none",
                 borderLeft: "3px solid #1D4592",
@@ -112,7 +112,7 @@ const StoreSetting = () => {
             </Typography>
 
             <Typography
-             
+
               sx={{ fontWeight: 600 }}
               color="text.primary"
             >
@@ -123,7 +123,7 @@ const StoreSetting = () => {
           </Breadcrumbs>
         </Box>
       </Stack>
- 
+
 
       <Box
         sx={{
@@ -178,12 +178,12 @@ const StoreSetting = () => {
           )}
         </Stack>
       </Box>
- 
+
 
       <TableContainer className="table-container" sx={{ mt: 2 }}>
         <Table className="table">
 
-          
+
 
           <TableHead>
             <TableRow>
@@ -202,7 +202,7 @@ const StoreSetting = () => {
             </TableRow>
           </TableHead>
 
-       
+
 
           {loading ? (
             <CircularIndeterminate />
@@ -270,7 +270,7 @@ const StoreSetting = () => {
           )}
         </Table>
 
-    
+
 
         <Stack
           direction="row"

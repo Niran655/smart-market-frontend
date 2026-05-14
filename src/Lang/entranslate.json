@@ -469,6 +469,10 @@
   "option_name":"Option Name",
   "surgar_lavel" :"Surgar lavel",
   "add_surgar_lavel":"Add Surgar Lavel",
-  "add_new_size":"Add New Size"
+  "add_new_size":"Add New Size",
+  "crop_image":"Crop Image",
+  "cancel":"Cancel",
+  "uploading":"Uploading...",
+  "crop_&_upload":"Crop & Upload"
    
 }

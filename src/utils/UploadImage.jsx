@@ -15,6 +15,8 @@ import ReactCrop, { centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import EmptyImage from "../assets/Image/empty-image.png";
 import { supabase } from "../supabaseClient";
+import { useAuth } from "../Context/AuthContext";
+import { translateLauguage } from "../function/translate";
 
 function getCenteredCrop(mediaWidth, mediaHeight, aspect) {
   return centerCrop(
@@ -37,6 +39,8 @@ function canvasPreview(image, crop) {
   const scaleX = image.naturalWidth / image.width;
   const scaleY = image.naturalHeight / image.height;
   const pixelRatio = window.devicePixelRatio || 1;
+
+ 
 
   canvas.width = Math.floor(crop.width * scaleX * pixelRatio);
   canvas.height = Math.floor(crop.height * scaleY * pixelRatio);
@@ -100,7 +104,8 @@ export default function UploadImage({
   const [selectedFile, setSelectedFile] = useState(null);
   const imageRef = useRef(null);
   const objectUrlRef = useRef("");
-
+   const {language} = useAuth();
+  const {t}  = translateLauguage(language);
   useEffect(() => {
     if (value) setPreview(value);
     else setPreview(EmptyImage);
@@ -236,7 +241,7 @@ export default function UploadImage({
 
       <Dialog open={cropDialogOpen} onClose={handleCancelCrop} fullWidth maxWidth="md">
         <DialogTitle sx={{ pr: 6 }}>
-          Crop image
+          {t(`crop_image`)}
           <IconButton
             aria-label="Close crop dialog"
             onClick={handleCancelCrop}
@@ -270,10 +275,10 @@ export default function UploadImage({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCancelCrop} color="inherit">
-            Cancel
+            {t(`cancel`)}
           </Button>
           <Button onClick={handleCropUpload} variant="contained" disabled={loading}>
-            {loading ? "Uploading..." : "Crop & upload"}
+            {loading ? t(`uploading`) : t(`crop_&_upload`)}
           </Button>
         </DialogActions>
       </Dialog>

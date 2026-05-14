@@ -38,7 +38,7 @@ export default function GetProductInShopAction({
   return (
     <div>
       <Stack direction="row" spacing={2}>
-        <Tooltip title={t("view_detail")}>
+        <Tooltip title={t("view")}>
           <IconButton className="edit-icon" onClick={handleOpenview}>
             <ScanEye size="18px" color="#36BBA7" />
           </IconButton>
@@ -52,7 +52,7 @@ export default function GetProductInShopAction({
           onClose={handleCloseView}
         />
 
-        <Tooltip title="get_product_in_warehouse">
+        <Tooltip title={t(`get_product`)}>
           <IconButton className="delete-icon" onClick={handleOpenGetProduct}>
             <Warehouse size="18px" color="orange" />
           </IconButton>
