@@ -37,6 +37,11 @@ const ProductList = ({
     setVisibleCount((prev) => prev + 12);
   };
 
+  const getDisplayPrice = (item) => {
+    const additionPrice = item.additionPrices?.[0]?.price;
+    return additionPrice ?? item.salePrice;
+  };
+
   return (
     <>
       {/* HEADER */}
@@ -136,7 +141,7 @@ const ProductList = ({
 
                       <Box display="flex" justifyContent="space-between" mt={1}>
                         <Typography className="product-price">
-                          {item.salePrice?.toLocaleString()}$
+                          {getDisplayPrice(item)?.toLocaleString()}$
                         </Typography>
 
                         <Chip
