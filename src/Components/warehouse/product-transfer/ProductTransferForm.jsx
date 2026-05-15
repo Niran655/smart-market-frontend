@@ -45,8 +45,7 @@ export default function ProductTransferForm({
   language,
   setRefetch,
 }) {
-  const { options: shopOptions, loading: shopLoading, refetch } =
-    useGetAllShopAutoComplete();
+  const { options: shopOptions, loading: shopLoading, refetch } =useGetAllShopAutoComplete();
 
   const { setAlert } = useAuth();
 
@@ -65,8 +64,8 @@ export default function ProductTransferForm({
       onCompleted: ({ createWarehouseTransfer }) => {
         if (createWarehouseTransfer?.isSuccess) {
           onClose();
-          refetch();
           setRefetch();
+          refetch();
           setAlert(true, "success", createWarehouseTransfer?.message);
         } else {
           setAlert(true, "error", createWarehouseTransfer?.message);
