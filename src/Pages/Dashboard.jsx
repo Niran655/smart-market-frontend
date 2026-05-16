@@ -233,7 +233,7 @@ const ViewAllBtn = () => {
         "&:hover": { bgcolor: "transparent", textDecoration: "underline" },
       }}
     >
-      {t("view_all")}
+      View All
     </Button>
   );
 };
