@@ -63,6 +63,7 @@ export default function Router() {
         { path: '/store/pos/:id/warehouse-in-shop', element: <WarehouseInShop/>},
         { path: "*", element: <NotFound /> },
         // push ban
+        // test push
       ],
     },
   ]);
