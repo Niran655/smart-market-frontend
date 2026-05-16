@@ -1545,8 +1545,8 @@ query GetPurchaseOrdersWithPagination($supplierId: ID, $status: PurchaseOrderSta
 
 
 export const GET_SHIFT_SESSIONS = gql`
-query GetShiftSessions($shopId: ID) {
-  getShiftSessions(shopId: $shopId) {
+query GetShiftSessions($shopId: ID, $startDate: Date, $endDate: Date) {
+  getShiftSessions(shopId: $shopId, startDate: $startDate, endDate: $endDate) {
     _id
     user {
       _id

@@ -33,6 +33,33 @@ import { GET_SHIFT_SESSIONS } from "../../graphql/queries";
 import ShiftSessionAction from "../Components/shiftSession/ShiftSessionAction";
 import ShiftSessionForm from "../Components/shiftSession/ShiftSessionForm";
 
+const toDateInputValue = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const toStartOfDayISO = (value) => {
+  if (!value) return null;
+  const date = new Date(value);
+  date.setHours(0, 0, 0, 0);
+  return date.toISOString();
+};
+
+const toEndOfDayISO = (value) => {
+  if (!value) return null;
+  const date = new Date(value);
+  date.setHours(23, 59, 59, 999);
+  return date.toISOString();
+};
+
+const formatMoney = (value) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(Number(value || 0));
+
 const StoreSetting = () => {
   const { language } = useAuth();
   const { t } = translateLauguage(language);
@@ -44,10 +71,14 @@ const StoreSetting = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
   const [keyword, setKeyword] = useState("");
+  const [startDate, setStartDate] = useState(toDateInputValue());
+  const [endDate, setEndDate] = useState(toDateInputValue());
 
   const { data, loading, error, refetch } = useQuery(GET_SHIFT_SESSIONS, {
     variables: {
       shopId,
+      startDate: toStartOfDayISO(startDate),
+      endDate: toEndOfDayISO(endDate),
     },
     fetchPolicy: "network-only",
   });
@@ -55,9 +86,14 @@ const StoreSetting = () => {
   const shiftSession = data?.getShiftSessions || [];
 
 
-  const filteredData = shiftSession.filter((shift) =>
-    shift?.shiftName?.toLowerCase().includes(keyword.toLowerCase())
-  );
+  const filteredData = shiftSession.filter((shift) => {
+    const searchValue = keyword.toLowerCase();
+    return (
+      shift?.shiftName?.toLowerCase().includes(searchValue) ||
+      shift?.user?.nameEn?.toLowerCase().includes(searchValue) ||
+      shift?.user?.nameKh?.toLowerCase().includes(searchValue)
+    );
+  });
 
 
   const startIndex = (page - 1) * limit;
@@ -158,8 +194,51 @@ const StoreSetting = () => {
             />
           </Grid>
 
+          <Grid xs={12} md={6}>
+            <Typography variant="body2" fontWeight={500} mb={0.5}>
+              {t("start_date") || "Start Date"}
+            </Typography>
+            <TextField
+              type="date"
+              size="small"
+              value={startDate}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setPage(1);
+              }}
+              fullWidth
+            />
+          </Grid>
+
+          <Grid xs={12} md={6}>
+            <Typography variant="body2" fontWeight={500} mb={0.5}>
+              {t("end_date") || "End Date"}
+            </Typography>
+            <TextField
+              type="date"
+              size="small"
+              value={endDate}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                setPage(1);
+              }}
+              fullWidth
+            />
+          </Grid>
+
         </Grid>
         <Stack direction="row" spacing={2} mt={3}>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              const today = toDateInputValue();
+              setStartDate(today);
+              setEndDate(today);
+              setPage(1);
+            }}
+          >
+            Today
+          </Button>
           <Button
             variant="contained"
             startIcon={<LibraryAddOutlinedIcon size={18} />}
@@ -248,7 +327,7 @@ const StoreSetting = () => {
                   </TableCell>
 
                   <TableCell>
-                    ${shift?.totalSales || 0}
+                    {formatMoney(shift?.totalSales)}
                   </TableCell>
 
                   <TableCell align="center">
