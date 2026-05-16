@@ -455,5 +455,9 @@
   "cancel":"បោះបង់",
   "uploading":"កំពុងដំណើរការ...",
   "crop_&_upload":"ច្រឹប & បញ្ចូន",
-  "purchases": "ការទិញ"
+  "purchases": "ការទិញ",
+  "vs_last_period": "ប្រៀបធៀបនឹងរយៈពេលមុន",
+  "first_time": "ដំបូង",
+  "return": "ត្រឡប់មកវិញ",
+  "view_all": "មើលទាំងអស់"
 }

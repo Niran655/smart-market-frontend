@@ -474,6 +474,10 @@
   "cancel":"Cancel",
   "uploading":"Uploading...",
   "crop_&_upload":"Crop & Upload",
-  "purchases": "Purchases"
+  "purchases": "Purchases",
+  "vs_last_period": "Vs Last Period",
+  "first_time": "First Time",
+  "return": "Return",
+  "view_all": "View All"
    
 }

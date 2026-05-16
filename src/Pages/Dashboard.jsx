@@ -766,7 +766,7 @@ export default function Dashboard() {
                           </Typography>
                           <Stack direction="row" alignItems="center" spacing={0.8}>
                             <TrendPill trend={card.trend} change={card.change} />
-                            <Typography sx={{ fontSize: "0.64rem", color: theme.palette.text.secondary }}>vs last period</Typography>
+                            <Typography sx={{ fontSize: "0.64rem", color: theme.palette.text.secondary }}>{t("vs_last_period")}</Typography>
                           </Stack>
                         </Box>
                         <Box sx={{
