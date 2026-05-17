@@ -162,7 +162,7 @@ export default function PurchaseOrderForm({
         <BootstrapDialog open={open} fullWidth maxWidth="sm">
             <DialogTitle>
                 {isEdit ? t("update_purchase_order") : t("create_purchase_order")}
-                <IconButton onClick={onClose} sx={{ position: "absolute", right: 8 }}>
+                <IconButton onClick={onClose} sx={{ position: "absolute", right: 8, top: 8 }}>
                     <CloseIcon />
                 </IconButton>
             </DialogTitle>

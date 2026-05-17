@@ -568,7 +568,7 @@ export default function Dashboard() {
           <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
             <Stack direction="row" alignItems="center" spacing={1.5}>
               <Box sx={{
-                width: 38, height: 38, borderRadius: 2.5,
+                width: 38, height: 38, borderRadius: 1,
                 bgcolor: theme.palette.primary.main, display: "flex", alignItems: "center", justifyContent: "center",
                 boxShadow: `0 4px 14px ${theme.palette.primary.main}70`,
               }}>
@@ -1245,7 +1245,7 @@ export default function Dashboard() {
                   <Typography variant="caption">{printData.address}<br />{printData.phone}<br />{printData.email}</Typography>
                 </Box>
                 <Box sx={{ textAlign: "right" }}>
-                  <Typography variant="h5" fontWeight={800}>{t("dashboard") || "Dashboard"}</Typography>
+                  <Typography variant="h5" fontWeight={800}>{t("dashboard")}</Typography>
                   <Typography variant="caption">
                     <b>Report #:</b> {printData.invoiceNumber}<br />
                     <b>Date:</b> {printData.invoiceDate}<br />

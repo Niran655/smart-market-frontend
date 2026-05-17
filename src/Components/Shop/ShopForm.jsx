@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client/react";
 import { styled } from "@mui/material/styles";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, IconButton, MenuItem, TextField, Typography } from "@mui/material";
 import { Form, FormikProvider, useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 
 import { CREATE_SHOP, UPDATE_SHOP } from "../../../graphql/mutation";
@@ -28,6 +28,7 @@ export default function ShopForm({
   const [loading, setLoading] = useState(false);
   const [pendingImagePath, setPendingImagePath] = useState(null);
   const [oldImageUrl, setOldImageUrl] = useState("");
+  const submittedValuesRef = useRef(null);
 
   const [createShop] = useMutation(CREATE_SHOP, {
     onCompleted: ({ createShop }) => {
@@ -56,12 +57,13 @@ export default function ShopForm({
     onCompleted: async ({ updateShop }) => {
       setLoading(false);
       if (updateShop?.isSuccess) {
-        if (oldImageUrl && oldImageUrl !== formik.values.image) {
+        const submittedImage = submittedValuesRef.current?.image || "";
+        if (oldImageUrl && oldImageUrl !== submittedImage) {
           await deleteImageFromStorage(oldImageUrl).catch(console.error);
         }
         setAlert(true, "success", updateShop?.message);
         setPendingImagePath(null);
-        setOldImageUrl(formik.values.image || "");
+        setOldImageUrl(submittedImage);
         onClose();
         setRefetch();
       } else setAlert(true, "error", updateShop?.message);
@@ -97,12 +99,12 @@ export default function ShopForm({
       address: Yup.string(),
       active: Yup.boolean(),
     }),
-    onSubmit: (values, { resetForm }) => {
+    onSubmit: (values) => {
       setLoading(true);
+      submittedValuesRef.current = { ...values };
       if (dialogTitle === "Create")
         createShop({ variables: { input: values } });
       else updateShop({ variables: { id: shopData?._id, input: values } });
-      resetForm();
     },
   });
 

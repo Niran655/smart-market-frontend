@@ -326,6 +326,7 @@ const Product = () => {
                                       <TableCell>
                                         <Skeleton variant="text" width={70} />
                                       </TableCell>
+                      
                                       <TableCell>
                                         <Skeleton variant="text" width={80} />
                                       </TableCell>

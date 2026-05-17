@@ -25,6 +25,7 @@ import {
 import { useState } from "react";
 
 import { useThemeContext } from "../Context/ThemeContext";
+import Logo from "../assets/Image/logo.png"
 import "./menuNavbar.scss";
 
 export default function MenuMobile({ onNavigate, showLabels }) {
@@ -32,11 +33,11 @@ export default function MenuMobile({ onNavigate, showLabels }) {
   const location = useLocation();
   const { sidebarColor, layoutMode } = useThemeContext();
 
-  // Determine if labels should be shown (passed prop overrides layout mode)
+ 
   const labelsVisible =
     typeof showLabels === "boolean" ? showLabels : layoutMode !== "compact";
 
-  // Full list of menu items (merged from topbar and desktop sidebar)
+ 
   const menuData = [
     {
       pageTitle: "Dashboard",
@@ -106,7 +107,7 @@ export default function MenuMobile({ onNavigate, showLabels }) {
         <Stack direction="column" spacing={2} alignItems="center">
           <Avatar
             alt="logo"
-            src="https://hamariweb.com/profiles/images/profile/6138-763-13405.jpg"
+            src={Logo}
             sx={{
               width: labelsVisible ? 48 : 40,
               height: labelsVisible ? 48 : 40,
