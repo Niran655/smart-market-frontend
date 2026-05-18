@@ -460,5 +460,9 @@
   "first_time": "ដំបូង",
   "return": "ត្រឡប់មកវិញ",
   "view_all": "មើលទាំងអស់",
-  "period_sale": "ការលក់"
+  "period_sale": "ការលក់",
+  "period_purchase": "ការទិញ",
+  "period_quotation": "សម្រង់តម្លៃ",
+  "period_expense": "ចំណាយ",
+  "period_invoice": "វិក្កយបត្រ"
 }
