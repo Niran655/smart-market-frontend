@@ -1,4 +1,4 @@
- 
+
 import { useState, useMemo, useCallback } from "react";
 import {
   Box, Button, Card, CardContent, Chip, Grid, Stack,
@@ -33,22 +33,22 @@ import ErrorPage from "../include/ErrorPage";
 import Chart from "react-apexcharts";
 import DashboardSkeleton from "../Components/dashboard/DashboardSkeleton";
 
- 
+
 const formatCurrency = (v) => (v != null ? `$${Number(v).toFixed(2)}` : "$0.00");
 const formatDateLong = (v) => (!v ? "-" : dayjs(v).format("MMMM D, YYYY"));
 const formatDateShort = (v) => (!v ? "-" : dayjs(v).format("DD MMM YYYY"));
 const formatFileDate = (v = new Date()) => dayjs(v).format("YYYY-MM-DD");
 
 const PERIOD_OPTIONS = [
-  { code: "1D",  label: "Today"    },
-  { code: "1W",  label: "Weekly"   },
-  { code: "1M",  label: "Monthly"  },
-  { code: "3M",  label: "3 Months" },
-  { code: "6M",  label: "6 Months" },
+  { code: "1D", label: "Today" },
+  { code: "1W", label: "Weekly" },
+  { code: "1M", label: "Monthly" },
+  { code: "3M", label: "3 Months" },
+  { code: "6M", label: "6 Months" },
   { code: "All", label: "All Time" },
 ];
 
- 
+
 const getStatusStyle = (status, theme) => {
   const s = status?.toLowerCase();
   if (s === "completed" || s === "paid" || s === "new")
@@ -60,7 +60,7 @@ const getStatusStyle = (status, theme) => {
   return { bg: theme.palette.action.hover, color: theme.palette.text.secondary };
 };
 
- 
+
 const cardSx = (theme) => ({
   borderRadius: "16px",
   boxShadow: theme.shadows[1],
@@ -87,7 +87,7 @@ const tdSx = (theme) => ({
   py: 1.1,
 });
 
- 
+
 const SkeletonRows = ({ count = 5, cols = 3, opacity = 0.25 }) => {
   const theme = useTheme();
   return Array.from({ length: count }).map((_, i) => (
@@ -107,7 +107,7 @@ const SkeletonCustomerRows = ({ count = 5 }) => {
         <Box sx={{ width: 36, height: 36, borderRadius: 2.5, bgcolor: theme.palette.divider }} />
         <Box>
           <Box sx={{ height: 10, borderRadius: 2, bgcolor: theme.palette.divider, mb: 0.6, width: `${55 + i * 10}px` }} />
-          <Box sx={{ height: 8,  borderRadius: 2, bgcolor: theme.palette.divider, width: 70 }} />
+          <Box sx={{ height: 8, borderRadius: 2, bgcolor: theme.palette.divider, width: 70 }} />
         </Box>
       </Stack>
       <Box sx={{ height: 10, borderRadius: 2, bgcolor: theme.palette.divider, width: 52 }} />
@@ -115,7 +115,7 @@ const SkeletonCustomerRows = ({ count = 5 }) => {
   ));
 };
 
- 
+
 const PeriodPills = ({ active, onChange }) => {
   const theme = useTheme();
   return (
@@ -176,7 +176,7 @@ const PeriodDropdown = ({ active, onChange }) => {
         onClose={() => setAnchor(null)}
         PaperProps={{
           sx: {
-            borderRadius:1,
+            borderRadius: 1,
             boxShadow: theme.shadows[8],
             border: `1px solid ${theme.palette.divider}`,
             minWidth: 140,
@@ -193,7 +193,7 @@ const PeriodDropdown = ({ active, onChange }) => {
               fontSize: "0.78rem",
               color: active === code ? theme.palette.primary.main : theme.palette.text.primary,
               fontWeight: active === code ? 700 : 400,
-              borderRadius: 1 ,
+              borderRadius: 1,
               "&.Mui-selected": { bgcolor: theme.palette.action.selected },
               "&:hover": { bgcolor: theme.palette.action.hover, color: theme.palette.primary.main },
             }}
@@ -296,29 +296,35 @@ const StableProgress = ({ loading }) => {
   );
 };
 
-const TX_TABS = [
-  { key: "sale",      label: "period_sale" },
-  { key: "purchase",  label: "Purchase"  },
-  { key: "quotation", label: "Quotation" },
-  { key: "expense",   label: "Expenses"  },
-  { key: "invoice",   label: "Invoice"   },
-];
+// const TX_TABS = [
+//   { key: "sale", label: "Sale" },
+//   { key: "purchase", label: "Purchase" },
+//   { key: "quotation", label: "Quotation" },
+//   { key: "expense", label: "Expenses" },
+//   { key: "invoice", label: "Invoice" },
+// ];
 
- 
+
 export default function Dashboard() {
   const theme = useTheme();
   const { language, user } = useAuth();
   const { t } = translateLauguage(language);
   const savedStoreId = localStorage.getItem("activeShopId");
-
-  const [period,      setPeriod]      = useState("month");
+  const TX_TABS = [
+    { key: "sale", label: t("period_sale") },
+    { key: "purchase", label: t("period_purchase") },
+    { key: "quotation", label: t("period_quotation") },
+    { key: "expense", label: t("period_expense") },
+    { key: "invoice", label: t("period_invoice") },
+  ];
+  const [period, setPeriod] = useState("month");
   const [customStart, setCustomStart] = useState(null);
-  const [customEnd,   setCustomEnd]   = useState(null);
-  const [spPeriod,    setSpPeriod]    = useState("1M");
+  const [customEnd, setCustomEnd] = useState(null);
+  const [spPeriod, setSpPeriod] = useState("1M");
   const [statsPeriod, setStatsPeriod] = useState("1M");
-  const [txTab,       setTxTab]       = useState("sale");
-  const [txPeriod,    setTxPeriod]    = useState("1M");
-  const [bottomPeriod,setBottomPeriod]= useState("1W");
+  const [txTab, setTxTab] = useState("sale");
+  const [txPeriod, setTxPeriod] = useState("1M");
+  const [bottomPeriod, setBottomPeriod] = useState("1W");
 
   const getQueryVars = () => {
     if (period === "custom")
@@ -333,35 +339,35 @@ export default function Dashboard() {
     nextFetchPolicy: "cache-first",
   });
 
-  const { data: spData,     loading: spLoading    } = useQuery(GET_CHART_DATA, { variables: { shopId: savedStoreId, period: spPeriod },    fetchPolicy: "cache-and-network" });
-  const { data: statsData,  loading: statsLoading  } = useQuery(GET_CHART_DATA, { variables: { shopId: savedStoreId, period: statsPeriod }, fetchPolicy: "cache-and-network" });
-  const { data: txData,     loading: txLoading     } = useQuery(GET_RECENT_TRANSACTIONS_BY_TYPE, { variables: { shopId: savedStoreId, txType: txTab, period: txPeriod, page: 1, limit: 8 }, fetchPolicy: "cache-and-network" });
+  const { data: spData, loading: spLoading } = useQuery(GET_CHART_DATA, { variables: { shopId: savedStoreId, period: spPeriod }, fetchPolicy: "cache-and-network" });
+  const { data: statsData, loading: statsLoading } = useQuery(GET_CHART_DATA, { variables: { shopId: savedStoreId, period: statsPeriod }, fetchPolicy: "cache-and-network" });
+  const { data: txData, loading: txLoading } = useQuery(GET_RECENT_TRANSACTIONS_BY_TYPE, { variables: { shopId: savedStoreId, txType: txTab, period: txPeriod, page: 1, limit: 8 }, fetchPolicy: "cache-and-network" });
   const { data: bottomData, loading: bottomLoading } = useQuery(GET_ORDER_CATEGORY_STATS, { variables: { shopId: savedStoreId, period: bottomPeriod }, fetchPolicy: "cache-and-network" });
 
-  const dashboard   = data?.getFullDashboard;
-  const overview    = dashboard?.overview || {};
+  const dashboard = data?.getFullDashboard;
+  const overview = dashboard?.overview || {};
   const overallInfo = dashboard?.overallInfo || { suppliers: 0, customers: 0, orders: 0 };
-  const custOverview= dashboard?.customerOverview || { firstTime: 0, return: 0, firstTimePercent: 0, returnPercent: 0 };
-  const topSelling  = dashboard?.topSellingProducts || [];
-  const lowStock    = dashboard?.lowStockProducts || [];
+  const custOverview = dashboard?.customerOverview || { firstTime: 0, return: 0, firstTimePercent: 0, returnPercent: 0 };
+  const topSelling = dashboard?.topSellingProducts || [];
+  const lowStock = dashboard?.lowStockProducts || [];
   const recentSales = dashboard?.recentSales || [];
-  const topCustomers= dashboard?.topCustomers || [];
+  const topCustomers = dashboard?.topCustomers || [];
 
-  const spChart     = spData?.getChartData    || { labels: [], sales: [], purchases: [] };
-  const statsChart  = statsData?.getChartData || { labels: [], sales: [], purchases: [] };
-  const recentTx    = txData?.getRecentTransactionsByType?.items || [];
+  const spChart = spData?.getChartData || { labels: [], sales: [], purchases: [] };
+  const statsChart = statsData?.getChartData || { labels: [], sales: [], purchases: [] };
+  const recentTx = txData?.getRecentTransactionsByType?.items || [];
 
-  const bottomStats  = bottomData?.getOrderCategoryStats;
-  const topCategories= bottomStats?.topCategories || [];
-  const catStats     = bottomStats?.categoryStatistics || { totalCategories: 0, totalProducts: 0 };
-  const orderStats   = {
-    labels: bottomStats?.orderLabels || ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
-    values: bottomStats?.orderValues || [0,0,0,0,0,0,0],
+  const bottomStats = bottomData?.getOrderCategoryStats;
+  const topCategories = bottomStats?.topCategories || [];
+  const catStats = bottomStats?.categoryStatistics || { totalCategories: 0, totalProducts: 0 };
+  const orderStats = {
+    labels: bottomStats?.orderLabels || ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    values: bottomStats?.orderValues || [0, 0, 0, 0, 0, 0, 0],
   };
 
-  const filterLabel = { today:"Today", week:"Week", month:"Month", year:"Year", custom:"Custom" }[period] || period;
+  const filterLabel = { today: "Today", week: "Week", month: "Month", year: "Year", custom: "Custom" }[period] || period;
 
- 
+
   const commonChartBase = {
     toolbar: { show: false },
     background: "transparent",
@@ -462,7 +468,7 @@ export default function Dashboard() {
     noData: { text: "No data available", align: "center", verticalAlign: "middle", style: { color: theme.palette.text.secondary, fontSize: "13px" } },
   };
 
- 
+
   const handlePeriodChange = (p) => {
     setPeriod(p);
     if (p !== "custom") refetch({ shopId: savedStoreId, period: p, startDate: null, endDate: null });
@@ -473,37 +479,37 @@ export default function Dashboard() {
   };
   const handlePrint = () => setTimeout(() => window.print(), 80);
 
- 
+
   const printData = useMemo(() => {
-    const companyName   = user?.companyName || user?.shopName || "Smart Market";
-    const phone         = user?.phone || "(000) 000-0000";
-    const email         = user?.email || "support@smartmarket.com";
-    const address       = user?.address || "Cambodia";
+    const companyName = user?.companyName || user?.shopName || "Smart Market";
+    const phone = user?.phone || "(000) 000-0000";
+    const email = user?.email || "support@smartmarket.com";
+    const address = user?.address || "Cambodia";
     const invoiceNumber = `DASH-${dayjs().format("YYYYMMDD")}-${String(savedStoreId || "ALL").slice(-4).toUpperCase()}`;
-    const periodText    = period === "custom" && customStart && customEnd
+    const periodText = period === "custom" && customStart && customEnd
       ? `${formatDateLong(customStart)} – ${formatDateLong(customEnd)}`
       : filterLabel;
 
     const summaryRows = [
-      ["Total Sales",            formatCurrency(overview.totalSales?.value || 0),           `${(overview.totalSales?.percentageChange || 0).toFixed(1)}%`],
-      ["Total Sales Return",     formatCurrency(overview.totalSalesReturn?.value || 0),      `${(overview.totalSalesReturn?.percentageChange || 0).toFixed(1)}%`],
-      ["Total Purchase",         formatCurrency(overview.totalPurchase?.value || 0),         `${(overview.totalPurchase?.percentageChange || 0).toFixed(1)}%`],
-      ["Total Purchase Return",  formatCurrency(overview.totalPurchaseReturn?.value || 0),   `${(overview.totalPurchaseReturn?.percentageChange || 0).toFixed(1)}%`],
-      ["Profit",                 formatCurrency(overview.profit?.value || 0),                `${(overview.profit?.percentageChange || 0).toFixed(1)}%`],
-      ["Invoice Due",            formatCurrency(overview.invoiceDue?.value || 0),            `${(overview.invoiceDue?.percentageChange || 0).toFixed(1)}%`],
-      ["Total Expenses",         formatCurrency(overview.totalExpenses?.value || 0),         `${(overview.totalExpenses?.percentageChange || 0).toFixed(1)}%`],
-      ["Payment Returns",        formatCurrency(overview.totalPaymentReturns?.value || 0),   `${(overview.totalPaymentReturns?.percentageChange || 0).toFixed(1)}%`],
+      ["Total Sales", formatCurrency(overview.totalSales?.value || 0), `${(overview.totalSales?.percentageChange || 0).toFixed(1)}%`],
+      ["Total Sales Return", formatCurrency(overview.totalSalesReturn?.value || 0), `${(overview.totalSalesReturn?.percentageChange || 0).toFixed(1)}%`],
+      ["Total Purchase", formatCurrency(overview.totalPurchase?.value || 0), `${(overview.totalPurchase?.percentageChange || 0).toFixed(1)}%`],
+      ["Total Purchase Return", formatCurrency(overview.totalPurchaseReturn?.value || 0), `${(overview.totalPurchaseReturn?.percentageChange || 0).toFixed(1)}%`],
+      ["Profit", formatCurrency(overview.profit?.value || 0), `${(overview.profit?.percentageChange || 0).toFixed(1)}%`],
+      ["Invoice Due", formatCurrency(overview.invoiceDue?.value || 0), `${(overview.invoiceDue?.percentageChange || 0).toFixed(1)}%`],
+      ["Total Expenses", formatCurrency(overview.totalExpenses?.value || 0), `${(overview.totalExpenses?.percentageChange || 0).toFixed(1)}%`],
+      ["Payment Returns", formatCurrency(overview.totalPaymentReturns?.value || 0), `${(overview.totalPaymentReturns?.percentageChange || 0).toFixed(1)}%`],
     ];
-    const chartRows   = spChart.labels.map((l, i) => [l, formatCurrency(spChart.sales[i]), formatCurrency(spChart.purchases[i])]);
-    const infoRows    = [["Suppliers", overallInfo.suppliers], ["Customers", overallInfo.customers], ["Orders", overallInfo.orders]];
-    const custRows    = [["First Time", custOverview.firstTime, `${custOverview.firstTimePercent.toFixed(1)}%`], ["Return", custOverview.return, `${custOverview.returnPercent.toFixed(1)}%`]];
-    const topProdRows = topSelling.map(p  => [p.productName, p.sales, formatCurrency(p.revenue)]);
-    const lowStockRows= lowStock.map(p    => [p.productName, p.stock, p.minStock]);
-    const rSalesRows  = recentSales.map(s => [s.productName, s.category, formatCurrency(s.amount), formatDateLong(s.date)]);
-    const rTxRows     = recentTx.map(tx   => [formatDateLong(tx.date), tx.customer, tx.quantity, formatCurrency(tx.price), tx.status, formatCurrency(tx.total)]);
-    const topCustRows = topCustomers.map(c  => [c.name, c.country || "-", c.orders, formatCurrency(c.totalSpent)]);
-    const topCatRows  = topCategories.map(c => [c.name, formatCurrency(c.salesAmount)]);
-    const orderRows   = orderStats.labels.map((l, i) => [l, orderStats.values[i]]);
+    const chartRows = spChart.labels.map((l, i) => [l, formatCurrency(spChart.sales[i]), formatCurrency(spChart.purchases[i])]);
+    const infoRows = [["Suppliers", overallInfo.suppliers], ["Customers", overallInfo.customers], ["Orders", overallInfo.orders]];
+    const custRows = [["First Time", custOverview.firstTime, `${custOverview.firstTimePercent.toFixed(1)}%`], ["Return", custOverview.return, `${custOverview.returnPercent.toFixed(1)}%`]];
+    const topProdRows = topSelling.map(p => [p.productName, p.sales, formatCurrency(p.revenue)]);
+    const lowStockRows = lowStock.map(p => [p.productName, p.stock, p.minStock]);
+    const rSalesRows = recentSales.map(s => [s.productName, s.category, formatCurrency(s.amount), formatDateLong(s.date)]);
+    const rTxRows = recentTx.map(tx => [formatDateLong(tx.date), tx.customer, tx.quantity, formatCurrency(tx.price), tx.status, formatCurrency(tx.total)]);
+    const topCustRows = topCustomers.map(c => [c.name, c.country || "-", c.orders, formatCurrency(c.totalSpent)]);
+    const topCatRows = topCategories.map(c => [c.name, formatCurrency(c.salesAmount)]);
+    const orderRows = orderStats.labels.map((l, i) => [l, orderStats.values[i]]);
     const catStatRows = [["Total Categories", catStats.totalCategories], ["Total Products", catStats.totalProducts]];
 
     return {
@@ -515,12 +521,12 @@ export default function Dashboard() {
     };
   }, [dashboard, period, customStart, customEnd, user, savedStoreId, filterLabel, overview, spChart, overallInfo, custOverview, topSelling, lowStock, recentSales, recentTx, topCustomers, topCategories, orderStats, catStats]);
 
-   
+
   const handleExportExcel = async () => {
-    const wb  = new ExcelJS.Workbook();
-    const C   = { blue: theme.palette.primary.main.replace("#",""), dark: "FF0D2B52", white: "FFFFFFFF", bdr: theme.palette.divider.replace("#","") };
-    const tb  = { top: { style: "thin", color: { argb: C.bdr } }, left: { style: "thin", color: { argb: C.bdr } }, bottom: { style: "thin", color: { argb: C.bdr } }, right: { style: "thin", color: { argb: C.bdr } } };
-    const hs  = { font: { name: "Calibri", size: 11, bold: true, color: { argb: C.white } }, fill: { type: "pattern", pattern: "solid", fgColor: { argb: C.blue } }, alignment: { horizontal: "center", vertical: "middle" }, border: tb };
+    const wb = new ExcelJS.Workbook();
+    const C = { blue: theme.palette.primary.main.replace("#", ""), dark: "FF0D2B52", white: "FFFFFFFF", bdr: theme.palette.divider.replace("#", "") };
+    const tb = { top: { style: "thin", color: { argb: C.bdr } }, left: { style: "thin", color: { argb: C.bdr } }, bottom: { style: "thin", color: { argb: C.bdr } }, right: { style: "thin", color: { argb: C.bdr } } };
+    const hs = { font: { name: "Calibri", size: 11, bold: true, color: { argb: C.white } }, fill: { type: "pattern", pattern: "solid", fgColor: { argb: C.blue } }, alignment: { horizontal: "center", vertical: "middle" }, border: tb };
     const addSheet = (name, title, headers, rows) => {
       const ws = wb.addWorksheet(name);
       ws.addRow([title]).font = { size: 14, bold: true, color: { argb: C.dark } };
@@ -530,41 +536,41 @@ export default function Dashboard() {
       rows.forEach(r => { const dr = ws.addRow(r); dr.eachCell((c, col) => { c.border = tb; c.alignment = { vertical: "middle", horizontal: col === 1 ? "left" : "right" }; }); });
       ws.autoFilter = { from: { row: hr.number, column: 1 }, to: { row: hr.number, column: headers.length } };
     };
-    addSheet("Summary",       "Dashboard Summary",    ["Metric", "Value", "Change"],                           printData.summaryRows);
-    if (printData.hasChart)   addSheet("Sales & Purchase", "Sales vs Purchase",  ["Period","Sales","Purchases"],   printData.chartRows);
-    addSheet("Overall Info",  "Overall Information",  ["Metric","Count"],                                       printData.infoRows);
-    addSheet("Customer Overview","Customer Overview", ["Type","Count","Percentage"],                             printData.custRows);
-    if (printData.hasTopProd) addSheet("Top Products",  "Top Selling Products",  ["Product","Sales","Revenue"],    printData.topProdRows);
-    if (printData.hasLowStock)addSheet("Low Stock",     "Low Stock Products",    ["Product","Stock","Min Stock"],  printData.lowStockRows);
-    if (printData.hasRSales)  addSheet("Recent Sales",  "Recent Sales",          ["Product","Category","Amount","Date"], printData.rSalesRows);
-    if (printData.hasRTx)     addSheet("Transactions",  "Recent Transactions",   ["Date","Customer","Qty","Price","Status","Total"], printData.rTxRows);
-    if (printData.hasTopCust) addSheet("Top Customers", "Top Customers",         ["Name","Country","Orders","Total Spent"], printData.topCustRows);
-    if (printData.hasTopCat)  addSheet("Top Categories","Top Categories",        ["Category","Sales Amount"],      printData.topCatRows);
-    addSheet("Order Stats",   "Order Statistics",     ["Label","Orders"],                                        printData.orderRows);
-    addSheet("Category Stats","Category Statistics",  ["Metric","Count"],                                        printData.catStatRows);
+    addSheet("Summary", "Dashboard Summary", ["Metric", "Value", "Change"], printData.summaryRows);
+    if (printData.hasChart) addSheet("Sales & Purchase", "Sales vs Purchase", ["Period", "Sales", "Purchases"], printData.chartRows);
+    addSheet("Overall Info", "Overall Information", ["Metric", "Count"], printData.infoRows);
+    addSheet("Customer Overview", "Customer Overview", ["Type", "Count", "Percentage"], printData.custRows);
+    if (printData.hasTopProd) addSheet("Top Products", "Top Selling Products", ["Product", "Sales", "Revenue"], printData.topProdRows);
+    if (printData.hasLowStock) addSheet("Low Stock", "Low Stock Products", ["Product", "Stock", "Min Stock"], printData.lowStockRows);
+    if (printData.hasRSales) addSheet("Recent Sales", "Recent Sales", ["Product", "Category", "Amount", "Date"], printData.rSalesRows);
+    if (printData.hasRTx) addSheet("Transactions", "Recent Transactions", ["Date", "Customer", "Qty", "Price", "Status", "Total"], printData.rTxRows);
+    if (printData.hasTopCust) addSheet("Top Customers", "Top Customers", ["Name", "Country", "Orders", "Total Spent"], printData.topCustRows);
+    if (printData.hasTopCat) addSheet("Top Categories", "Top Categories", ["Category", "Sales Amount"], printData.topCatRows);
+    addSheet("Order Stats", "Order Statistics", ["Label", "Orders"], printData.orderRows);
+    addSheet("Category Stats", "Category Statistics", ["Metric", "Count"], printData.catStatRows);
     const buffer = await wb.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), `dashboard_${period}_${formatFileDate()}.xlsx`);
   };
 
-   
+
   if (loading && !dashboard) return (
     <Box    >
       {/* <LinearProgress sx={{ borderRadius: 4, bgcolor: theme.palette.action.hover, "& .MuiLinearProgress-bar": { bgcolor: theme.palette.primary.main } }} />
       <Typography sx={{ mt: 2, fontSize: "0.875rem", color: theme.palette.text.secondary }}>{t("loading") || "Loading..."}</Typography> */}
-      <DashboardSkeleton/>
+      <DashboardSkeleton />
     </Box>
   );
   if (error) return <ErrorPage t={t} error={error} refetch={refetch} />;
 
- 
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <style>{`@media print{@page{size:A4 portrait;margin:1.2cm 0.8cm;}body *{visibility:hidden;}#pdr,#pdr *{visibility:visible;}#pdr{position:fixed;left:0;top:0;width:100%;background:#f4f6fb;}thead{display:table-header-group;}}`}</style>
 
-      <Box sx={{ width: "100%",  bgcolor: theme.palette.background.default, pb: 5 }}>
+      <Box sx={{ width: "100%", bgcolor: theme.palette.background.default, pb: 5 }}>
         <Box sx={{ "@media print": { display: "none" } }}>
 
-        
+
           <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
             <Stack direction="row" alignItems="center" spacing={1.5}>
               <Box sx={{
@@ -615,12 +621,12 @@ export default function Dashboard() {
           </Stack>
 
           <Box>
-       
+
             <Box
               sx={{
                 bgcolor: theme.palette.background.paper, borderRadius: 1, border: `1px solid ${theme.palette.divider}`,
                 px: 2.5, py: 1.8, mb: 2.5,
-                 
+
               }}
             >
               <Grid container spacing={1.5} alignItems="center">
@@ -632,16 +638,16 @@ export default function Dashboard() {
                     onChange={(e) => handlePeriodChange(e.target.value)}
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        textAlign: "left", 
+                        textAlign: "left",
                         "&.Mui-focused fieldset": { borderColor: theme.palette.primary.main },
                       },
                       "& .MuiInputLabel-root.Mui-focused": { color: theme.palette.primary.main },
                     }}
                   >
-                    <MenuItem value="today">{t("today")  || "Today"}</MenuItem>
-                    <MenuItem value="week"> {t("week")   || "Week"}</MenuItem>
-                    <MenuItem value="month">{t("month")  || "Month"}</MenuItem>
-                    <MenuItem value="year"> {t("year")   || "Year"}</MenuItem>
+                    <MenuItem value="today">{t("today") || "Today"}</MenuItem>
+                    <MenuItem value="week"> {t("week") || "Week"}</MenuItem>
+                    <MenuItem value="month">{t("month") || "Month"}</MenuItem>
+                    <MenuItem value="year"> {t("year") || "Year"}</MenuItem>
                     <MenuItem value="custom">{t("custom_range") || "Custom Range"}</MenuItem>
                   </TextField>
                 </Grid>
@@ -684,7 +690,7 @@ export default function Dashboard() {
               </Grid>
             </Box>
 
-             
+
             <Grid container spacing={1.5} sx={{ mb: 1.5 }}>
               {[
                 {
@@ -745,12 +751,12 @@ export default function Dashboard() {
               ))}
             </Grid>
 
-          
+
             <Grid container spacing={1.5} sx={{ mb: 2 }}>
               {[
-                { title: t("profit") || "Profit",                value: overview.profit?.value || 0,              change: overview.profit?.percentageChange || 0,              trend: overview.profit?.trend || "up",   icon: <TrendingUp    sx={{ fontSize: 18, color: theme.palette.primary.main   }} />, iconBg: theme.palette.primary.light + "30" },
-                { title: t("invoice_due") || "Invoice Due",      value: overview.invoiceDue?.value || 0,          change: overview.invoiceDue?.percentageChange || 0,          trend: overview.invoiceDue?.trend || "up",icon: <Receipt       sx={{ fontSize: 18, color: theme.palette.warning.main }} />, iconBg: theme.palette.warning.light + "30" },
-                { title: t("total_expenses") || "Total Expenses",value: overview.totalExpenses?.value || 0,       change: overview.totalExpenses?.percentageChange || 0,       trend: overview.totalExpenses?.trend || "up",icon: <AttachMoney  sx={{ fontSize: 18, color: theme.palette.info.main    }} />, iconBg: theme.palette.info.light + "30" },
+                { title: t("profit") || "Profit", value: overview.profit?.value || 0, change: overview.profit?.percentageChange || 0, trend: overview.profit?.trend || "up", icon: <TrendingUp sx={{ fontSize: 18, color: theme.palette.primary.main }} />, iconBg: theme.palette.primary.light + "30" },
+                { title: t("invoice_due") || "Invoice Due", value: overview.invoiceDue?.value || 0, change: overview.invoiceDue?.percentageChange || 0, trend: overview.invoiceDue?.trend || "up", icon: <Receipt sx={{ fontSize: 18, color: theme.palette.warning.main }} />, iconBg: theme.palette.warning.light + "30" },
+                { title: t("total_expenses") || "Total Expenses", value: overview.totalExpenses?.value || 0, change: overview.totalExpenses?.percentageChange || 0, trend: overview.totalExpenses?.trend || "up", icon: <AttachMoney sx={{ fontSize: 18, color: theme.palette.info.main }} />, iconBg: theme.palette.info.light + "30" },
                 { title: t("total_payment_returns") || "Payment Returns", value: overview.totalPaymentReturns?.value || 0, change: overview.totalPaymentReturns?.percentageChange || 0, trend: overview.totalPaymentReturns?.trend || "down", icon: <MonetizationOn sx={{ fontSize: 18, color: theme.palette.secondary.main }} />, iconBg: theme.palette.secondary.light + "30" },
               ].map((card, idx) => (
                 <Grid size={{ xs: 12, sm: 6, md: 3 }} key={idx}>
@@ -784,7 +790,7 @@ export default function Dashboard() {
               ))}
             </Grid>
 
-         
+
             <Grid container spacing={1.5} sx={{ mb: 1.5 }}>
               <Grid size={{ xs: 12, md: 8 }}>
                 <Card sx={cardSx(theme)}>
@@ -799,7 +805,7 @@ export default function Dashboard() {
                         <Chart
                           options={makeBarOpts(spChart, false)}
                           series={[
-                            { name: t("sales")     || "Total Sales",    data: spChart.sales.length     > 0 ? spChart.sales     : [0] },
+                            { name: t("sales") || "Total Sales", data: spChart.sales.length > 0 ? spChart.sales : [0] },
                             { name: t("purchases") || "Total Purchase", data: spChart.purchases.length > 0 ? spChart.purchases : [0] },
                           ]}
                           type="bar" height={280}
@@ -819,7 +825,7 @@ export default function Dashboard() {
                       {[
                         { label: t("suppliers") || "Suppliers", value: overallInfo.suppliers, color: theme.palette.success.main },
                         { label: t("customer") || "Customers", value: overallInfo.customers, color: theme.palette.primary.main },
-                        { label: t("orders")    || "Orders",    value: overallInfo.orders,    color: theme.palette.warning.main },
+                        { label: t("orders") || "Orders", value: overallInfo.orders, color: theme.palette.warning.main },
                       ].map((item, i) => (
                         <Grid size={4} key={i}>
                           <Box sx={{
@@ -851,8 +857,8 @@ export default function Dashboard() {
                       </Box>
                       <Stack spacing={1.4} flex={1}>
                         {[
-                          { label: t("first_time") || "First Time", value: custOverview.firstTime, pct: custOverview.firstTimePercent, color: theme.palette.primary.main  },
-                          { label: t("return")     || "Return",     value: custOverview.return,    pct: custOverview.returnPercent,    color: theme.palette.primary.dark },
+                          { label: t("first_time") || "First Time", value: custOverview.firstTime, pct: custOverview.firstTimePercent, color: theme.palette.primary.main },
+                          { label: t("return") || "Return", value: custOverview.return, pct: custOverview.returnPercent, color: theme.palette.primary.dark },
                         ].map((row, i) => (
                           <Box key={i}>
                             <Stack direction="row" justifyContent="space-between" mb={0.4}>
@@ -882,9 +888,9 @@ export default function Dashboard() {
               </Grid>
             </Grid>
 
-            
+
             <Grid container spacing={1.5} sx={{ mb: 1.5 }}>
-          
+
               <Grid size={{ xs: 12, md: 6 }}>
                 <Card sx={cardSx(theme)}>
                   <CardContent sx={{ pb: "12px !important", p: "20px !important" }}>
@@ -930,7 +936,7 @@ export default function Dashboard() {
                 </Card>
               </Grid>
 
-            
+
               <Grid size={{ xs: 12, md: 6 }}>
                 <Card sx={cardSx(theme)}>
                   <CardContent sx={{ pb: "12px !important", p: "20px !important" }}>
@@ -966,7 +972,7 @@ export default function Dashboard() {
                                     sx={{
                                       fontWeight: 700, fontSize: "0.64rem", borderRadius: 6, height: 20,
                                       bgcolor: item.stock <= item.minStock ? theme.palette.error.light + "30" : theme.palette.success.light + "30",
-                                      color:   item.stock <= item.minStock ? theme.palette.error.main      : theme.palette.success.main,
+                                      color: item.stock <= item.minStock ? theme.palette.error.main : theme.palette.success.main,
                                     }}
                                   />
                                 </TableCell>
@@ -982,7 +988,7 @@ export default function Dashboard() {
               </Grid>
             </Grid>
 
-             
+
             <Grid container spacing={1.5} sx={{ mb: 1.5 }}>
               <Grid size={{ xs: 12, md: 7 }}>
                 <Card sx={cardSx(theme)}>
@@ -1014,7 +1020,7 @@ export default function Dashboard() {
                         <Chart
                           options={makeBarOpts(statsChart, true)}
                           series={[
-                            { name: t("sales")     || "Sales",    data: statsChart.sales.length     > 0 ? statsChart.sales     : [0] },
+                            { name: t("sales") || "Sales", data: statsChart.sales.length > 0 ? statsChart.sales : [0] },
                             { name: t("purchases") || "Purchase", data: statsChart.purchases.length > 0 ? statsChart.purchases : [0] },
                           ]}
                           type="bar" height={250}
@@ -1121,7 +1127,7 @@ export default function Dashboard() {
               </Grid>
             </Grid>
 
-          
+
             <Grid container spacing={1.5}>
               <Grid size={{ xs: 12, md: 3 }}>
                 <Card sx={{ ...cardSx(theme), height: "100%" }}>
@@ -1200,7 +1206,7 @@ export default function Dashboard() {
                     <Stack direction="row" justifyContent="space-around">
                       {[
                         { label: t("category"), value: catStats.totalCategories },
-                        { label: t("product"),   value: catStats.totalProducts   },
+                        { label: t("product"), value: catStats.totalProducts },
                       ].map((s, i) => (
                         <Box key={i} sx={{ textAlign: "center" }}>
                           <Typography sx={{ fontWeight: 800, fontSize: "1.05rem", color: theme.palette.primary.main, letterSpacing: "-0.02em" }}>{s.value}</Typography>
@@ -1235,7 +1241,7 @@ export default function Dashboard() {
           </Box>
         </Box>
 
-    
+
         <Box id="pdr" sx={{ position: "fixed", left: "-10000px", top: 0, width: "100%", visibility: "hidden", "@media print": { position: "relative", left: 0, top: 0, visibility: "visible" } }}>
           <Box sx={{ bgcolor: theme.palette.background.default, p: 2 }}>
             <Box sx={{ background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%)`, color: "#fff", p: 2.5, borderRadius: "12px 12px 0 0" }}>

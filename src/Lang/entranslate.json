@@ -483,5 +483,6 @@
   "period_purchase": "Period Purchase",
   "period_quotation": "Period Quotation",
   "period_expense": "Period Expense",
-  "period_invoice": "Period Invoice"
+  "period_invoice": "Period Invoice",
+  "sales": "Sales"
 }
