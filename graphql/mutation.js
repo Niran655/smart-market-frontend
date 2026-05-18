@@ -343,6 +343,8 @@ mutation CreateSale($input: SaleInput) {
       saleNumber
       total
       status
+      khqrString
+      bakongReference
       qrImage
     }
   }

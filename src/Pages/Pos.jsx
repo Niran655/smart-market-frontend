@@ -738,7 +738,17 @@
 
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
 import { Navigate, useParams } from "react-router-dom";
-import { Box, Grid } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuth } from "../Context/AuthContext";
 
@@ -761,6 +771,15 @@ import "../Styles/pos.scss";
 
 const GUEST = { _id: "guest", nameEn: "Guest", nameKh: "ភ្ញៀវ" };
 
+const KHQR_PAYMENT_DURATION_MS = 5 * 60 * 1000;
+
+const formatCountdown = (milliseconds) => {
+  const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+};
+
 const POS = () => {
   const { shopId } = useParams();
   const activeShopId = localStorage.getItem("activeShopId");
@@ -771,6 +790,8 @@ const POS = () => {
   const [openProductDialog, setOpenProductDialog] = useState(false);
   const [openPaymentDialog, setOpenPaymentDialog] = useState(false);
   const [openPendingDialog, setOpenPendingDialog] = useState(false);
+  const [qrPaymentData, setQrPaymentData] = useState(null);
+  const [qrTimeLeft, setQrTimeLeft] = useState(KHQR_PAYMENT_DURATION_MS);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [openHistory, setOpenHistory] = useState(false);
   const [openSalePending, setOpenSalePending] = useState(false);
@@ -866,6 +887,18 @@ const POS = () => {
     }
   }, [productData, language]);
 
+  useEffect(() => {
+    if (!qrPaymentData?.expiresAt) return;
+
+    const updateRemainingTime = () => {
+      setQrTimeLeft(Math.max(0, qrPaymentData.expiresAt - Date.now()));
+    };
+
+    updateRemainingTime();
+    const timer = setInterval(updateRemainingTime, 1000);
+    return () => clearInterval(timer);
+  }, [qrPaymentData]);
+
  
   const handleScan = async (barcode) => {
     try {
@@ -897,6 +930,10 @@ const POS = () => {
     setOpenPaymentDialog(true);
   };
   const handleClosePaymentDialog = () => setOpenPaymentDialog(false);
+  const handleCloseQrDialog = () => {
+    setQrPaymentData(null);
+    setQrTimeLeft(KHQR_PAYMENT_DURATION_MS);
+  };
 
   const handleOpenPendingDialog = () => {
     if (cart.length === 0) {
@@ -1120,6 +1157,10 @@ const POS = () => {
   const subtotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
   const tax = subtotal * 0.1;
   const total = subtotal + tax;
+  const qrShopName =
+    shopData?.getShopById?.nameEn ||
+    shopData?.getShopById?.nameKh ||
+    "Smart Market";
 
  
   const handleCreateSale = async (paymentInfo, isPending = false) => {
@@ -1165,6 +1206,18 @@ const POS = () => {
 
       const result = await createSale({ variables: { input } });
       const createdSale = result?.data?.createSale;
+
+      if (createdSale?.isSuccess && paymentInfo.method === "qr" && createdSale?.data?.qrImage) {
+        setQrPaymentData({
+          saleNumber: createdSale.data.saleNumber,
+          total: createdSale.data.total || totalRounded,
+          qrImage: createdSale.data.qrImage,
+          khqrString: createdSale.data.khqrString,
+          bakongReference: createdSale.data.bakongReference,
+          expiresAt: Date.now() + KHQR_PAYMENT_DURATION_MS,
+        });
+        return;
+      }
 
       if (createdSale?.isSuccess && !isPending) {
         printSaleInvoice({
@@ -1217,6 +1270,111 @@ const POS = () => {
         t={t}
         isPending={false}
       />
+
+      <Dialog
+        open={Boolean(qrPaymentData)}
+        onClose={handleCloseQrDialog}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            bgcolor: "#f6f7fb",
+            boxShadow: "0 24px 70px rgba(15, 23, 42, 0.24)",
+          },
+        }}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Typography variant="h6" fontWeight={800} textAlign="center">
+            Bakong KHQR Payment
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} alignItems="center" sx={{ py: 1 }}>
+            <Box
+              sx={{
+                width: 280,
+                maxWidth: "100%",
+                overflow: "hidden",
+                borderRadius: "10px",
+                bgcolor: "common.white",
+                border: "1px solid #edf0f4",
+                boxShadow: "0 14px 34px rgba(15, 23, 42, 0.12)",
+              }}
+            >
+              <Box
+                sx={{
+                  position: "relative",
+                  bgcolor: "#e91f2d",
+                  color: "common.white",
+                  py: 1,
+                  textAlign: "center",
+                  fontWeight: 800,
+                  letterSpacing: 0,
+                  "&:after": {
+                    content: '""',
+                    position: "absolute",
+                    right: 0,
+                    bottom: -18,
+                    borderTop: "18px solid #e91f2d",
+                    borderLeft: "28px solid transparent",
+                  },
+                }}
+              >
+                KHQR
+              </Box>
+              <Box sx={{ px: 3, pt: 2.5, pb: 1.5 }}>
+                <Typography
+                  variant="caption"
+                  sx={{ display: "block", color: "#8a94a6", fontWeight: 700, lineHeight: 1.2 }}
+                >
+                  {qrShopName}
+                </Typography>
+                <Typography sx={{ mt: 0.5, color: "#111827", fontSize: 24, fontWeight: 800, lineHeight: 1 }}>
+                  ${Number(qrPaymentData?.total || 0).toFixed(2)}
+                </Typography>
+              </Box>
+              <Box sx={{ borderTop: "1px dashed #d9dde6", mx: 2 }} />
+              <Box sx={{ px: 3, py: 2.25 }}>
+                {qrPaymentData?.qrImage && (
+                  <Box
+                    component="img"
+                    src={qrPaymentData.qrImage}
+                    alt="Bakong KHQR"
+                    sx={{
+                      display: "block",
+                      width: "100%",
+                      aspectRatio: "1 / 1",
+                      objectFit: "contain",
+                      bgcolor: "common.white",
+                    }}
+                  />
+                )}
+              </Box>
+            </Box>
+
+            <Stack spacing={0.5} alignItems="center">
+              <Typography variant="body2" color="text.secondary">
+                Invoice #{qrPaymentData?.saleNumber}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: qrTimeLeft > 0 ? "#e91f2d" : "error.main",
+                  fontWeight: 800,
+                }}
+              >
+                {qrTimeLeft > 0 ? `Expires in ${formatCountdown(qrTimeLeft)}` : "Payment QR expired"}
+              </Typography>
+            </Stack>
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button onClick={handleCloseQrDialog} variant="contained" fullWidth>
+            Done
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <PaymentDialog
         open={openPendingDialog}

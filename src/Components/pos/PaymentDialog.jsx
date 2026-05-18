@@ -52,6 +52,10 @@ const PaymentDialog = ({
     if (activeStep === 0 && !paymentMethod && !isPending) {
       return;
     }
+    if (activeStep === 0 && paymentMethod === "qr" && !isPending) {
+      handleComplete();
+      return;
+    }
     if (activeStep === 1 && !isPending && (!amountPaid || parseFloat(amountPaid) < total)) {
       return;
     }
@@ -67,10 +71,11 @@ const PaymentDialog = ({
   };
 
   const handleComplete = () => {
+    const isQrPayment = paymentMethod === "qr" && !isPending;
     const paymentInfo = {
       method: paymentMethod,
-      amountPaid: parseFloat(amountPaid) || 0,
-      change: change,
+      amountPaid: isQrPayment ? Number(total.toFixed(2)) : parseFloat(amountPaid) || 0,
+      change: isQrPayment ? 0 : change,
     };
     onCreateSale(paymentInfo);
   };
@@ -296,6 +301,10 @@ const PaymentDialog = ({
               : language === "kh"
                 ? "បង្កើតវិក័យប័ត្របណ្ដោះអាសន្ន"
                 : "Create Pending Invoice"
+            : paymentMethod === "qr" && activeStep === 0
+              ? creating
+                ? "Creating QR..."
+                : "Create QR"
             : activeStep === steps.length - 1
               ? creating
                 ? language === "kh"
