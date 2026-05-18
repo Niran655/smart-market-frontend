@@ -479,10 +479,13 @@
   "first_time": "First Time",
   "return": "Return",
   "view_all": "View All",
-  "period_sale": "Period Sale",
-  "period_purchase": "Period Purchase",
-  "period_quotation": "Period Quotation",
-  "period_expense": "Period Expense",
-  "period_invoice": "Period Invoice",
-  "sales": "Sales"
+  "period_sale": "Sale",
+  "period_purchase": "Purchase",
+  "period_quotation": "Quotation",
+  "period_expense": "Expense",
+  "period_invoice": "Invoice",
+  "sales": "Sales",
+  "3_months": "3 Months",
+  "6_months": "6 Months",
+  "all_time": "All Time"
 }

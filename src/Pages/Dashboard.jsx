@@ -39,14 +39,14 @@ const formatDateLong = (v) => (!v ? "-" : dayjs(v).format("MMMM D, YYYY"));
 const formatDateShort = (v) => (!v ? "-" : dayjs(v).format("DD MMM YYYY"));
 const formatFileDate = (v = new Date()) => dayjs(v).format("YYYY-MM-DD");
 
-const PERIOD_OPTIONS = [
-  { code: "1D", label: "Today" },
-  { code: "1W", label: "Weekly" },
-  { code: "1M", label: "Monthly" },
-  { code: "3M", label: "3 Months" },
-  { code: "6M", label: "6 Months" },
-  { code: "All", label: "All Time" },
-];
+// const PERIOD_OPTIONS = [
+//   { code: "1D", label: "Today" },
+//   { code: "1W", label: "Weekly" },
+//   { code: "1M", label: "Monthly" },
+//   { code: "3M", label: "3 Months" },
+//   { code: "6M", label: "6 Months" },
+//   { code: "All", label: "All Time" },
+// ];
 
 
 const getStatusStyle = (status, theme) => {
@@ -317,6 +317,15 @@ export default function Dashboard() {
     { key: "expense", label: t("period_expense") },
     { key: "invoice", label: t("period_invoice") },
   ];
+  const PERIOD_OPTIONS = [
+    { code: "1D", label: t("today") },
+    { code: "1W", label: t("week") },
+    { code: "1M", label: t("month") },
+    { code: "3M", label: t("3_months") },
+    { code: "6M", label: t("6_months") },
+    { code: "All", label: t("all_time") },
+  ];
+
   const [period, setPeriod] = useState("month");
   const [customStart, setCustomStart] = useState(null);
   const [customEnd, setCustomEnd] = useState(null);

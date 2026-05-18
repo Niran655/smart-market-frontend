@@ -464,5 +464,8 @@
   "period_purchase": "ការទិញ",
   "period_quotation": "សម្រង់តម្លៃ",
   "period_expense": "ចំណាយ",
-  "period_invoice": "វិក្កយបត្រ"
+  "period_invoice": "វិក្កយបត្រ",
+  "3_months": "៣ខែចុងក្រោយ",
+  "6_months": "៦ខែចុងក្រោយ",
+  "all_time": "គ្រប់ពេល"
 }
