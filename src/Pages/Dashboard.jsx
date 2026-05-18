@@ -604,7 +604,7 @@ export default function Dashboard() {
                   "&:hover": { bgcolor: theme.palette.action.hover, borderColor: theme.palette.primary.main },
                 }}
               >
-                Export
+                {t("export_excel")}
               </Button>
               <Button
                 onClick={handlePrint}
@@ -617,7 +617,7 @@ export default function Dashboard() {
                   "&:hover": { bgcolor: theme.palette.primary.dark },
                 }}
               >
-                Print
+                {t("print")}
               </Button>
             </Stack>
           </Stack>
