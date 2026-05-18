@@ -223,6 +223,8 @@ const SectionTitle = ({ children, action }) => {
 
 const ViewAllBtn = () => {
   const theme = useTheme();
+  const { language } = useAuth();
+  const { t } = translateLauguage(language);
   return (
     <Button
       size="small"
@@ -233,7 +235,7 @@ const ViewAllBtn = () => {
         "&:hover": { bgcolor: "transparent", textDecoration: "underline" },
       }}
     >
-      View All
+      {t("view_all")}
     </Button>
   );
 };
