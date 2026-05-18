@@ -297,7 +297,7 @@ const StableProgress = ({ loading }) => {
 };
 
 const TX_TABS = [
-  { key: "sale",      label:  "period_sale" },
+  { key: "sale",      label: t("period_sale") || "Sales" },
   { key: "purchase",  label: "Purchase"  },
   { key: "quotation", label: "Quotation" },
   { key: "expense",   label: "Expenses"  },
