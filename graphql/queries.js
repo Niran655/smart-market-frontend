@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_UNIT_WHITH_PAGINATION = gql`
-query GetUnitWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
-  getUnitWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+query GetUnitWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $active: Boolean) {
+  getUnitWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, active: $active) {
     data {
       nameKh
       nameEn
@@ -173,8 +173,8 @@ query GetCustomersByShop($shopId: ID!) {
 }`
 
 export const GET_CATEGORY_WHITH_PAGINATION = gql`
-query GetCategoryWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
-  getCategoryWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+query GetCategoryWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $active: Boolean) {
+  getCategoryWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, active: $active) {
     data {
       _id
       nameKh
@@ -311,8 +311,8 @@ query GetTableByShopId($shopId: ID!) {
 
 
 export const GET_PRODUCT_WITH_PAGINATION = gql`
-query GetProductsWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
-  getProductsWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+query GetProductsWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $categoryId: ID, $active: Boolean) {
+  getProductsWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, categoryId: $categoryId, active: $active) {
     data {
       nameKh
       nameEn
@@ -1460,13 +1460,14 @@ export const GET_ANNUAL_REPORT = gql`
 `;
 // ===============================END REPORT QUERY=========================
 export const GET_SUPPLIERS_WITH_PAGINATION = gql`
-query GetSuppliersWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
-  getSuppliersWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+query GetSuppliersWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $active: Boolean) {
+  getSuppliersWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, active: $active) {
     data {
       _id
       nameKh
       nameEn
       remark
+      active
       createdAt
       updatedAt
     }

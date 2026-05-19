@@ -289,6 +289,7 @@ import {
   Button,
   Grid,
   InputAdornment,
+  MenuItem,
   Stack,
   TextField,
   Typography,
@@ -524,6 +525,7 @@ const Store = () => {
 
   const [open, setOpen] = useState(false);
   const [keyword, setKeyword] = useState("");
+  const [activeFilter, setActiveFilter] = useState("active");
   const [userObject, setUserObject] = useState(null);
 
   useEffect(() => {
@@ -557,9 +559,16 @@ const Store = () => {
     }
   };
 
-  const filteredShops = data?.getAllShops?.filter((shop) =>
-    shop?.nameEn?.toLowerCase().includes(keyword.toLowerCase())
-  );
+  const filteredShops = data?.getAllShops?.filter((shop) => {
+    const matchesKeyword = shop?.nameEn?.toLowerCase().includes(keyword.toLowerCase());
+    const matchesStatus =
+      activeFilter === "all"
+        ? true
+        : activeFilter === "active"
+        ? shop?.active === true
+        : shop?.active === false;
+    return matchesKeyword && matchesStatus;
+  });
 
   const totalShops = data?.getAllShops?.length || 0;
 
@@ -645,30 +654,42 @@ const Store = () => {
           mb: 3,
         }}
       >
-        <Grid
-      container
-      spacing={2}
-    >
-       
-      <Grid item xs={12}>
-        <TextField
-          type="search"
-          size="small"
-          placeholder={`${t("search")} ${t("store")}...`}
-          fullWidth
-          variant="outlined"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search size={16} color={theme.palette.primary.main} />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Grid>
-    </Grid>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 6, md: 3 }}>
+             
+            <TextField
+              type="search"
+              size="small"
+              placeholder={`${t("search")} ${t("store")}...`}
+              fullWidth
+              variant="outlined"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search size={16} color={theme.palette.primary.main} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 6, md: 2 }}>
+          
+            <TextField
+              select
+              fullWidth
+              size="small"
+         
+              value={activeFilter}
+              onChange={(e) => setActiveFilter(e.target.value)}
+            >
+              <MenuItem value="active">{t("active")}</MenuItem>
+              <MenuItem value="inactive">{t("inactive")}</MenuItem>
+              <MenuItem value="all">{t("all")}</MenuItem>
+            </TextField>
+          </Grid>
+        </Grid>
       </Box>
 
   

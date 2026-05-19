@@ -23,6 +23,7 @@ import Customer from './Pages/Customer';
 import TablePage from './Pages/Table';
 import ReportInShop from './Pages/ReportInShop';
 import DashboardInShop from './Pages/DashboardInShop';
+import ChatBot from './Pages/ChatBot';
  
 export default function Router() {
   const { isAuthenticated } = useAuth();
@@ -43,6 +44,7 @@ export default function Router() {
       children: [
         { path: '/', element: <Navigate to="/dashboard" /> },
         { path: 'dashboard', element: <Dashboard /> },
+        { path: 'chat', element: <ChatBot /> },
         { path: 'setting', element: <Settings/> },
         { path: '/setting/unit', element: <Unit/>},
         { path: '/setting/supplier', element: <Supplier/>},

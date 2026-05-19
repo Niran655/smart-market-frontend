@@ -351,6 +351,38 @@ mutation CreateSale($input: SaleInput) {
 }
 `;
 
+export const CREATE_BAKONG_PAYMENT = gql`
+mutation CreateBakongPayment($input: CreateBakongPaymentInput!) {
+  createBakongPayment(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+    data {
+      saleNumber
+      total
+      status
+      khqrString
+      bakongReference
+      qrImage
+    }
+  }
+}
+`;
+
+export const CHECK_BAKONG_PAYMENT = gql`
+mutation CheckBakongPayment($reference: String!) {
+  checkBakongPayment(reference: $reference) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`;
+
 export const ADJUST_STOCK = gql`
 mutation AdjustStock($input: AdjustStockInput!) {
   adjustStock(input: $input) {

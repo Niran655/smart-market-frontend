@@ -374,6 +374,7 @@ export default function Settings() {
     { to: "/setting/supplier", image: Supplier, titleKey: "suppliers", metaIndex: 4 },
     { to: "/setting/customer", image: Customer, titleKey: "customer", metaIndex: 5 },
     { to: "/setting/table", image: Table, titleKey: "table", metaIndex: 6 },
+    { to: "/setting/chat-bot", image: Table, titleKey: "chat-bot", metaIndex: 7 },
   ];
 
   return (

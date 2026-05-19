@@ -5,12 +5,13 @@ const useGetSupplierWithPagination = (
     page,
     limit,
     pagination,
-    keyword
+    keyword,
+    active
 ) => {
     const { data, loading, error, refetch } = useQuery(
         GET_SUPPLIERS_WITH_PAGINATION,
         {
-            variables: { page, limit, pagination, keyword },
+            variables: { page, limit, pagination, keyword, active },
             // fetchPolicy: "cache-and-network",
         }
     );

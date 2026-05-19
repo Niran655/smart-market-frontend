@@ -1,14 +1,13 @@
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Breadcrumbs, Button, Grid, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Box, Breadcrumbs, Button, Grid, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../Styles/TableStyle.scss";
 import useGetSupplierWithPagination from "../Components/hook/useGetSupplierWithPagination";
 import SupplierAction from "../Components/supplier/SupplierAction";
 import SupplierForm from "../Components/supplier/SupplierForm";
 import FooterPagination from "../include/FooterPagination";
-import "../Styles/TableStyle.scss";
 import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
@@ -22,9 +21,21 @@ const Supplier = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
   const [keyword, setKeyword] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
+
+  useEffect(() => {
+    setPage(1);
+  }, [activeFilter]);
+
+  const active =
+    activeFilter === "active"
+      ? true
+      : activeFilter === "inactive"
+      ? false
+      : undefined;
 
   const { suppliers, paginator, loading, refetch } =
-    useGetSupplierWithPagination(page, limit, true, keyword);
+    useGetSupplierWithPagination(page, limit, true, keyword, active);
 
   const handleLimit = (e) => {
     setLimit(parseInt(e.target.value, 10));
@@ -59,8 +70,8 @@ const Supplier = () => {
         sx={{ display: "flex", justifyContent: "space-between" }}
         mt={5}
       >
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12 }} textAlign={"start"}>
+        <Grid container spacing={2} alignItems="center" textAlign="start">
+          <Grid size={{ xs: 6, md: 6 }}>
             <Typography variant="body2" fontWeight={500} mb={0.5}>
               {t("search")}
             </Typography>
@@ -69,7 +80,10 @@ const Supplier = () => {
               fullWidth
               placeholder={t("search") + "..."}
               value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                setPage(1);
+              }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -78,6 +92,22 @@ const Supplier = () => {
                 ),
               }}
             />
+          </Grid>
+          <Grid size={{ xs: 6, md: 6 }}>
+            <Typography variant="body2" fontWeight={500} mb={0.5}>
+              {t("status")}
+            </Typography>
+            <TextField
+              select
+              fullWidth
+              size="small"
+              value={activeFilter}
+              onChange={(e) => setActiveFilter(e.target.value)}
+            >
+              <MenuItem value="active">{t("active")}</MenuItem>
+              <MenuItem value="inactive">{t("inactive")}</MenuItem>
+              <MenuItem value="all">{t("all")}</MenuItem>
+            </TextField>
           </Grid>
         </Grid>
 

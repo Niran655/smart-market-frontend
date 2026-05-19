@@ -4,7 +4,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Accordion from "@mui/material/Accordion";
 import { useQuery } from "@apollo/client/react";
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Breadcrumbs, Button, Grid, IconButton, InputAdornment, Skeleton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Breadcrumbs, Button, Grid, IconButton, InputAdornment, MenuItem, Skeleton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { CopyPlus, Search } from "lucide-react";
 import { useState } from "react";
 
@@ -15,7 +15,7 @@ import ProductForm from "../Components/product/ProductForm";
 import FooterPagination from "../include/FooterPagination";
 import "../Styles/TableStyle.scss";
 import { useAuth } from "../Context/AuthContext";
-import { GET_PRODUCT_WITH_PAGINATION, GET_SUP_PRODUCT } from "../../graphql/queries";
+import { GET_CATEGORY, GET_PRODUCT_WITH_PAGINATION, GET_SUP_PRODUCT } from "../../graphql/queries";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
@@ -33,6 +33,8 @@ const Product = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
   const [keyword, setKeyword] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -41,8 +43,20 @@ const Product = () => {
   const handleCloseSub = () => setOpenSub(false);
 
   const { data, loading, refetch } = useQuery(GET_PRODUCT_WITH_PAGINATION, {
-    variables: { page, limit, pagination: true, keyword },
+    variables: {
+      page,
+      limit,
+      pagination: true,
+      keyword,
+      ...(categoryId && { categoryId }),
+      ...(activeFilter !== "all" && {
+        active: activeFilter === "active" ? true : false,
+      }),
+    },
   });
+
+  const { data: categoryData } = useQuery(GET_CATEGORY);
+  const categories = categoryData?.getCategory || [];
 
   const {
     data: subData,
@@ -114,7 +128,7 @@ const Product = () => {
         mt={5}
       >
         <Grid container spacing={2} alignItems="center" textAlign={"start"}>
-          <Grid size={{ xs: 12 }}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Typography variant="body2" fontWeight={500} mb={0.5}>
               {t("search")}
             </Typography>
@@ -125,7 +139,10 @@ const Product = () => {
               placeholder={t("search") + "..."}
               fullWidth
               value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                setPage(1);
+              }}
               variant="outlined"
 
               InputProps={{
@@ -136,6 +153,47 @@ const Product = () => {
                 ),
               }}
             />
+          </Grid>
+          <Grid size={{ xs: 6, md: 4 }}>
+            <Typography variant="body2" fontWeight={500} mb={0.5}>
+              {t("category")}
+            </Typography>
+            <Autocomplete
+              fullWidth
+              size="small"
+              options={categories}
+              value={categories.find((cat) => cat._id === categoryId) || null}
+              getOptionLabel={(option) =>
+                language === "en" ? option.nameEn || "" : option.nameKh || ""
+              }
+              isOptionEqualToValue={(option, value) => option._id === value._id}
+              onChange={(_, newValue) => {
+                setCategoryId(newValue?._id || "");
+                setPage(1);
+              }}
+              renderInput={(params) => (
+                <TextField {...params} placeholder={t("all")} />
+              )}
+            />
+          </Grid>
+          <Grid size={{ xs: 6, md: 4 }}>
+            <Typography variant="body2" fontWeight={500} mb={0.5}>
+              {t("status")}
+            </Typography>
+            <TextField
+              select
+              fullWidth
+              size="small"
+              value={activeFilter}
+              onChange={(e) => {
+                setActiveFilter(e.target.value);
+                setPage(1);
+              }}
+            >
+              <MenuItem value="active">{t("active")}</MenuItem>
+              <MenuItem value="inactive">{t("inactive")}</MenuItem>
+              <MenuItem value="all">{t("all")}</MenuItem>
+            </TextField>
           </Grid>
         </Grid>
 

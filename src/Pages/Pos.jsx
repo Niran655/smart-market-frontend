@@ -760,7 +760,11 @@ import {
   GET_SHOP_BY_ID,
 } from "../../graphql/queries";
 
-import { CREATE_SALE } from "../../graphql/mutation";
+import {
+  CHECK_BAKONG_PAYMENT,
+  CREATE_BAKONG_PAYMENT,
+  CREATE_SALE,
+} from "../../graphql/mutation";
 import { translateLauguage } from "../function/translate";
 import ProductDialog from "../Components/pos/ProductDialog";
 import PaymentDialog from "../Components/pos/PaymentDialog";
@@ -861,6 +865,14 @@ const POS = () => {
         setAlert(true, "error", createSale?.message);
       }
     },
+    onError: (error) => setAlert(true, "error", error.message),
+  });
+
+  const [createBakongPayment, { loading: creatingQr }] = useMutation(CREATE_BAKONG_PAYMENT, {
+    onError: (error) => setAlert(true, "error", error.message),
+  });
+
+  const [checkBakongPayment, { loading: checkingQr }] = useMutation(CHECK_BAKONG_PAYMENT, {
     onError: (error) => setAlert(true, "error", error.message),
   });
 
@@ -1204,20 +1216,39 @@ const POS = () => {
         status:        isPending ? "pending" : "completed",
       };
 
-      const result = await createSale({ variables: { input } });
-      const createdSale = result?.data?.createSale;
+      if (!isPending && paymentInfo.method === "qr") {
+        const billNumber = `QR-${Date.now()}`;
+        const result = await createBakongPayment({
+          variables: {
+            input: {
+              amount: totalRounded,
+              billNumber,
+              currency: "USD",
+            },
+          },
+        });
+        const payment = result?.data?.createBakongPayment;
 
-      if (createdSale?.isSuccess && paymentInfo.method === "qr" && createdSale?.data?.qrImage) {
+        if (!payment?.isSuccess || !payment?.data?.qrImage || !payment?.data?.bakongReference) {
+          setAlert(true, "error", payment?.message || "Failed to create QR payment");
+          return;
+        }
+
         setQrPaymentData({
-          saleNumber: createdSale.data.saleNumber,
-          total: createdSale.data.total || totalRounded,
-          qrImage: createdSale.data.qrImage,
-          khqrString: createdSale.data.khqrString,
-          bakongReference: createdSale.data.bakongReference,
+          saleNumber: payment.data.saleNumber || billNumber,
+          total: payment.data.total || totalRounded,
+          qrImage: payment.data.qrImage,
+          khqrString: payment.data.khqrString,
+          bakongReference: payment.data.bakongReference,
+          saleInput: input,
           expiresAt: Date.now() + KHQR_PAYMENT_DURATION_MS,
         });
+        setOpenPaymentDialog(false);
         return;
       }
+
+      const result = await createSale({ variables: { input } });
+      const createdSale = result?.data?.createSale;
 
       if (createdSale?.isSuccess && !isPending) {
         printSaleInvoice({
@@ -1231,6 +1262,38 @@ const POS = () => {
       }
     } catch (error) {
       console.error("Error creating sale:", error);
+    }
+  };
+
+  const handleConfirmQrPayment = async () => {
+    if (!qrPaymentData?.bakongReference || !qrPaymentData?.saleInput) return;
+    if (qrTimeLeft <= 0) {
+      setAlert(true, "error", "Payment QR expired");
+      return;
+    }
+
+    const result = await checkBakongPayment({
+      variables: { reference: qrPaymentData.bakongReference },
+    });
+    const payment = result?.data?.checkBakongPayment;
+
+    if (!payment?.isSuccess) {
+      setAlert(true, "warning", payment?.message || "Payment not successful yet");
+      return;
+    }
+
+    const resultSale = await createSale({ variables: { input: qrPaymentData.saleInput } });
+    const createdSale = resultSale?.data?.createSale;
+
+    if (createdSale?.isSuccess) {
+      printSaleInvoice({
+        ...qrPaymentData.saleInput,
+        saleNumber: createdSale?.data?.saleNumber,
+        saleId: createdSale?.data?.saleId,
+        status: createdSale?.data?.status || qrPaymentData.saleInput.status,
+        createdAt: new Date().toISOString(),
+      });
+      handleCloseQrDialog();
     }
   };
  
@@ -1266,7 +1329,7 @@ const POS = () => {
         total={total}
         onCreateSale={(paymentInfo) => handleCreateSale(paymentInfo, false)}
         language={language}
-        creating={creating}
+        creating={creating || creatingQr}
         t={t}
         isPending={false}
       />
@@ -1370,8 +1433,16 @@ const POS = () => {
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button onClick={handleCloseQrDialog} variant="contained" fullWidth>
-            Done
+          <Button onClick={handleCloseQrDialog} color="inherit" disabled={checkingQr}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmQrPayment}
+            variant="contained"
+            disabled={checkingQr || creating || qrTimeLeft <= 0}
+            fullWidth
+          >
+            {checkingQr || creating ? "Checking..." : "Check Payment"}
           </Button>
         </DialogActions>
       </Dialog>

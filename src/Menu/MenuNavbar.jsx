@@ -65,6 +65,11 @@ export default function MenuNavbar() {
       routeTo: "/report",
       pageIcon: <DocumentText1 className="icon" />,
     },
+    {
+      pageTitle: "AI Chat",
+      routeTo: "/chat",
+      pageIcon: <Messages2 className="icon" />,
+    },
   ];
 
  

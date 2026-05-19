@@ -1,9 +1,9 @@
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import { useQuery } from "@apollo/client/react";
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Breadcrumbs, Button, Grid, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Box, Breadcrumbs, Button, Grid, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import UpdateCategoryStatus from "../Components/category/UpdateCategoryStatus";
 import CategoryAction from "../Components/category/CategoryAction";
@@ -24,12 +24,26 @@ const Category = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(5);
   const [keyword, setKeyword] = useState("");
+  const [activeFilter, setActiveFilter] = useState("active");
+
+  useEffect(() => {
+    setPage(1);
+  }, [activeFilter]);
+
+  const active =
+    activeFilter === "active"
+      ? true
+      : activeFilter === "inactive"
+      ? false
+      : undefined;
+
   const { data, refetch, loading } = useQuery(GET_CATEGORY_WHITH_PAGINATION, {
     variables: {
       page,
       limit,
       pagination: true,
       keyword,
+      active,
     },
   });
   const categoryData = data?.getCategoryWithPagination?.data || [];
@@ -74,8 +88,8 @@ const Category = () => {
         </Box>
       </Stack>
       <Box sx={{display:"flex",justifyContent:"space-between",alignItems:"center"}}  mt={5}>
-        <Grid container spacing={2} alignItems="center" textAlign={"start"}>
-          <Grid size={{ xs: 12 }}>
+        <Grid container spacing={2} alignItems="center" textAlign="start">
+          <Grid size={{ xs: 6, md: 6 }}>
             <Typography variant="body2" fontWeight={500} mb={0.5}>
               {t("search")}
             </Typography>
@@ -85,9 +99,12 @@ const Category = () => {
               placeholder={t("search") + "..."}
               fullWidth
               value={keyword}
-              onChange={(e)=>setKeyword(e.target.value)}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                setPage(1);
+              }}
               variant="outlined"
-               
+
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -96,6 +113,22 @@ const Category = () => {
                 ),
               }}
             />
+          </Grid>
+          <Grid size={{ xs: 6, md: 6 }}>
+            <Typography variant="body2" fontWeight={500} mb={0.5}>
+              {t("status")}
+            </Typography>
+            <TextField
+              select
+              fullWidth
+              size="small"
+              value={activeFilter}
+              onChange={(e) => setActiveFilter(e.target.value)}
+            >
+              <MenuItem value="active">{t("active")}</MenuItem>
+              <MenuItem value="inactive">{t("inactive")}</MenuItem>
+              <MenuItem value="all">{t("all")}</MenuItem>
+            </TextField>
           </Grid>
         </Grid>
 
