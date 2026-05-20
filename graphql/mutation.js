@@ -537,6 +537,39 @@ mutation CreateShiftSession($input: ShiftSessionInput) {
 }
 `
 
+export const CREATE_WAREHOUSE_REQUEST = gql`
+mutation CreateWarehouseRequest($input: CreateWarehouseRequestInput) {
+  createWarehouseRequest(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}`
+
+export const APPROVE_WAREHOUSE_REQUEST = gql`
+mutation ApproveWarehouseRequest($id: ID!, $items: [ApproveWarehouseRequestItemInput!]!) {
+  approveWarehouseRequest(_id: $id, items: $items) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}`
+
+export const REJECT_WAREHOUSE_REQUEST = gql`
+mutation RejectWarehouseRequest($id: ID!, $reason: String) {
+  rejectWarehouseRequest(_id: $id, reason: $reason) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}`
+
 export const UPDATE_SHIFT_SEESION = gql`
 mutation UpdateShiftSession($id: ID!, $input: ShiftSessionInput) {
   updateShiftSession(_id: $id, input: $input) {

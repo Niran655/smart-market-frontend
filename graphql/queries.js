@@ -771,6 +771,68 @@ query GetWarehouseTransferById($id: ID!) {
 }
 `
 
+export const GET_WAREHOUSE_REQUESTS_WITH_PAGINATION = gql`
+query GetWarehouseRequestsWithPagination($status: WarehouseRequestStatus, $shopId: ID, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
+  getWarehouseRequestsWithPagination(status: $status, shopId: $shopId, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+    data {
+      _id
+      toShop {
+        _id
+        nameEn
+        nameKh
+      }
+      items {
+        requestedQty
+        approvedQty
+        receivedQty
+        subProduct {
+          _id
+          productImg
+          costPrice
+          parentProductId {
+            nameEn
+            nameKh
+          }
+          unitId {
+            nameEn
+            nameKh
+          }
+        }
+      }
+      status
+      remark
+      dateWantGetProduct
+      requestedBy {
+        nameEn
+        nameKh
+      }
+      approvedBy {
+        nameEn
+        nameKh
+      }
+      transfer {
+        _id
+        status
+      }
+      createdAt
+      approvedAt
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
+  }
+}
+`
+
 export const GET_SALES = gql`
   query GetSales(
     $shopId: ID
@@ -1487,8 +1549,8 @@ query GetSuppliersWithPagination($page: Int, $limit: Int, $pagination: Boolean, 
 }`
 
 export const GET_PURCHASE_ORDER_WITH_PAGINATION = gql`
-query GetPurchaseOrdersWithPagination($supplierId: ID, $status: PurchaseOrderStatus, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
-  getPurchaseOrdersWithPagination(supplierId: $supplierId, status: $status, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
+query GetPurchaseOrdersWithPagination($supplierId: ID, $shopId: ID, $status: PurchaseOrderStatus, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
+  getPurchaseOrdersWithPagination(supplierId: $supplierId, shopId: $shopId, status: $status, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
     data {
       _id
       supplier {
@@ -1498,6 +1560,11 @@ query GetPurchaseOrdersWithPagination($supplierId: ID, $status: PurchaseOrderSta
         remark
         createdAt
         updatedAt
+      }
+      shop {
+        _id
+        nameKh
+        nameEn
       }
       items {
          
@@ -1641,6 +1708,10 @@ query GetStockMovementWithPagination($page: Int, $limit: Int, $pagination: Boole
         nameEn
       }
       subProduct {
+        parentProductId {
+          nameKh
+          nameEn
+        }
         unitId {
           nameKh
           nameEn

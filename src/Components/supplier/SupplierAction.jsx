@@ -59,7 +59,7 @@ export default function SupplierAction({
 
   return (
     <div>
-      <Stack direction="row" spacing={2} >
+      <Stack direction="row" spacing={2} justifyContent="flex-end">
         <IconButton className="edit-icon" onClick={handleOpen}>
           <SquarePen size="18px" color="#36BBA7" />
         </IconButton>

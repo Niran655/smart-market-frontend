@@ -154,23 +154,11 @@ const SummaryCard = ({ label, value, colorName = "primary", icon }) => {
       variant="outlined"
       sx={{
         border: `1px solid ${theme.palette.divider}`,
-
         background: theme.palette.background.paper,
         position: "relative",
         overflow: "hidden",
         transition: "box-shadow 0.2s, transform 0.2s",
-        "&:hover": {
-          boxShadow: theme.shadows[4],
-          transform: "translateY(-2px)",
-        },
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: 0, left: 0, right: 0,
-          height: "4px",
-          background: mainColor,
-
-        },
+        
       }}
     >
       <CardContent sx={{ pt: 2.5 }}>
@@ -197,10 +185,12 @@ const SummaryCard = ({ label, value, colorName = "primary", icon }) => {
           </Box>
           <Avatar
             sx={{
-              bgcolor: `${mainColor}18`,
+              borderRadius: 1,
+              backgroundColor: mainColor + "33",
               width: 44,
               height: 44,
               fontSize: "1.4rem",
+              color: mainColor,
             }}
           >
             {icon}
@@ -596,7 +586,7 @@ const ReportPage = ({ shopId = null }) => {
   <Grid container spacing={2.5} sx={{ mb: 3 }}>
     <Grid size={{ xs: 12, md: 4 }}>
       <SummaryCard
-        label={t("total_revenue") || "Total Revenue"}
+        label={t("total_revenue")}
         value={formatCurrency(reportData.totalRevenue)}
         colorName="primary"
         icon={<AttachMoneyIcon />}
@@ -605,7 +595,7 @@ const ReportPage = ({ shopId = null }) => {
 
     <Grid size={{ xs: 12, md: 4 }}>
       <SummaryCard
-        label={t("total_orders") || "Total Orders"}
+        label={t("total_orders")}
         value={reportData.totalSalesCount || 0}
         colorName="success"
         icon={<ShoppingCartIcon />}
@@ -614,7 +604,7 @@ const ReportPage = ({ shopId = null }) => {
 
     <Grid size={{ xs: 12, md: 4 }}>
       <SummaryCard
-        label={t("average_order_value") || "Avg Order Value"}
+        label={t("average_order_value")}
         value={formatCurrency(reportData.averageOrderValue)}
         colorName="warning"
         icon={<BarChartIcon />}

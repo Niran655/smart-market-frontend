@@ -66,7 +66,7 @@ export default function UserAction({
 
   return (
     <div>
-      <Stack direction="row" spacing={2}>
+      <Stack direction="row" spacing={2} justifyContent="flex-end">
         <IconButton className="edit-icon" onClick={() => navigate(`${userId}/profile`)}
         >
           <ScanEye size="18px" color="#FFAF1F" />

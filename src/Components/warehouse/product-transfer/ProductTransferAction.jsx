@@ -30,7 +30,7 @@ export default function ProductTransferAction({ editData, t, language }) {
 
   return (
     <div>
-      <Stack direction="row" spacing={2}>
+      <Stack direction="row" spacing={2} justifyContent="flex-end">
         <Tooltip title={t("view_stock")}>
           <IconButton className="edit-icon" onClick={handleOpenview}>
             <ScanEye size="18px" color="#36BBA7" />

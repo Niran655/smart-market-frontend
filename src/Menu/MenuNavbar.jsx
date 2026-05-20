@@ -182,7 +182,8 @@ export default function MenuNavbar() {
                       >
                         <ListItemIcon
                           sx={{
-                            color: "inherit",             
+                            color: "inherit",     
+                              
                             minWidth: 0,
                             display: "flex",
                             justifyContent: "center",

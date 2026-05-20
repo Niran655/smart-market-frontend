@@ -1,6 +1,6 @@
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import CloseIcon from "@mui/icons-material/Close";
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { styled } from "@mui/material/styles";
 import {
     Autocomplete,
@@ -21,8 +21,10 @@ import { Form, FormikProvider, useFormik } from "formik";
 import * as Yup from "yup";
 
 import { CREATE_PURCHASE_ORDER, UPDATE_PURCHASE_ORDER } from "../../../../graphql/mutation";
+import { GET_PRODUCT_FOR_SALE_WITH_PAGINATION } from "../../../../graphql/queries";
 import useGetSupplierWithPagination from "../../hook/useGetSupplierWithPagination";
 import useGetProductWarehouseWithPagination from "../../hook/useGetProductWarehouseWithPagination";
+import useGetProductWarehouseInShopWithPagination from "../../hook/useGetProductWarehouseInShopWithPagination";
 import { useAuth } from "../../../Context/AuthContext";
 import { useState } from "react";
 
@@ -44,6 +46,8 @@ export default function PurchaseOrderForm({
     language,
     setRefetch,
     editData = null,
+    productSource = "warehouse",
+    shopId,
 
 }) {
     const isEdit = Boolean(editData);
@@ -59,6 +63,46 @@ export default function PurchaseOrderForm({
             limit: 50,
             pagination: false,
         });
+
+    const { producteWarehouseInShop, loading: shopWarehouseLoading } =
+        useGetProductWarehouseInShopWithPagination({
+            shopId,
+            page: 1,
+            limit: 100,
+            pagination: false,
+            keyword: "",
+        });
+
+    const { data: catalogProductData, loading: catalogProductLoading } = useQuery(
+        GET_PRODUCT_FOR_SALE_WITH_PAGINATION,
+        {
+            variables: {
+                shopId: shopId || null,
+                page: 1,
+                limit: 100,
+                pagination: false,
+                keyword: "",
+            },
+            fetchPolicy: "cache-and-network",
+            skip: productSource !== "catalog",
+        }
+    );
+
+    const productOptions =
+        productSource === "catalog"
+            ? (catalogProductData?.getProductForSaleWithPagination?.data || []).map((subProduct) => ({
+                subProduct,
+            }))
+            : productSource === "shopWarehouse"
+            ? producteWarehouseInShop
+            : productWarehouseWithPagination;
+
+    const productsLoading =
+        productSource === "catalog"
+            ? catalogProductLoading
+            : productSource === "shopWarehouse"
+            ? shopWarehouseLoading
+            : productLoading;
 
 
     const [createPurchaseOrder, { loading: creating }] = useMutation(
@@ -119,6 +163,7 @@ export default function PurchaseOrderForm({
         onSubmit: (values) => {
             const payload = {
                 supplierId: values.supplierId,
+                shopId: shopId || undefined,
                 remark: values.remark,
                 items: values.items.map((i) => ({
                     subProductId: i.subProductId,
@@ -223,10 +268,10 @@ export default function PurchaseOrderForm({
                                 <Grid container spacing={2} key={index}>
                                     <Grid size={{ xs: 12, md: 5 }}>
                                         <Autocomplete
-                                            options={productWarehouseWithPagination}
-                                            loading={productLoading}
+                                            options={productOptions}
+                                            loading={productsLoading}
                                             value={
-                                                productWarehouseWithPagination.find(
+                                                productOptions.find(
                                                     (p) => p.subProduct?._id === item.subProductId
                                                 ) || null
                                             }

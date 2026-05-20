@@ -159,6 +159,7 @@
   "items_count": "ចំនួនផលិតផល",
   "total_quantity": "ចំនួនសរុប",
   "date": "កាលបរិច្ឆេទ",
+  "date_want_get_product": "កាលបរិច្ឆេទចង់ទទួលទំនិញ",
   "view_product_transfer": "មើលការបញ្ចូនផលិតផល",
   "transfer_information": "ព័ត៍មាននៃការបញ្ចូន",
   "price_in_unit": "តម្លៃក្នុងមួយឯកតា",
@@ -467,5 +468,6 @@
   "period_invoice": "វិក្កយបត្រ",
   "3_months": "៣ខែចុងក្រោយ",
   "6_months": "៦ខែចុងក្រោយ",
-  "all_time": "គ្រប់ពេល"
+  "all_time": "គ្រប់ពេល",
+    "transferred": "បានផ្ទេរ"
 }

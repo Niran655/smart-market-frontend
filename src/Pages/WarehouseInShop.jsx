@@ -1,167 +1,270 @@
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
+import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Box, Breadcrumbs, Chip, Grid, InputAdornment, MenuItem, Stack, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Breadcrumbs,
+  Button,
+  Chip,
+  Grid,
+  InputAdornment,
+  MenuItem,
+  Stack,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Search } from "lucide-react";
 import { useState } from "react";
 
 import useGetProductWarehouseInShopWithPagination from "../Components/hook/useGetProductWarehouseInShopWithPagination";
-import useGetWarehouseTransferWithPagination from "../Components/hook/useGetWarehouseTransferWithPagination";
-import GetProductInShopAction from "../Components/warehouseInShop/getProduct/GetProductInShopAction";
-import { useAuth } from "../Context/AuthContext";
-import FooterPagination from "../include/FooterPagination";
-import "../Styles/modernTable.scss";
- 
+import useGetPurchaseOrdersWithPagination from "../Components/hook/useGetPurchaseOrdersWithPagination";
 import useGetStockMovementWithPagination from "../Components/hook/useGetStockMovementWithPagination";
+import useGetWarehouseRequestWithPagination from "../Components/hook/useGetWarehouseRequestWithPagination";
+import useGetWarehouseTransferWithPagination from "../Components/hook/useGetWarehouseTransferWithPagination";
+import PurchaseOrderAction from "../Components/warehouse/purchaseOrder/PurchaseOrderAction";
+import PurchaseOrderForm from "../Components/warehouse/purchaseOrder/PurchaseOrderForm";
+import GetProductInShopAction from "../Components/warehouseInShop/getProduct/GetProductInShopAction";
+import WarehouseRequestForm from "../Components/warehouseInShop/WarehouseRequestForm";
+import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
+import FooterPagination from "../include/FooterPagination";
 import EmptyData from "../include/EmptyData";
 import CircularIndeterminate from "../include/Loading";
+import "../Styles/modernTable.scss";
 
-const getStatusStyle = (status) => {
+const statusColor = (status) => {
   switch (status) {
-    case "pending":
-      return {
-        backgroundColor: "warning",
-        color: "#EF6C00",
-        "& .MuiChip-icon": { color: "#EF6C00" },
-        fontWeight: 500,
-        borderRadius: "6px",
-      };
     case "accepted":
-      return {
-        backgroundColor: "success",
-        color: "#2E7D32",
-        "& .MuiChip-icon": { color: "#2E7D32" },
-        fontWeight: 500,
-        borderRadius: "6px",
-      };
-    case "rejected":
-      return {
-        backgroundColor: "error",
-        color: "#C62828",
-        "& .MuiChip-icon": { color: "#C62828" },
-        fontWeight: 500,
-        borderRadius: "6px",
-      };
+    case "received":
+    case "transferred":
+      return "success";
+    case "pending":
+      return "warning";
     case "partial_accepted":
-      return {
-        backgroundColor: "info",
-        color: "#1565C0",
-        "& .MuiChip-icon": { color: "#1565C0" },
-        fontWeight: 500,
-        borderRadius: "6px",
-      };
+    case "partial_received":
+    case "approved":
+      return "info";
+    case "rejected":
+    case "cancelled":
+      return "error";
     default:
-      return {
-        backgroundColor: "#F5F5F5",
-        color: "#616161",
-        fontWeight: 500,
-        borderRadius: "6px",
-      };
+      return "default";
   }
 };
+
+const productName = (row, language) =>
+  language === "kh"
+    ? row?.subProduct?.parentProductId?.nameKh || row?.product?.nameKh
+    : row?.subProduct?.parentProductId?.nameEn || row?.product?.nameEn;
+
+const unitName = (row, language) =>
+  language === "kh" ? row?.subProduct?.unitId?.nameKh : row?.subProduct?.unitId?.nameEn;
 
 const WarehouseInShop = () => {
   const { language } = useAuth();
   const { t } = translateLauguage(language);
-
-  const [productWarehouseKeyword, setProductWarehouseKeyword] = useState("");
+  const shopId = localStorage.getItem("activeShopId");
 
   const [tab, setTab] = useState("1");
-  const handleTabChange = (e, newValue) => setTab(newValue);
 
-  const savedStoreId = localStorage.getItem("activeShopId");
+  const [stockPage, setStockPage] = useState(1);
+  const [stockLimit, setStockLimit] = useState(5);
+  const [stockKeyword, setStockKeyword] = useState("");
+  const [stockStatus, setStockStatus] = useState("All");
 
-  const [status, setStatus] = useState("All");
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(5);
-
-  const [stockMovementPage, setStockMovementPage] = useState(1);
-  const [stockMovementLimit, setStockMovementLimit] = useState(5);
-  const [stockMovementKeyword, setStockMovementKeyword] = useState("");
+  const [purchasePage, setPurchasePage] = useState(1);
+  const [purchaseLimit, setPurchaseLimit] = useState(5);
+  const [purchaseKeyword, setPurchaseKeyword] = useState("");
+  const [purchaseStatus, setPurchaseStatus] = useState("All");
+  const [openPurchaseOrder, setOpenPurchaseOrder] = useState(false);
 
   const [transferPage, setTransferPage] = useState(1);
   const [transferLimit, setTransferLimit] = useState(5);
+  const [transferKeyword, setTransferKeyword] = useState("");
+  const [transferStatus, setTransferStatus] = useState("All");
 
-  const handleStatusChange = (event) => {
-    setStatus(event.target.value);
-  };
+  const [requestPage, setRequestPage] = useState(1);
+  const [requestLimit, setRequestLimit] = useState(5);
+  const [requestKeyword, setRequestKeyword] = useState("");
+  const [requestStatus, setRequestStatus] = useState("All");
+  const [openWarehouseRequest, setOpenWarehouseRequest] = useState(false);
+
+  const [movementPage, setMovementPage] = useState(1);
+  const [movementLimit, setMovementLimit] = useState(5);
+  const [movementKeyword, setMovementKeyword] = useState("");
 
   const {
     producteWarehouseInShop,
-    loading: productWarehouseLoading,
-    paginator,
-    refetch: productWarehouseInShopRefetch
+    loading: stockLoading,
+    paginator: stockPaginator,
+    refetch: refetchShopStock,
   } = useGetProductWarehouseInShopWithPagination({
-    shopId: savedStoreId,
-    page,
-    limit,
+    shopId,
+    page: stockPage,
+    limit: stockLimit,
     pagination: true,
-    keyword: productWarehouseKeyword,
+    keyword: stockKeyword,
+  });
+
+  const {
+    purchaseOrders,
+    loading: purchaseLoading,
+    error: purchaseError,
+    refetch: refetchPurchases,
+    paginator: purchasePaginator,
+  } = useGetPurchaseOrdersWithPagination({
+    shopId,
+    page: purchasePage,
+    limit: purchaseLimit,
+    pagination: true,
+    keyword: purchaseKeyword,
+    status: purchaseStatus === "All" ? undefined : purchaseStatus,
   });
 
   const {
     productsWarehouseTransfer,
-    loading: productWarehouseTransferLoading,
-    error: productWarehouseTransferError,
-    refetch: transferRefetch,
+    loading: transferLoading,
+    error: transferError,
+    refetch: refetchTransfers,
     paginator: transferPaginator,
   } = useGetWarehouseTransferWithPagination({
-    shopId: savedStoreId,
+    shopId,
     page: transferPage,
     limit: transferLimit,
     pagination: true,
-    keyword: "",
+    keyword: transferKeyword,
+    status: transferStatus === "All" ? undefined : transferStatus,
+  });
+
+  const {
+    warehouseRequests,
+    loading: requestLoading,
+    error: requestError,
+    refetch: refetchRequests,
+    paginator: requestPaginator,
+  } = useGetWarehouseRequestWithPagination({
+    shopId,
+    page: requestPage,
+    limit: requestLimit,
+    pagination: true,
+    keyword: requestKeyword,
+    status: requestStatus === "All" ? undefined : requestStatus,
   });
 
   const {
     stockMovement,
-    loading: stockMovementLoading,
-    refetch: sotckMovementRefetch,
-    paginator: stockMovementPaginator,
+    loading: movementLoading,
+    refetch: refetchMovements,
+    paginator: movementPaginator,
   } = useGetStockMovementWithPagination({
-    page: stockMovementPage,
-    limit: stockMovementLimit,
+    shopId,
+    page: movementPage,
+    limit: movementLimit,
     pagination: true,
-    keyword: stockMovementKeyword,
-    shopId: savedStoreId
+    keyword: movementKeyword,
   });
 
-
-  const handleLimitStockMovement = (e) => {
-    const newLimit = parseInt(e.target.value, 10);
-    setStockMovementLimit(newLimit);
-    setStockMovementPage(1);
-  };
-  const handleStockMovementPageChange = (newPage) => {
-    setStockMovementPage(newPage);
-  };
-
-  const filteredProducts = producteWarehouseInShop?.filter((item) => {
-    if (status === "All") return true;
-
-    if (status === "low_stock") {
-      return item.stock < item?.subProduct?.minStock;
-    }
-
-    if (status === "in_stock") {
-      return item.stock >= item?.subProduct?.minStock;
-    }
-
-    return true;
+  const filteredStock = producteWarehouseInShop.filter((item) => {
+    if (stockStatus === "All") return true;
+    const stock = Number(item?.stock || 0);
+    const minStock = Number(item?.subProduct?.minStock || 0);
+    return stockStatus === "low_stock" ? stock < minStock : stock >= minStock;
   });
+
+  const handleLimit = (setter, pageSetter) => (e) => {
+    setter(parseInt(e.target.value, 10));
+    pageSetter(1);
+  };
+
+  const renderToolbar = ({
+    keyword,
+    setKeyword,
+    setPage,
+    status,
+    setStatus,
+    statusItems,
+    action,
+  }) => (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: { xs: "stretch", md: "center" },
+        flexDirection: { xs: "column", md: "row" },
+        gap: 2,
+        mb: 2,
+      }}
+    >
+      <Grid container spacing={2} alignItems="center" textAlign="start" sx={{ flex: 1 }}>
+        <Grid size={{ xs: 12, sm: 3 }}>
+          <Typography variant="body2" fontWeight={500} mb={0.5}>
+            {t("search")}
+          </Typography>
+          <TextField
+            type="search"
+            size="small"
+            placeholder={t("search") + "..."}
+            value={keyword}
+            fullWidth
+            onChange={(e) => {
+              setKeyword(e.target.value);
+              setPage(1);
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+
+        {statusItems && (
+          <Grid size={{ xs: 12, sm: 2 }}>
+            <Typography variant="body2" fontWeight={500} mb={0.5}>
+              {t("status")}
+            </Typography>
+            <TextField
+              select
+              fullWidth
+              size="small"
+              value={status}
+              onChange={(e) => {
+                setStatus(e.target.value);
+                setPage(1);
+              }}
+            >
+              {statusItems.map((item) => (
+                <MenuItem key={item.value} value={item.value}>
+                  {item.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+        )}
+      </Grid>
+
+      {action && (
+        <Stack direction="row" sx={{ alignSelf: { xs: "flex-end", md: "auto" } }}>
+          {action}
+        </Stack>
+      )}
+    </Box>
+  );
 
   return (
     <Box sx={{ width: "100%", p: 2 }}>
-
       <Breadcrumbs separator="/">
-        <Typography
-           
-          sx={{
-            borderLeft: "3px solid #1D4592",
-            pl: 1.5,
-          }}
-        >
+        <Typography sx={{ borderLeft: "3px solid #1D4592", pl: 1.5 }}>
           {t("warehouse_in_shop")}
         </Typography>
       </Breadcrumbs>
@@ -169,7 +272,7 @@ const WarehouseInShop = () => {
       <TabContext value={tab}>
         <Box sx={{ borderBottom: 1, borderColor: "divider", mt: 4 }}>
           <TabList
-            onChange={handleTabChange}
+            onChange={(_, newValue) => setTab(newValue)}
             variant="scrollable"
             scrollButtons="auto"
             sx={{
@@ -188,80 +291,19 @@ const WarehouseInShop = () => {
           </TabList>
         </Box>
 
-
         <TabPanel value="1">
-          <Stack direction={"row"} justifyContent={"space-between"} mt={1}>
-            <Grid
-              container
-              spacing={5}
-              fullWidth
-              alignItems="center"
-              textAlign="start"
-              mb={2}
-            >
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Typography variant="body2" fontWeight={500} mb={0.5}>
-                  {t("search")}
-                </Typography>
-                <TextField
-                  type="search"
-                  size="small"
-                  placeholder={t("search") + "..."}
-                  value={productWarehouseKeyword}
-                  onChange={(e) => setProductWarehouseKeyword(e.target.value)}
-                  fullWidth
-                  variant="outlined"
-                  sx={{
-                    width: "250px",
-
-                    "& .MuiOutlinedInput-root": {
-                      // "& fieldset": { border: "none" },
-                    },
-                  }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Search />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Typography className="search-head-title">{t("status")}</Typography>
-                <TextField
-                  className="select-text-field"
-                  select
-                  fullWidth
-                  placeholder="Select"
-                  size="small"
-                  value={status}
-                  sx={{
-                    width: "200px",
-
-                  }}
-                  onChange={handleStatusChange}
-                >
-                  <MenuItem value="All">
-                    {t("all")}
-                  </MenuItem>
-                  <MenuItem value="low_stock">
-                    {t("low_stock")}
-                  </MenuItem>
-                  <MenuItem value="in_stock">
-                    {t("in_enough")}
-                  </MenuItem>
-
-                </TextField>
-              </Grid>
-            </Grid>
-
-            <Stack direction="row" spacing={2} mt={3}>
-
-
-            </Stack>
-          </Stack>
+          {renderToolbar({
+            keyword: stockKeyword,
+            setKeyword: setStockKeyword,
+            setPage: setStockPage,
+            status: stockStatus,
+            setStatus: setStockStatus,
+            statusItems: [
+              { value: "All", label: t("all") },
+              { value: "low_stock", label: t("low_stock") },
+              { value: "in_stock", label: t("in_enough") },
+            ],
+          })}
 
           <TableContainer className="table-container">
             <Table className="table">
@@ -278,88 +320,48 @@ const WarehouseInShop = () => {
                   <TableCell>{t("status")}</TableCell>
                 </TableRow>
               </TableHead>
-
-              {productWarehouseLoading ? (
+              {stockLoading ? (
                 <CircularIndeterminate />
-              ) : producteWarehouseInShop?.length === 0 ? (
+              ) : filteredStock.length === 0 ? (
                 <EmptyData />
               ) : (
                 <TableBody>
-                  {filteredProducts.map((row, index) => {
-                    const stock = row?.stock || 0;
-                    const minStock = row?.subProduct?.minStock || 0;
-                    const cost = row?.subProduct?.costPrice || 0;
-
-                    const totalValue = stock * cost;
+                  {filteredStock.map((row, index) => {
+                    const stock = Number(row?.stock || 0);
+                    const minStock = Number(row?.subProduct?.minStock || 0);
+                    const cost = Number(row?.subProduct?.costPrice || 0);
                     const isLow = stock < minStock;
 
                     return (
                       <TableRow key={row._id} className="table-row">
-
-
-                        <TableCell>{paginator.slNo + index}</TableCell>
-
-
+                        <TableCell>{stockPaginator?.slNo + index}</TableCell>
                         <TableCell>
                           <Stack direction="row" spacing={1} alignItems="center">
                             <img
                               src={row?.subProduct?.productImg}
                               width={36}
                               height={36}
-                              style={{ borderRadius: "50%" }}
+                              style={{ borderRadius: "50%", objectFit: "cover" }}
                             />
-                            {language === "kh"
-                              ? row?.subProduct?.parentProductId?.nameKh
-                              : row?.subProduct?.parentProductId?.nameEn}
+                            {productName(row, language)}
                           </Stack>
                         </TableCell>
-
-
                         <TableCell>{row?.subProduct?.barCode}</TableCell>
-
-
-                        <TableCell>
-                          {language === "kh"
-                            ? row?.subProduct?.unitId?.nameKh
-                            : row?.subProduct?.unitId?.nameEn}
-                        </TableCell>
-
-
+                        <TableCell>{unitName(row, language)}</TableCell>
                         <TableCell align="right">{stock}</TableCell>
-
-
                         <TableCell align="right">{minStock}</TableCell>
-
-
+                        <TableCell align="right">${cost.toFixed(2)}</TableCell>
                         <TableCell align="right">
-                          ${cost.toFixed(2)}
+                          <strong>${(stock * cost).toFixed(2)}</strong>
                         </TableCell>
-
-
-                        <TableCell align="right">
-                          <strong>${totalValue.toFixed(2)}</strong>
-                        </TableCell>
-
-
                         <TableCell>
-                          {isLow ? (
-                            <Chip
-                              icon={<WarningAmberOutlinedIcon />}
-                              label={`${t("low_stock")} (${minStock - stock})`}
-                              color="error"
-                              size="small"
-                            />
-                          ) : (
-                            <Chip
-                              icon={<CheckOutlinedIcon />}
-                              label={t("in_stock")}
-                              size="small"
-                              fontWeight={600}
-                              color="success"
-                            />
-                          )}
+                          <Chip
+                            icon={isLow ? <WarningAmberOutlinedIcon /> : <CheckOutlinedIcon />}
+                            label={isLow ? `${t("low_stock")} (${minStock - stock})` : t("in_stock")}
+                            color={isLow ? "error" : "success"}
+                            size="small"
+                          />
                         </TableCell>
-
                       </TableRow>
                     );
                   })}
@@ -369,26 +371,154 @@ const WarehouseInShop = () => {
 
             <Stack alignItems="flex-end" p={2}>
               <FooterPagination
-                page={page}
-                limit={limit}
-                setPage={setPage}
-                handleLimit={(e) => setLimit(+e.target.value)}
-                totalDocs={paginator?.totalDocs}
-                totalPages={paginator?.totalPages}
+                page={stockPage}
+                limit={stockLimit}
+                setPage={setStockPage}
+                handleLimit={handleLimit(setStockLimit, setStockPage)}
+                totalDocs={stockPaginator?.totalDocs}
+                totalPages={stockPaginator?.totalPages}
+              />
+            </Stack>
+          </TableContainer>
+        </TabPanel>
+
+        <TabPanel value="2">
+          {renderToolbar({
+            keyword: purchaseKeyword,
+            setKeyword: setPurchaseKeyword,
+            setPage: setPurchasePage,
+            status: purchaseStatus,
+            setStatus: setPurchaseStatus,
+            statusItems: [
+              { value: "All", label: t("all") },
+              { value: "pending", label: t("pending") },
+              { value: "partial_received", label: t("partial_accepted") },
+              { value: "received", label: t("received") },
+              { value: "cancelled", label: t("cancelled") },
+            ],
+            action: (
+              <Button
+                variant="contained"
+                startIcon={<LibraryAddOutlinedIcon />}
+                onClick={() => setOpenPurchaseOrder(true)}
+              >
+                {t("create_purchase_order")}
+              </Button>
+            ),
+          })}
+
+          <TableContainer className="table-container">
+            <Table className="table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t("no")}</TableCell>
+                  <TableCell>{t("suppliers")}</TableCell>
+                  <TableCell>{t("items")}</TableCell>
+                  <TableCell>{t("total_quantity")}</TableCell>
+                  <TableCell>{t("total_price")}</TableCell>
+                  <TableCell>{t("status")}</TableCell>
+                  <TableCell>{t("date")}</TableCell>
+                  <TableCell align="right">{t("action")}</TableCell>
+                </TableRow>
+              </TableHead>
+              {purchaseLoading ? (
+                <CircularIndeterminate />
+              ) : purchaseError ? (
+                <TableBody>
+                  <TableRow>
+                    <TableCell colSpan={8}>
+                      <Typography color="error">{purchaseError.message}</Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              ) : purchaseOrders.length === 0 ? (
+                <EmptyData />
+              ) : (
+                <TableBody>
+                  {purchaseOrders.map((row, index) => {
+                    const totalQty = row.items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+                    const totalPrice = row.items.reduce((sum, item) => sum + Number(item.totalPrice || 0), 0);
+
+                    return (
+                      <TableRow key={row._id} className="table-row">
+                        <TableCell>{purchasePaginator?.slNo + index}</TableCell>
+                        <TableCell>
+                          {language === "kh" ? row?.supplier?.nameKh : row?.supplier?.nameEn}
+                        </TableCell>
+                        <TableCell>{row.items.length}</TableCell>
+                        <TableCell>{totalQty}</TableCell>
+                        <TableCell>${totalPrice.toFixed(2)}</TableCell>
+                        <TableCell>
+                          <Chip
+                            label={t(row?.status)}
+                            color={statusColor(row?.status)}
+                            size="small"
+                            sx={{ fontWeight: 600 }}
+                          />
+                        </TableCell>
+                        <TableCell>{new Date(row?.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell align="right">
+                          <PurchaseOrderAction
+                            language={language}
+                            purchaseOrder={row}
+                            t={t}
+                            productSource="shopWarehouse"
+                            shopId={shopId}
+                            setRefetch={() => {
+                              refetchPurchases();
+                              refetchShopStock();
+                              refetchMovements();
+                            }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              )}
+            </Table>
+
+            <Stack alignItems="flex-end" p={2}>
+              <FooterPagination
+                page={purchasePage}
+                limit={purchaseLimit}
+                setPage={setPurchasePage}
+                handleLimit={handleLimit(setPurchaseLimit, setPurchasePage)}
+                totalDocs={purchasePaginator?.totalDocs}
+                totalPages={purchasePaginator?.totalPages}
               />
             </Stack>
           </TableContainer>
 
-
+          {openPurchaseOrder && (
+            <PurchaseOrderForm
+              t={t}
+              open={openPurchaseOrder}
+              onClose={() => setOpenPurchaseOrder(false)}
+              language={language}
+              setRefetch={refetchPurchases}
+              productSource="shopWarehouse"
+              shopId={shopId}
+            />
+          )}
         </TabPanel>
-
-
-        <TabPanel value="2">
-          <Typography>Orders Content</Typography>
-        </TabPanel>
-
 
         <TabPanel value="3">
+          {renderToolbar({
+            keyword: transferKeyword,
+            setKeyword: setTransferKeyword,
+            setPage: setTransferPage,
+            status: transferStatus,
+            setStatus: setTransferStatus,
+            statusItems: [
+              { value: "All", label: t("all") },
+              { value: "pending", label: t("pending") },
+              { value: "partial_accepted", label: t("partial_accepted") },
+              { value: "accepted", label: t("accepted") },
+              { value: "rejected", label: t("rejected") },
+            ],
+          })}
+
           <TableContainer className="table-container">
             <Table className="table">
               <TableHead>
@@ -402,71 +532,41 @@ const WarehouseInShop = () => {
                   <TableCell>{t("accepted_by")}</TableCell>
                   <TableCell>{t("status")}</TableCell>
                   <TableCell>{t("date")}</TableCell>
-                  <TableCell>{t("action")}</TableCell>
+                  <TableCell align="right">{t("action")}</TableCell>
                 </TableRow>
               </TableHead>
-
-              {productWarehouseTransferLoading ? (
+              {transferLoading ? (
                 <CircularIndeterminate />
-              ) : productWarehouseTransferError ? (
+              ) : transferError ? (
                 <TableBody>
                   <TableRow>
                     <TableCell colSpan={10}>
-                      <Typography color="error">
-                        {productWarehouseTransferError.message}
-                      </Typography>
+                      <Typography color="error">{transferError.message}</Typography>
                     </TableCell>
                   </TableRow>
                 </TableBody>
-              ) : productsWarehouseTransfer?.length === 0 ? (
+              ) : productsWarehouseTransfer.length === 0 ? (
                 <EmptyData />
               ) : (
                 <TableBody>
                   {productsWarehouseTransfer.map((row, index) => {
-
-                    const totalQty = row.items.reduce(
-                      (sum, item) => sum + item.quantity,
-                      0
-                    );
-
+                    const totalQty = row.items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
                     const totalPrice = row.items.reduce(
                       (sum, item) =>
-                        sum + item.quantity * (item.costPrice || item.subProduct?.costPrice || 0),
-                      0
+                        sum +
+                        Number(item.quantity || 0) *
+                          Number(item.costPrice || item.subProduct?.costPrice || 0),
+                      0,
                     );
 
                     return (
-                      <TableRow className="table-row" key={row._id}>
-
-
-                        <TableCell>
-                          {transferPaginator.slNo + index}
-                        </TableCell>
-
-
-                        <TableCell>
-                          {language === "kh"
-                            ? row?.toShop?.nameKh
-                            : row?.toShop?.nameEn}
-                        </TableCell>
-
-
+                      <TableRow key={row._id} className="table-row">
+                        <TableCell>{transferPaginator?.slNo + index}</TableCell>
+                        <TableCell>{language === "kh" ? row?.toShop?.nameKh : row?.toShop?.nameEn}</TableCell>
                         <TableCell>{row.items.length}</TableCell>
-
-
                         <TableCell>{totalQty}</TableCell>
-
-
                         <TableCell>${totalPrice.toFixed(2)}</TableCell>
-
-
-                        <TableCell>
-                          {language === "kh"
-                            ? row?.requestedBy?.nameKh
-                            : row?.requestedBy?.nameEn}
-                        </TableCell>
-
-
+                        <TableCell>{language === "kh" ? row?.requestedBy?.nameKh : row?.requestedBy?.nameEn}</TableCell>
                         <TableCell>
                           {row?.acceptedBy
                             ? language === "kh"
@@ -474,35 +574,22 @@ const WarehouseInShop = () => {
                               : row?.acceptedBy?.nameEn
                             : "-"}
                         </TableCell>
-
-
                         <TableCell>
                           <Chip
                             label={t(row?.status)}
+                            color={statusColor(row?.status)}
                             size="small"
-                            icon={
-                              row?.status === "accepted"
-                                ? <CheckOutlinedIcon />
-                                : undefined
-                            }
-                            sx={getStatusStyle(row?.status)}
-                            
+                            sx={{ fontWeight: 600 }}
                           />
                         </TableCell>
-
-                      
-                        <TableCell>
-                          {new Date(row?.createdAt).toLocaleDateString()}
-                        </TableCell>
-
-                    
-                        <TableCell>
+                        <TableCell>{new Date(row?.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell align="right">
                           <GetProductInShopAction
                             t={t}
                             language={language}
                             editData={row}
-                            refetch={transferRefetch}
-                            productWarehouseInShopRefetch={productWarehouseInShopRefetch}
+                            refetch={refetchTransfers}
+                            productWarehouseInShopRefetch={refetchShopStock}
                           />
                         </TableCell>
                       </TableRow>
@@ -517,7 +604,7 @@ const WarehouseInShop = () => {
                 page={transferPage}
                 limit={transferLimit}
                 setPage={setTransferPage}
-                handleLimit={(e) => setTransferLimit(+e.target.value)}
+                handleLimit={handleLimit(setTransferLimit, setTransferPage)}
                 totalDocs={transferPaginator?.totalDocs}
                 totalPages={transferPaginator?.totalPages}
               />
@@ -525,115 +612,201 @@ const WarehouseInShop = () => {
           </TableContainer>
         </TabPanel>
 
-
         <TabPanel value="4">
-          <Typography>Request to warehouse</Typography>
-        </TabPanel>
-        <TabPanel value="5">
-          <Box>
-            <TableContainer className="table-container">
-              <Table className="table"  >
-                <TableHead>
+          {renderToolbar({
+            keyword: requestKeyword,
+            setKeyword: setRequestKeyword,
+            setPage: setRequestPage,
+            status: requestStatus,
+            setStatus: setRequestStatus,
+            statusItems: [
+              { value: "All", label: t("all") },
+              { value: "pending", label: t("pending") },
+              { value: "approved", label: t("accepted") },
+              { value: "transferred", label: t("transferred") },
+              { value: "rejected", label: t("rejected") },
+            ],
+            action: (
+              <Button
+                variant="contained"
+                startIcon={<LibraryAddOutlinedIcon />}
+                onClick={() => setOpenWarehouseRequest(true)}
+              >
+                {t("request_to_warehouse")}
+              </Button>
+            ),
+          })}
+
+          <TableContainer className="table-container">
+            <Table className="table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t("no")}</TableCell>
+                  <TableCell>{t("shop")}</TableCell>
+                  <TableCell>{t("items")}</TableCell>
+                  <TableCell>{t("total_qty")}</TableCell>
+                  <TableCell>{t("total_price")}</TableCell>
+                  <TableCell>{t("send_by")}</TableCell>
+                  <TableCell>{t("accepted_by")}</TableCell>
+                  <TableCell>{t("status")}</TableCell>
+                  <TableCell>{t("date_want_get_product")}</TableCell>
+                  <TableCell>{t("date")}</TableCell>
+                </TableRow>
+              </TableHead>
+              {requestLoading ? (
+                <CircularIndeterminate />
+              ) : requestError ? (
+                <TableBody>
                   <TableRow>
-                    <TableCell>{t("no")}</TableCell>
-                    <TableCell>{t("date")}</TableCell>
-                    <TableCell>{t("product")}</TableCell>
-                    <TableCell>{t("type")}</TableCell>
-                    <TableCell>{t("quantity")}</TableCell>
-                    <TableCell>{t("previous_stock")}</TableCell>
-                    <TableCell>{t("new_stock")}</TableCell>
-                    <TableCell>{t("reason")}</TableCell>
-
+                    <TableCell colSpan={10}>
+                      <Typography color="error">{requestError.message}</Typography>
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                {stockMovementLoading ? (
-                  <CircularIndeterminate />
-                ) : stockMovement?.length === 0 ? (
-                  <EmptyData />
-                ) : (
-                  <TableBody>
-                    {stockMovement?.map((row, index) => (
-                      <TableRow className="table-row" key={index}>
+                </TableBody>
+              ) : warehouseRequests.length === 0 ? (
+                <EmptyData />
+              ) : (
+                <TableBody>
+                  {warehouseRequests.map((row, index) => {
+                    const totalQty = row.items.reduce(
+                      (sum, item) => sum + Number(item.requestedQty || 0),
+                      0,
+                    );
+                    const totalPrice = row.items.reduce(
+                      (sum, item) =>
+                        sum +
+                        Number(item.requestedQty || 0) *
+                          Number(item.subProduct?.costPrice || 0),
+                      0,
+                    );
 
-            
+                    return (
+                      <TableRow key={row._id} className="table-row">
+                        <TableCell>{requestPaginator?.slNo + index}</TableCell>
+                        <TableCell>{language === "kh" ? row?.toShop?.nameKh : row?.toShop?.nameEn}</TableCell>
+                        <TableCell>{row.items.length}</TableCell>
+                        <TableCell>{totalQty}</TableCell>
+                        <TableCell>${totalPrice.toFixed(2)}</TableCell>
+                        <TableCell>{language === "kh" ? row?.requestedBy?.nameKh : row?.requestedBy?.nameEn}</TableCell>
                         <TableCell>
-                          {stockMovementPaginator?.slNo + index}
+                          {row?.approvedBy
+                            ? language === "kh"
+                              ? row?.approvedBy?.nameKh
+                              : row?.approvedBy?.nameEn
+                            : "-"}
                         </TableCell>
-
-                     
-                        <TableCell>
-                          {new Date(row?.createdAt).toLocaleString()}
-                        </TableCell>
-
-                       
-                        <TableCell>
-                          {language === "kh"
-                            ? row?.product?.nameKh
-                            : row?.product?.nameEn}
-                        </TableCell>
-
-                       
                         <TableCell>
                           <Chip
-                            label={row?.type}
+                            label={t(row?.status)}
+                            color={statusColor(row?.status)}
                             size="small"
-                               color={
-                                row?.type === "in"
-                                  ? "success"
-                                  : row?.type === "out"
-                                    ? "error"
-                                    : "warning"}
-                            sx={{
-                              width: 50,
-                           
-                         
-                              fontWeight: 600,
-                            }}
+                            sx={{ fontWeight: 600 }}
                           />
                         </TableCell>
-
-                
                         <TableCell>
-                          {row?.quantity}{" "}
-                          {language === "kh"
-                            ? row?.subProduct?.unitId?.nameKh
-                            : row?.subProduct?.unitId?.nameEn}
+                          {row?.dateWantGetProduct
+                            ? new Date(row.dateWantGetProduct).toLocaleDateString()
+                            : "-"}
                         </TableCell>
-
-            
-                        <TableCell>{row?.previousStock}</TableCell>
-
-                    
-                        <TableCell>{row?.newStock}</TableCell>
-
-                     
-                        <TableCell>{row?.reason || "-"}</TableCell>
-
-
-
-
+                        <TableCell>{new Date(row?.createdAt).toLocaleDateString()}</TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                )}
-              </Table>
-              <Stack
-                direction="row"
-                justifyContent="flex-end"
-                alignItems="center"
-                sx={{ padding: 2 }}
-              >
-                <FooterPagination
-                  page={stockMovementPage}
-                  limit={stockMovementLimit}
-                  setPage={handleStockMovementPageChange}
-                  handleLimit={handleLimitStockMovement}
-                  totalDocs={stockMovementPaginator?.totalDocs}
-                  totalPages={stockMovementPaginator?.totalPages}
-                />
-              </Stack>
-            </TableContainer>
-          </Box>
+                    );
+                  })}
+                </TableBody>
+              )}
+            </Table>
+
+            <Stack alignItems="flex-end" p={2}>
+              <FooterPagination
+                page={requestPage}
+                limit={requestLimit}
+                setPage={setRequestPage}
+                handleLimit={handleLimit(setRequestLimit, setRequestPage)}
+                totalDocs={requestPaginator?.totalDocs}
+                totalPages={requestPaginator?.totalPages}
+              />
+            </Stack>
+          </TableContainer>
+
+          {openWarehouseRequest && (
+            <WarehouseRequestForm
+              t={t}
+              language={language}
+              shopId={shopId}
+              open={openWarehouseRequest}
+              onClose={() => setOpenWarehouseRequest(false)}
+              setRefetch={refetchRequests}
+            />
+          )}
+        </TabPanel>
+
+        <TabPanel value="5">
+          {renderToolbar({
+            keyword: movementKeyword,
+            setKeyword: setMovementKeyword,
+            setPage: setMovementPage,
+          })}
+
+          <TableContainer className="table-container">
+            <Table className="table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t("no")}</TableCell>
+                  <TableCell>{t("date")}</TableCell>
+                  <TableCell>{t("product")}</TableCell>
+                  <TableCell>{t("type")}</TableCell>
+                  <TableCell>{t("quantity")}</TableCell>
+                  <TableCell>{t("previous_stock")}</TableCell>
+                  <TableCell>{t("new_stock")}</TableCell>
+                  <TableCell>{t("reason")}</TableCell>
+                </TableRow>
+              </TableHead>
+              {movementLoading ? (
+                <CircularIndeterminate />
+              ) : stockMovement.length === 0 ? (
+                <EmptyData />
+              ) : (
+                <TableBody>
+                  {stockMovement.map((row, index) => (
+                    <TableRow key={row._id || index} className="table-row">
+                      <TableCell>{movementPaginator?.slNo + index}</TableCell>
+                      <TableCell>{new Date(row?.createdAt).toLocaleString()}</TableCell>
+                      <TableCell>
+                        {language === "kh"
+                          ? row?.product?.nameKh || row?.subProduct?.parentProductId?.nameKh
+                          : row?.product?.nameEn || row?.subProduct?.parentProductId?.nameEn}
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={row?.type}
+                          size="small"
+                          color={row?.type === "in" ? "success" : row?.type === "out" ? "error" : "warning"}
+                          sx={{ width: 50, fontWeight: 600 }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {row?.quantity} {unitName(row, language)}
+                      </TableCell>
+                      <TableCell>{row?.previousStock}</TableCell>
+                      <TableCell>{row?.newStock}</TableCell>
+                      <TableCell>{row?.reason || "-"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              )}
+            </Table>
+
+            <Stack alignItems="flex-end" p={2}>
+              <FooterPagination
+                page={movementPage}
+                limit={movementLimit}
+                setPage={setMovementPage}
+                handleLimit={handleLimit(setMovementLimit, setMovementPage)}
+                totalDocs={movementPaginator?.totalDocs}
+                totalPages={movementPaginator?.totalPages}
+              />
+            </Stack>
+          </TableContainer>
         </TabPanel>
       </TabContext>
     </Box>

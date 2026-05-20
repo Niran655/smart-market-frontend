@@ -479,12 +479,15 @@ import useGetPurchaseOrdersWithPagination from "../Components/hook/useGetPurchas
 import PurchaseOrderAction from "../Components/warehouse/purchaseOrder/PurchaseOrderAction";
 import PurchaseOrderForm from "../Components/warehouse/purchaseOrder/PurchaseOrderForm";
 import useGetStockMovementWithPagination from "../Components/hook/useGetStockMovementWithPagination";
+import useGetWarehouseRequestWithPagination from "../Components/hook/useGetWarehouseRequestWithPagination";
+import WarehouseRequestAction from "../Components/warehouse/WarehouseRequestAction";
 
 const getStatusColor = (status) => {
   switch (status) {
     case "pending":
       return "warning";
     case "accepted":
+    case "transferred":
       return "success";
     case "rejected":
       return "error";
@@ -518,9 +521,13 @@ const Warehouse = () => {
   const [purchaseOrderPage, setPurchaseOrderPage] = useState(1);
   const [purchaseOrderLimit, setPurchaseOrderLimit] = useState(5);
   const [purchaseOrderKeyword, setPurchaseOrderKeyword] = useState("");
+  const [warehouseRequestPage, setWarehouseRequestPage] = useState(1);
+  const [warehouseRequestLimit, setWarehouseRequestLimit] = useState(5);
+  const [warehouseRequestKeyword, setWarehouseRequestKeyword] = useState("");
 
   const [productsWarehouseTransferStatus, setProductsWarehouseTransferStatus] = useState("All");
   const [purchaseOrderStatus, setPurchaseOrderStatus] = useState("All");
+  const [warehouseRequestStatus, setWarehouseRequestStatus] = useState("All");
 
   const [openTransfer, setOpenTransfer] = useState(false);
   const handleOpenTransfer = () => setOpenTransfer(true);
@@ -582,6 +589,20 @@ const Warehouse = () => {
     status: purchaseOrderStatus === "All" ? undefined : purchaseOrderStatus
   });
 
+  const {
+    warehouseRequests,
+    loading: warehouseRequestLoading,
+    error: warehouseRequestError,
+    refetch: warehouseRequestRefetch,
+    paginator: warehouseRequestPaginator,
+  } = useGetWarehouseRequestWithPagination({
+    page: warehouseRequestPage,
+    limit: warehouseRequestLimit,
+    pagination: true,
+    keyword: warehouseRequestKeyword,
+    status: warehouseRequestStatus === "All" ? undefined : warehouseRequestStatus,
+  });
+
 
 
 
@@ -615,6 +636,16 @@ const Warehouse = () => {
     setPurchaseOrderKeyword(e.target.value);
   }
 
+  const handleWarehouseRequestStatusChange = (e) => {
+    setWarehouseRequestStatus(e.target.value);
+    setWarehouseRequestPage(1);
+  };
+
+  const handleWarehouseRequestSearchChange = (e) => {
+    setWarehouseRequestKeyword(e.target.value);
+    setWarehouseRequestPage(1);
+  };
+
   const handleLimit = (e) => {
     const newLimit = parseInt(e.target.value, 10);
     setProductWarehouseLimit(newLimit);
@@ -642,6 +673,11 @@ const Warehouse = () => {
   };
   const handlePurchaseOrderPageChange = (newPage) => {
     setPurchaseOrderPage(newPage);
+  };
+
+  const handleLimitWarehouseRequest = (e) => {
+    setWarehouseRequestLimit(parseInt(e.target.value, 10));
+    setWarehouseRequestPage(1);
   };
 
   const handleLimitStockMovement = (e) => {
@@ -810,7 +846,7 @@ const Warehouse = () => {
                         onClose={handleCloseTransfer}
                         dialogTitle={"Create"}
                         language={language}
-                        setRefetch={productsWarehouseTransferRefetch}
+                        setRefetch={purchaseOrderRefetch}
                       />
                     )}
                   </Stack>
@@ -1005,7 +1041,7 @@ const Warehouse = () => {
                         onClose={handleCloseTransfer}
                         dialogTitle={"Create"}
                         language={language}
-                        setRefetch={productsWarehouseTransferRefetch}
+                        setRefetch={purchaseOrderRefetch}
                       />
                     )}
                   </Stack>
@@ -1363,7 +1399,170 @@ const Warehouse = () => {
                 </Stack>
               </TableContainer>
             </Box>}
-            {activeTab === "4" && <Typography> 4</Typography>}
+            {activeTab === "4" && (
+              <Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 2,
+                    mb: 2,
+                  }}
+                >
+                  <Grid container spacing={2} alignItems="center" textAlign="start" sx={{ flex: 1 }}>
+                    <Grid size={{ xs: 3 }}>
+                      <Typography variant="body2" fontWeight={500} mb={0.5}>
+                        {t("search")}
+                      </Typography>
+                      <TextField
+                        type="search"
+                        size="small"
+                        value={warehouseRequestKeyword}
+                        onChange={handleWarehouseRequestSearchChange}
+                        placeholder={t("search") + "..."}
+                        fullWidth
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Search />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 3 }}>
+                      <Typography className="search-head-title">{t("status")}</Typography>
+                      <TextField
+                        select
+                        fullWidth
+                        size="small"
+                        value={warehouseRequestStatus}
+                        sx={{ width: "200px" }}
+                        onChange={handleWarehouseRequestStatusChange}
+                      >
+                        <MenuItem value="All">{t("all")}</MenuItem>
+                        <MenuItem value="pending">{t("pending")}</MenuItem>
+                        <MenuItem value="approved">{t("accepted")}</MenuItem>
+                        <MenuItem value="transferred">{t("transferred")}</MenuItem>
+                        <MenuItem value="rejected">{t("rejected")}</MenuItem>
+                        <MenuItem value="cancelled">{t("cancelled")}</MenuItem>
+                      </TextField>
+                    </Grid>
+                  </Grid>
+                </Box>
+
+                <TableContainer className="table-container">
+                  <Table className="table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>{t("no")}</TableCell>
+                        <TableCell>{t("shop")}</TableCell>
+                        <TableCell>{t("items")}</TableCell>
+                        <TableCell>{t("total_quantity")}</TableCell>
+                        <TableCell>{t("total_price")}</TableCell>
+                        <TableCell>{t("send_by")}</TableCell>
+                        <TableCell>{t("accepted_by")}</TableCell>
+                        <TableCell>{t("status")}</TableCell>
+                        <TableCell>{t("date_want_get_product")}</TableCell>
+                        <TableCell>{t("date")}</TableCell>
+                        <TableCell className="flex-center">{t("action")}</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    {warehouseRequestLoading ? (
+                      <CircularIndeterminate />
+                    ) : warehouseRequestError ? (
+                      <TableBody>
+                        <TableRow>
+                          <TableCell colSpan={11}>
+                            <Typography color="error">{warehouseRequestError.message}</Typography>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    ) : warehouseRequests?.length === 0 ? (
+                      <EmptyData />
+                    ) : (
+                      <TableBody>
+                        {warehouseRequests.map((row, index) => {
+                          const totalQty = row.items.reduce(
+                            (sum, item) => sum + Number(item.requestedQty || 0),
+                            0,
+                          );
+                          const totalPrice = row.items.reduce(
+                            (sum, item) =>
+                              sum +
+                              Number(item.requestedQty || 0) *
+                                Number(item.subProduct?.costPrice || 0),
+                            0,
+                          );
+
+                          return (
+                            <TableRow key={row._id} className="table-row">
+                              <TableCell>{warehouseRequestPaginator?.slNo + index}</TableCell>
+                              <TableCell>
+                                {language === "kh" ? row.toShop?.nameKh : row.toShop?.nameEn || "-"}
+                              </TableCell>
+                              <TableCell>{row.items.length}</TableCell>
+                              <TableCell>{totalQty}</TableCell>
+                              <TableCell>${totalPrice.toFixed(2)}</TableCell>
+                              <TableCell>
+                                {language === "kh"
+                                  ? row.requestedBy?.nameKh
+                                  : row.requestedBy?.nameEn || "-"}
+                              </TableCell>
+                              <TableCell>
+                                {row.approvedBy
+                                  ? language === "kh"
+                                    ? row.approvedBy?.nameKh
+                                    : row.approvedBy?.nameEn
+                                  : "-"}
+                              </TableCell>
+                              <TableCell>
+                                <Chip
+                                  label={t(row?.status)}
+                                  color={getStatusColor(row?.status)}
+                                  size="small"
+                                  sx={{ fontWeight: 600 }}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                {row?.dateWantGetProduct
+                                  ? dayjs(row.dateWantGetProduct).format("DD/MM/YYYY")
+                                  : "-"}
+                              </TableCell>
+                              <TableCell>{dayjs(row.createdAt).format("DD/MM/YYYY")}</TableCell>
+                              <TableCell className="flex-end">
+                                <WarehouseRequestAction
+                                  request={row}
+                                  t={t}
+                                  language={language}
+                                  setRefetch={() => {
+                                    warehouseRequestRefetch();
+                                    productsWarehouseTransferRefetch();
+                                    productWarehouseRefetch();
+                                  }}
+                                />
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    )}
+                  </Table>
+                  <Stack direction="row" justifyContent="flex-end" alignItems="center" sx={{ padding: 2 }}>
+                    <FooterPagination
+                      page={warehouseRequestPage}
+                      limit={warehouseRequestLimit}
+                      setPage={setWarehouseRequestPage}
+                      handleLimit={handleLimitWarehouseRequest}
+                      totalDocs={warehouseRequestPaginator?.totalDocs}
+                      totalPages={warehouseRequestPaginator?.totalPages}
+                    />
+                  </Stack>
+                </TableContainer>
+              </Box>
+            )}
           </Box>
         </Grid>
       </Grid>

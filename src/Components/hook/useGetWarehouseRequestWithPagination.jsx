@@ -1,15 +1,15 @@
 import { useQuery } from "@apollo/client/react";
-import { GET_PURCHASE_ORDER_WITH_PAGINATION } from "../../../graphql/queries";
 
-const useGetPurchaseOrdersWithPagination = ({
-  supplierId = null,
-  shopId = null,
-  status = null,
+import { GET_WAREHOUSE_REQUESTS_WITH_PAGINATION } from "../../../graphql/queries";
+
+const useGetWarehouseRequestWithPagination = ({
   page = 1,
   limit = 10,
   pagination = true,
   keyword = "",
-}) => {
+  status,
+  shopId,
+} = {}) => {
   const normalizedShopId =
     shopId && shopId !== "null" && shopId !== "undefined" ? shopId : undefined;
   const normalizedStatus =
@@ -18,30 +18,28 @@ const useGetPurchaseOrdersWithPagination = ({
       : undefined;
 
   const { data, loading, error, refetch } = useQuery(
-    GET_PURCHASE_ORDER_WITH_PAGINATION,
+    GET_WAREHOUSE_REQUESTS_WITH_PAGINATION,
     {
       variables: {
-        supplierId,
-        shopId: normalizedShopId,
-        status: normalizedStatus,
         page,
         limit,
         pagination,
-        keyword,
+        keyword: keyword || "",
+        shopId: normalizedShopId,
+        status: normalizedStatus,
       },
       fetchPolicy: "cache-and-network",
       notifyOnNetworkStatusChange: true,
-      skip: !pagination && !keyword,
-    }
+    },
   );
 
   return {
-    purchaseOrders: data?.getPurchaseOrdersWithPagination?.data ?? [],
-    paginator: data?.getPurchaseOrdersWithPagination?.paginator ?? {},
+    warehouseRequests: data?.getWarehouseRequestsWithPagination?.data || [],
+    paginator: data?.getWarehouseRequestsWithPagination?.paginator || {},
     loading,
     error,
     refetch,
   };
 };
 
-export default useGetPurchaseOrdersWithPagination;
+export default useGetWarehouseRequestWithPagination;

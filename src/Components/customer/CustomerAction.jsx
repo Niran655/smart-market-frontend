@@ -37,7 +37,7 @@ export default function CustomerAction({ customerData, setRefetch, t }) {
 
   return (
     <>
-      <Stack direction="row" spacing={1}>
+      <Stack direction="row" spacing={1} justifyContent="flex-end">
         <IconButton onClick={() => setOpen(true)}>
           <SquarePen size="18px" color="#36BBA7" />
         </IconButton>

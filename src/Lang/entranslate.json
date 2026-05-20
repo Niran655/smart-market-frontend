@@ -159,6 +159,7 @@
   "items_count": "Items Count",
   "total_quantity": "Total Quantity",
   "date": "Date",
+  "date_want_get_product": "Wanted Date",
   "view_product_transfer": "View Product Transfer",
   "transfer_information": "Transfer Information",
   "price_in_unit": "Price In Unit",
@@ -488,5 +489,6 @@
   "3_months": "3 Months",
   "6_months": "6 Months",
   "all_time": "All Time",
-  "export": "Export"
+  "export": "Export",
+  "transferred": "Transferred"
 }

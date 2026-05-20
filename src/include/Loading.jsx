@@ -7,7 +7,7 @@ export default function CircularIndeterminate() {
   return (
     <TableBody   sx={{ height: "300px", borderRadius: "20px" }}>
       <TableRow>
-        <TableCell colSpan={10} align="center">
+        <TableCell colSpan={15} align="center">
           <Box >
             <Stack
               direction="row"

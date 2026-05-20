@@ -88,9 +88,18 @@ const Unit = () => {
           </Breadcrumbs>
         </Box>
       </Stack>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }} mt={5}>
-        <Grid container spacing={2} alignItems="center" textAlign="start">
-          <Grid size={{ xs: 6, md: 6 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: { xs: "stretch", md: "center" },
+          flexDirection: { xs: "column", md: "row" },
+          gap: 2,
+        }}
+        mt={5}
+      >
+        <Grid container spacing={2} alignItems="center" textAlign="start" sx={{ flex: 1, width: "100%" }}>
+          <Grid size={{ xs: 12, sm: 3 }}>
             <Typography variant="body2" fontWeight={500} mb={0.5}>
               {t("search")}
             </Typography>
@@ -105,7 +114,7 @@ const Unit = () => {
               }}
               fullWidth
               variant="outlined"
-
+ 
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -115,7 +124,7 @@ const Unit = () => {
               }}
             />
           </Grid>
-          <Grid size={{ xs: 6, md: 6 }}>
+          <Grid size={{ xs: 12, sm: 2 }}>
             <Typography variant="body2" fontWeight={500} mb={0.5}>
               {t("status")}
             </Typography>
@@ -133,7 +142,7 @@ const Unit = () => {
           </Grid>
         </Grid>
 
-        <Stack direction="row" spacing={2} mt={3}>
+        <Stack direction="row" spacing={2} mt={{ xs: 0, md: 3 }} sx={{ alignSelf: { xs: "flex-end", md: "auto" }, flexShrink: 0 }}>
           <Button
             variant="contained"
             startIcon={<LibraryAddOutlinedIcon size={18} />}

@@ -44,6 +44,8 @@ export default function ProductTransferForm({
   t,
   language,
   setRefetch,
+  defaultToShopIds = [],
+  lockToShop = false,
 }) {
   const { options: shopOptions, loading: shopLoading, refetch } =useGetAllShopAutoComplete();
 
@@ -79,7 +81,7 @@ export default function ProductTransferForm({
 
   const formik = useFormik({
     initialValues: {
-      toShopIds: [],
+      toShopIds: defaultToShopIds,
       note: "",
       items: [emptyItem],
     },
@@ -177,6 +179,7 @@ export default function ProductTransferForm({
                 <Typography>{t("to_shop")}</Typography>
                 <Autocomplete
                   multiple
+                  disabled={lockToShop}
                   options={shopOptions}
                   loading={shopLoading}
                   value={shopOptions.filter((o) =>

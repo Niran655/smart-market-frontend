@@ -17,6 +17,8 @@ export default function PurchaseOrderAction({
   setRefetch,
   purchaseOrder,
   language,
+  productSource,
+  shopId,
 }) {
   const [openEdit, setOpenEdit] = useState(false);
   const [openCancel, setOpenCancel] = useState(false);
@@ -25,7 +27,7 @@ export default function PurchaseOrderAction({
 
   return (
     <>
-      <Stack direction="row" spacing={1}>
+      <Stack direction="row" spacing={1} justifyContent="flex-end">
         <Tooltip title={t("view")}>
           <IconButton onClick={() => setOpenView(true)}>
             <ScanEye size={18} color="#36BBA7" />
@@ -66,6 +68,8 @@ export default function PurchaseOrderAction({
         language={language}
         setRefetch={setRefetch}
         editData={purchaseOrder}
+        productSource={productSource}
+        shopId={shopId}
       />
 
       <PurchaseOrderReceive

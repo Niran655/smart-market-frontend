@@ -93,15 +93,24 @@ const User = () => {
           </Breadcrumbs>
         </Box>
       </Stack>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }} mt={5}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: { xs: "stretch", md: "center" },
+          flexDirection: { xs: "column", md: "row" },
+          gap: 2,
+        }}
+        mt={5}
+      >
         <Grid
           container
-          spacing={5}
-          fullWidth
+          spacing={2}
           alignItems="center"
           textAlign="start"
+          sx={{ flex: 1, width: "100%" }}
         >
-          <Grid size={{ xs: 6, md: 6 }}>
+          <Grid size={{ xs: 12, sm: 3 }}>
             <Typography variant="body2" fontWeight={500} mb={0.5}>
               {t("search")}
             </Typography>
@@ -113,10 +122,6 @@ const User = () => {
               onChange={(e) => setKeyword(e.target.value)}
               fullWidth
               variant="outlined"
-              sx={{
-                width: "250px",
-
-              }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -127,7 +132,7 @@ const User = () => {
             />
           </Grid>
 
-          <Grid size={{ xs: 6, md: 6 }}>
+          <Grid size={{ xs: 12, sm: 2 }}>
             <Typography className="search-head-title">{t("status")}</Typography>
             <TextField
               className="select-text-field"
@@ -135,10 +140,6 @@ const User = () => {
               fullWidth
               size="small"
               value={role}
-              sx={{
-                width: "200px",
-
-              }}
               onChange={handleRoleChange}
             >
               <MenuItem value="All">{t("all")}</MenuItem>
@@ -152,7 +153,7 @@ const User = () => {
           </Grid>
         </Grid>
 
-        <Stack direction="row" spacing={2} mt={3}>
+        <Stack direction="row" spacing={2} mt={{ xs: 0, md: 3 }} sx={{ alignSelf: { xs: "flex-end", md: "auto" }, flexShrink: 0 }}>
           <Button
             variant="contained"
             startIcon={

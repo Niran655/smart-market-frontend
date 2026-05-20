@@ -35,7 +35,7 @@ export default function TableAction({ tableData, setRefetch, t, onEdit }) {
 
   return (
     <>
-      <Stack direction="row" spacing={1} justifyContent="center">
+      <Stack direction="row" spacing={1} justifyContent="flex-end">
         <IconButton onClick={() => onEdit(tableData)}>
           <SquarePen size="18px" color="#36BBA7" />
         </IconButton>
