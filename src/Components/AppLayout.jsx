@@ -61,6 +61,7 @@ export default function AppLayout() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [menuPosition, setMenuPosition] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userObject, setUserObject] = useState(null);
 
@@ -97,8 +98,18 @@ export default function AppLayout() {
   );
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
-  const handleMenuOpen = (e) => setAnchorEl(e.currentTarget);
-  const handleMenuClose = () => setAnchorEl(null);
+  const handleMenuOpen = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setAnchorEl(e.currentTarget);
+    setMenuPosition({
+      top: rect.bottom,
+      left: rect.right,
+    });
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setMenuPosition(null);
+  };
   const handleLogout = () => {
     handleMenuClose();
     logout();
@@ -158,6 +169,39 @@ export default function AppLayout() {
 
   const sidebarBg = sidebarColor;
 
+  const ProfileMenu = () => (
+    <MuiMenu
+      open={Boolean(anchorEl)}
+      onClose={handleMenuClose}
+      anchorReference="anchorPosition"
+      anchorPosition={menuPosition || undefined}
+      transformOrigin={{ horizontal: "right", vertical: "top" }}
+      slotProps={{
+        paper: {
+          sx: {
+            mt: 1.5,
+            minWidth: 160,
+            boxShadow: theme.shadows[4],
+            transformOrigin: "right top !important",
+          },
+        },
+      }}
+    >
+      <MenuItem onClick={handleProfile}>
+        <ListItemIcon>
+          <PersonIcon fontSize="small" />
+        </ListItemIcon>
+        {t(`profile`)}
+      </MenuItem>
+      <MenuItem onClick={handleLogout}>
+        <ListItemIcon>
+          <LogoutIcon fontSize="small" />
+        </ListItemIcon>
+        {t(`logout`)}
+      </MenuItem>
+    </MuiMenu>
+  );
+
  
   const RightActions = () => (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -196,27 +240,6 @@ export default function AppLayout() {
         </Stack>
       </ButtonBase>
 
-      <MuiMenu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-        PaperProps={{ sx: { mt: 1.5, boxShadow: theme.shadows[4] } }}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-      >
-        <MenuItem onClick={handleProfile}>
-          <ListItemIcon>
-            <PersonIcon fontSize="small" />
-          </ListItemIcon>
-          {t(`profile`)}
-        </MenuItem>
-        <MenuItem onClick={handleLogout}>
-          <ListItemIcon>
-            <LogoutIcon fontSize="small" />
-          </ListItemIcon>
-          {t(`logout`)}
-        </MenuItem>
-      </MuiMenu>
     </Box>
   );
 
@@ -497,6 +520,8 @@ export default function AppLayout() {
             {open && <Menu open={open} onClose={handleClose} t={t} />}
           </>
         )}
+
+        <ProfileMenu />
 
          
         <Box

@@ -715,6 +715,24 @@ const Warehouse = () => {
     { value: "4", label: t("shop_request"), icon: Store },
     { value: "3", label: t("stock_movement"), icon: Activity },
   ];
+  const tableScrollSx = {
+    maxHeight: { xs: "65vh", md: "calc(100vh - 270px)" },
+    overflow: "auto",
+    position: "relative",
+    "& .MuiTableCell-stickyHeader": {
+      top: 0,
+      zIndex: 2,
+      bgcolor: "background.paper",
+    },
+  };
+  const tablePaginationSx = {
+    position: "sticky",
+    bottom: 0,
+    zIndex: 2,
+    padding: 2,
+    bgcolor: "background.paper",
+    borderTop: `1px solid ${theme.palette.divider}`,
+  };
 
   return (
     <Box>
@@ -754,7 +772,8 @@ const Warehouse = () => {
               // backgroundColor: "#f5f5f5",
               height: "70vh",
               borderRadius: 1,
-              position: "relative",
+              position: { sm: "sticky" },
+              top: { sm: 88 },
               // height: "100%",
             }}
           >
@@ -928,8 +947,8 @@ const Warehouse = () => {
                     )}
                   </Stack>
                 </Box>
-                <TableContainer className="table-container">
-                  <Table className="table"  >
+                <TableContainer className="table-container" sx={tableScrollSx}>
+                  <Table className="table" stickyHeader>
                     <TableHead  >
                       <TableRow>
                         <TableCell>{t("no")}</TableCell>
@@ -1024,7 +1043,7 @@ const Warehouse = () => {
                     direction="row"
                     justifyContent="flex-end"
                     alignItems="center"
-                    sx={{ padding: 2 }}
+                    sx={tablePaginationSx}
                   >
                     <FooterPagination
                       page={productWarehousePage}
@@ -1123,8 +1142,8 @@ const Warehouse = () => {
                     )}
                   </Stack>
                 </Box>
-                <TableContainer className="table-container">
-                  <Table className="table">
+                <TableContainer className="table-container" sx={tableScrollSx}>
+                  <Table className="table" stickyHeader>
                     <TableHead  >
                       <TableRow>
                         <TableCell>{t("no")}</TableCell>
@@ -1199,7 +1218,7 @@ const Warehouse = () => {
                     direction="row"
                     justifyContent="flex-end"
                     alignItems="center"
-                    sx={{ padding: 2 }}
+                    sx={tablePaginationSx}
                   >
                     <FooterPagination
                       page={productWarehouseTransferPage}
@@ -1298,8 +1317,8 @@ const Warehouse = () => {
                     )}
                   </Stack>
                 </Box>
-                <TableContainer className="table-container">
-                  <Table className="table">
+                <TableContainer className="table-container" sx={tableScrollSx}>
+                  <Table className="table" stickyHeader>
                     <TableHead  >
                       <TableRow>
                         <TableCell>{t("no")}</TableCell>
@@ -1358,7 +1377,7 @@ const Warehouse = () => {
                     direction="row"
                     justifyContent="flex-end"
                     alignItems="center"
-                    sx={{ padding: 2 }}
+                    sx={tablePaginationSx}
                   >
                     <FooterPagination
                       page={purchaseOrderPage}
@@ -1373,8 +1392,8 @@ const Warehouse = () => {
               </Box>
             }
             {activeTab === "3" && <Box>
-              <TableContainer className="table-container">
-                <Table className="table"  >
+              <TableContainer className="table-container" sx={tableScrollSx}>
+                <Table className="table" stickyHeader>
                   <TableHead>
                     <TableRow>
                       <TableCell>{t("no")}</TableCell>
@@ -1463,7 +1482,7 @@ const Warehouse = () => {
                   direction="row"
                   justifyContent="flex-end"
                   alignItems="center"
-                  sx={{ padding: 2 }}
+                  sx={tablePaginationSx}
                 >
                   <FooterPagination
                     page={stockMovementPage}
@@ -1530,8 +1549,8 @@ const Warehouse = () => {
                   </Grid>
                 </Box>
 
-                <TableContainer className="table-container">
-                  <Table className="table">
+                <TableContainer className="table-container" sx={tableScrollSx}>
+                  <Table className="table" stickyHeader>
                     <TableHead>
                       <TableRow>
                         <TableCell>{t("no")}</TableCell>
@@ -1627,7 +1646,7 @@ const Warehouse = () => {
                       </TableBody>
                     )}
                   </Table>
-                  <Stack direction="row" justifyContent="flex-end" alignItems="center" sx={{ padding: 2 }}>
+                  <Stack direction="row" justifyContent="flex-end" alignItems="center" sx={tablePaginationSx}>
                     <FooterPagination
                       page={warehouseRequestPage}
                       limit={warehouseRequestLimit}
