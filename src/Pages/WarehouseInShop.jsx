@@ -1,17 +1,18 @@
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
-import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { TabContext, TabPanel } from "@mui/lab";
 import {
   Box,
   Breadcrumbs,
   Button,
   Chip,
   Grid,
+  IconButton,
   InputAdornment,
   MenuItem,
+  Paper,
   Stack,
-  Tab,
   Table,
   TableBody,
   TableCell,
@@ -19,9 +20,21 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import { Search } from "lucide-react";
+import {
+  Activity,
+  ArrowDownToLine,
+  Boxes,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  Send,
+  Search,
+} from "lucide-react";
 import { useState } from "react";
 
 import useGetProductWarehouseInShopWithPagination from "../Components/hook/useGetProductWarehouseInShopWithPagination";
@@ -34,6 +47,7 @@ import PurchaseOrderForm from "../Components/warehouse/purchaseOrder/PurchaseOrd
 import GetProductInShopAction from "../Components/warehouseInShop/getProduct/GetProductInShopAction";
 import WarehouseRequestForm from "../Components/warehouseInShop/WarehouseRequestForm";
 import { useAuth } from "../Context/AuthContext";
+import { useThemeContext } from "../Context/ThemeContext";
 import { translateLauguage } from "../function/translate";
 import FooterPagination from "../include/FooterPagination";
 import EmptyData from "../include/EmptyData";
@@ -71,9 +85,15 @@ const unitName = (row, language) =>
 const WarehouseInShop = () => {
   const { language } = useAuth();
   const { t } = translateLauguage(language);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { layoutMode } = useThemeContext();
   const shopId = localStorage.getItem("activeShopId");
 
   const [tab, setTab] = useState("1");
+  const [warehouseNavMode, setWarehouseNavMode] = useState(
+    layoutMode === "compact" ? "compact" : "default"
+  );
 
   const [stockPage, setStockPage] = useState(1);
   const [stockLimit, setStockLimit] = useState(5);
@@ -261,6 +281,15 @@ const WarehouseInShop = () => {
     </Box>
   );
 
+  const isWarehouseNavCompact = warehouseNavMode === "compact" && !isMobile;
+  const warehouseTabs = [
+    { value: "1", label: t("product_stock"), icon: Boxes },
+    { value: "2", label: t("purchase_order"), icon: ClipboardList },
+    { value: "3", label: t("get_product"), icon: ArrowDownToLine },
+    { value: "4", label: t("request_to_warehouse"), icon: Send },
+    { value: "5", label: t("stock_movement"), icon: Activity },
+  ];
+
   return (
     <Box sx={{ width: "100%", p: 2 }}>
       <Breadcrumbs separator="/">
@@ -270,28 +299,114 @@ const WarehouseInShop = () => {
       </Breadcrumbs>
 
       <TabContext value={tab}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider", mt: 4 }}>
-          <TabList
-            onChange={(_, newValue) => setTab(newValue)}
-            variant="scrollable"
-            scrollButtons="auto"
-            sx={{
-              "& .MuiTab-root": {
-                textTransform: "none",
-                fontWeight: 600,
-                fontSize: 14,
-              },
+        <Grid container spacing={2} sx={{ mt: 2 }}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: isWarehouseNavCompact ? 1 : 3,
+              md: isWarehouseNavCompact ? 1 : 2,
             }}
           >
-            <Tab label={t("product_stock")} value="1" />
-            <Tab label={t("purchase_order")} value="2" />
-            <Tab label={t("get_product")} value="3" />
-            <Tab label={t("request_to_warehouse")} value="4" />
-            <Tab label={t("stock_movement")} value="5" />
-          </TabList>
-        </Box>
+            <Paper
+              elevation={0}
+              sx={{
+                p: isWarehouseNavCompact ? 1 : 2,
+                height: "70vh",
+                borderRadius: 1,
+                position: "relative",
+              }}
+            >
+              {!isMobile && (
+                <Tooltip
+                  title={isWarehouseNavCompact ? "Show labels" : "Compact"}
+                  placement="right"
+                  arrow
+                >
+                  <IconButton
+                    size="small"
+                    onClick={() =>
+                      setWarehouseNavMode((prev) =>
+                        prev === "compact" ? "default" : "compact"
+                      )
+                    }
+                    sx={{
+                      position: "absolute",
+                      right: -14,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: 28,
+                      height: 28,
+                      zIndex: 2,
+                      bgcolor: "background.paper",
+                      border: `1px solid ${theme.palette.divider}`,
+                      boxShadow: theme.shadows[2],
+                      "&:hover": { bgcolor: "background.paper" },
+                    }}
+                  >
+                    {isWarehouseNavCompact ? (
+                      <ChevronRight size={16} />
+                    ) : (
+                      <ChevronLeft size={16} />
+                    )}
+                  </IconButton>
+                </Tooltip>
+              )}
 
-        <TabPanel value="1">
+              <Stack
+                direction="column"
+                spacing={1}
+                alignItems={isWarehouseNavCompact ? "center" : "stretch"}
+              >
+                {warehouseTabs.map((item) => {
+                  const Icon = item.icon;
+                  const active = tab === item.value;
+                  const button = (
+                    <Button
+                      fullWidth={!isWarehouseNavCompact}
+                      variant={active ? "contained" : "text"}
+                      onClick={() => setTab(item.value)}
+                      aria-label={item.label}
+                      sx={{
+                        minWidth: isWarehouseNavCompact ? 40 : 0,
+                        width: isWarehouseNavCompact ? 40 : "100%",
+                        height: 40,
+                        px: isWarehouseNavCompact ? 0 : 1.5,
+                        justifyContent: isWarehouseNavCompact
+                          ? "center"
+                          : "flex-start",
+                        textTransform: "none",
+                      }}
+                    >
+                      <Icon size={18} />
+                      {!isWarehouseNavCompact && (
+                        <Box component="span" sx={{ ml: 1 }}>
+                          {item.label}
+                        </Box>
+                      )}
+                    </Button>
+                  );
+
+                  return isWarehouseNavCompact ? (
+                    <Tooltip key={item.value} title={item.label} placement="right" arrow>
+                      {button}
+                    </Tooltip>
+                  ) : (
+                    <Box key={item.value}>{button}</Box>
+                  );
+                })}
+              </Stack>
+            </Paper>
+          </Grid>
+
+          <Grid
+            size={{
+              xs: 12,
+              sm: isWarehouseNavCompact ? 11 : 9,
+              md: isWarehouseNavCompact ? 11 : 10,
+            }}
+          >
+            <Box>
+        <TabPanel value="1" sx={{ p: 0 }}>
           {renderToolbar({
             keyword: stockKeyword,
             setKeyword: setStockKeyword,
@@ -382,7 +497,7 @@ const WarehouseInShop = () => {
           </TableContainer>
         </TabPanel>
 
-        <TabPanel value="2">
+        <TabPanel value="2" sx={{ p: 0 }}>
           {renderToolbar({
             keyword: purchaseKeyword,
             setKeyword: setPurchaseKeyword,
@@ -503,7 +618,7 @@ const WarehouseInShop = () => {
           )}
         </TabPanel>
 
-        <TabPanel value="3">
+        <TabPanel value="3" sx={{ p: 0 }}>
           {renderToolbar({
             keyword: transferKeyword,
             setKeyword: setTransferKeyword,
@@ -612,7 +727,7 @@ const WarehouseInShop = () => {
           </TableContainer>
         </TabPanel>
 
-        <TabPanel value="4">
+        <TabPanel value="4" sx={{ p: 0 }}>
           {renderToolbar({
             keyword: requestKeyword,
             setKeyword: setRequestKeyword,
@@ -740,7 +855,7 @@ const WarehouseInShop = () => {
           )}
         </TabPanel>
 
-        <TabPanel value="5">
+        <TabPanel value="5" sx={{ p: 0 }}>
           {renderToolbar({
             keyword: movementKeyword,
             setKeyword: setMovementKeyword,
@@ -808,6 +923,9 @@ const WarehouseInShop = () => {
             </Stack>
           </TableContainer>
         </TabPanel>
+            </Box>
+          </Grid>
+        </Grid>
       </TabContext>
     </Box>
   );

@@ -459,8 +459,19 @@ import {
   useTheme,
   useMediaQuery,
   MenuItem,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
-import { Search } from "lucide-react";
+import {
+  Activity,
+  ArrowLeftRight,
+  Boxes,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  Search,
+  Store,
+} from "lucide-react";
 import dayjs from "dayjs";
 import { useState } from "react";
 
@@ -481,6 +492,7 @@ import PurchaseOrderForm from "../Components/warehouse/purchaseOrder/PurchaseOrd
 import useGetStockMovementWithPagination from "../Components/hook/useGetStockMovementWithPagination";
 import useGetWarehouseRequestWithPagination from "../Components/hook/useGetWarehouseRequestWithPagination";
 import WarehouseRequestAction from "../Components/warehouse/WarehouseRequestAction";
+import { useThemeContext } from "../Context/ThemeContext";
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -691,6 +703,18 @@ const Warehouse = () => {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { layoutMode } = useThemeContext();
+  const [warehouseNavMode, setWarehouseNavMode] = useState(
+    layoutMode === "compact" ? "compact" : "default"
+  );
+  const isWarehouseNavCompact = warehouseNavMode === "compact" && !isMobile;
+  const warehouseTabs = [
+    { value: "1", label: t("product_stock"), icon: Boxes },
+    { value: "5", label: t("transfer_product"), icon: ArrowLeftRight },
+    { value: "2", label: t("purchase_order"), icon: ClipboardList },
+    { value: "4", label: t("shop_request"), icon: Store },
+    { value: "3", label: t("stock_movement"), icon: Activity },
+  ];
 
   return (
     <Box>
@@ -716,65 +740,117 @@ const Warehouse = () => {
 
       <Grid container spacing={2} sx={{ mt: 2 }}>
 
-        <Grid size={{ xs: 12, sm: 3, md: 2 }}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: isWarehouseNavCompact ? 1 : 3,
+            md: isWarehouseNavCompact ? 1 : 2,
+          }}
+        >
           <Paper
             elevation={0}
             sx={{
-              p: 2,
+              p: isWarehouseNavCompact ? 1 : 2,
               // backgroundColor: "#f5f5f5",
               height: "70vh",
               borderRadius: 1,
+              position: "relative",
               // height: "100%",
             }}
           >
-            <Stack direction="column" spacing={1}>
-              <Button
-                fullWidth
-                variant={activeTab === "1" ? "contained" : "text"}
-                onClick={() => setActiveTab("1")}
-                sx={{ justifyContent: "flex-start", textTransform: "none" }}
+            {!isMobile && (
+              <Tooltip
+                title={
+                  isWarehouseNavCompact
+                    ? "Show labels"
+                    : "Compact"
+                }
+                placement="right"
+                arrow
               >
-                {t("product_stock")}
-              </Button>
-              <Button
-                fullWidth
-                variant={activeTab === "5" ? "contained" : "text"}
-                onClick={() => setActiveTab("5")}
-                sx={{ justifyContent: "flex-start", textTransform: "none" }}
-              >
-                {t("transfer_product")}
-              </Button>
-              <Button
-                fullWidth
-                variant={activeTab === "2" ? "contained" : "text"}
-                onClick={() => setActiveTab("2")}
-                sx={{ justifyContent: "flex-start", textTransform: "none" }}
-              >
-                {t("purchase_order")}
-              </Button>
+                <IconButton
+                  size="small"
+                  onClick={() =>
+                    setWarehouseNavMode((prev) =>
+                      prev === "compact" ? "default" : "compact"
+                    )
+                  }
+                  sx={{
+                    position: "absolute",
+                    right: -14,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: 28,
+                    height: 28,
+                    zIndex: 2,
+                    bgcolor: "background.paper",
+                    border: `1px solid ${theme.palette.divider}`,
+                    boxShadow: theme.shadows[2],
+                    "&:hover": {
+                      bgcolor: "background.paper",
+                    },
+                  }}
+                >
+                  {isWarehouseNavCompact ? (
+                    <ChevronRight size={16} />
+                  ) : (
+                    <ChevronLeft size={16} />
+                  )}
+                </IconButton>
+              </Tooltip>
+            )}
+            <Stack
+              direction="column"
+              spacing={1}
+              alignItems={isWarehouseNavCompact ? "center" : "stretch"}
+            >
+              {warehouseTabs.map((tab) => {
+                const Icon = tab.icon;
+                const active = activeTab === tab.value;
+                const button = (
                   <Button
-                fullWidth
-                variant={activeTab === "4" ? "contained" : "text"}
-                onClick={() => setActiveTab("4")}
-                sx={{ justifyContent: "flex-start", textTransform: "none" }}
-              >
-                {t("shop_request")}
-              </Button>
-              <Button
-                fullWidth
-                variant={activeTab === "3" ? "contained" : "text"}
-                onClick={() => setActiveTab("3")}
-                sx={{ justifyContent: "flex-start", textTransform: "none" }}
-              >
-                {t("stock_movement")}
-              </Button>
-          
+                    fullWidth={!isWarehouseNavCompact}
+                    variant={active ? "contained" : "text"}
+                    onClick={() => setActiveTab(tab.value)}
+                    aria-label={tab.label}
+                    sx={{
+                      minWidth: isWarehouseNavCompact ? 40 : 0,
+                      width: isWarehouseNavCompact ? 40 : "100%",
+                      height: 40,
+                      px: isWarehouseNavCompact ? 0 : 1.5,
+                      justifyContent: isWarehouseNavCompact ? "center" : "flex-start",
+                      textTransform: "none",
+                    }}
+                  >
+                    <Icon size={18} />
+                    {!isWarehouseNavCompact && (
+                      <Box component="span" sx={{ ml: 1 }}>
+                        {tab.label}
+                      </Box>
+                    )}
+                  </Button>
+                );
+
+                return isWarehouseNavCompact ? (
+                  <Tooltip key={tab.value} title={tab.label} placement="right" arrow>
+                    {button}
+                  </Tooltip>
+                ) : (
+                  <Box key={tab.value}>{button}</Box>
+                );
+              })}
             </Stack>
           </Paper>
         </Grid>
 
 
-        <Grid size={{ xs: 12, sm: 9, md: 10 }}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: isWarehouseNavCompact ? 11 : 9,
+            md: isWarehouseNavCompact ? 11 : 10,
+          }}
+        >
           <Box>
             {activeTab === "1" && (
               <Box>

@@ -124,7 +124,7 @@ export default function AppLayout() {
     setSelectedLanguage(newLang === "kh" ? "ភាសាខ្មែរ" : "English");
   };
 
-  // These are used only in non-POS mode when NOT in top-nav layout
+  
   const menuItems = [
     {
       icon: GridViewOutlinedIcon,
@@ -253,7 +253,7 @@ export default function AppLayout() {
         </Box>
       )}
 
-      {/* ── Mobile drawer (not POS, not top-nav) ────────────────────────── */}
+ 
       {!isPosPage && isMobile && (
         <Drawer
           anchor="left"
@@ -276,7 +276,7 @@ export default function AppLayout() {
         </Drawer>
       )}
 
-      {/* ── Main content area ─────────────────────────────────────────────── */}
+   
       <Box
         sx={{
           marginLeft: !isPosPage && !isMobile && !isTopNav ? `${sidebarWidth}px` : 0,
@@ -289,19 +289,18 @@ export default function AppLayout() {
           }),
         }}
       >
-        {/* ── Non-POS AppBar ─────────────────────────────────────────────── */}
+     
         {!isPosPage && (
           <AppBar
             position="sticky"
             color="default"
             sx={{
               bgcolor: topbarColor,
-              borderBottom: `1px solid ${theme.palette.divider}`,
               boxShadow: theme.shadows[1],
             }}
           >
             <Toolbar sx={{ justifyContent: "space-between", gap: 1 }}>
-              {/* Mobile: hamburger */}
+              
               {isMobile && (
                 <IconButton
                   onClick={handleDrawerToggle}
@@ -367,7 +366,6 @@ export default function AppLayout() {
               color="default"
               sx={{
                 bgcolor: topbarColor,
-                borderBottom: `1px solid ${theme.palette.divider}`,
                 boxShadow: theme.shadows[1],
               }}
             >
