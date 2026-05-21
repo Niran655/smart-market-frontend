@@ -3,23 +3,23 @@ import { FaAngleUp } from "react-icons/fa6";
 import { FaAngleDown } from "react-icons/fa6";
 import { IoLogOutOutline } from "react-icons/io5";
 import { Avatar, Button, IconButton, Menu, MenuItem, Stack, Toolbar, Typography } from "@mui/material";
-import { useContext, useState } from "react";
+import { useState } from "react";
 
 import CambodiaFlag from "../assets/Image/cambodiaflag.png";
 import EnglishFlag from "../assets/Image/englishflag.png";
  
-import { AuthContext } from "../Context/AuthContext";
-import { translateLauguage } from "../Function/translate";
+import { useAuth } from "../Context/AuthContext";
+import { translateLauguage } from "../function/translate";
 import "./topnavbar.scss";
 import Notification from "./Notification";
 export default function TopNavbar({ width, toggleDrawer }) {
   const navigate = useNavigate();
-  const { changeLanguage, language } = useContext(AuthContext);
+  const { changeLanguage, language } = useAuth();
   const { t } = translateLauguage(language);
 
   let userLogin = JSON.parse(window.localStorage.getItem("userLogin"));
 
-  // ================== Function menu logout ===================
+ 
   const [anchorEl, setAnchorEl] = useState(null);
   const [openMenu, setOpenMenu] = useState(false);
   const [selectedFlag, setSelectedFlag] = useState(

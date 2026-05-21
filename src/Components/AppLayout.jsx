@@ -35,7 +35,7 @@ import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import Menu from "./menu/Menu";
 import { MenuMobile, MenuNavbar } from "../Menu";
-import TopNavbar from "./TopNavbar"; // ← new import
+import TopNavbar from "../Menu/TopNavbar";
 import { useQuery } from "@apollo/client/react";
 import { GET_SHOP_BY_SHOP_ID } from "../../graphql/queries";
 
@@ -64,12 +64,12 @@ export default function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userObject, setUserObject] = useState(null);
 
-  // "top" mode: no sidebar — nav lives in the topbar
+ 
   const isTopNav = layoutMode === "top";
   const isCompact = layoutMode === "compact";
 
-  // Sidebar width: compact = 200px (icon+label), default = 250px, top = 0
-  const sidebarWidth = isTopNav ? 0 : isCompact ? 200 : 250;
+  
+  const sidebarWidth = isTopNav ? 0 : isCompact ? 75 : 250;
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -158,7 +158,7 @@ export default function AppLayout() {
 
   const sidebarBg = sidebarColor;
 
-  // Right-side actions reused in both topbars
+ 
   const RightActions = () => (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       <IconButton
@@ -229,7 +229,7 @@ export default function AppLayout() {
         bgcolor: theme.palette.background.default,
       }}
     >
-      {/* ── Sidebar (only when NOT top-nav, NOT POS, NOT mobile) ─────────── */}
+ 
       {!isPosPage && !isMobile && !isTopNav && (
         <Box
           sx={{
@@ -312,14 +312,14 @@ export default function AppLayout() {
                 </IconButton>
               )}
 
-              {/* TOP NAV MODE: full horizontal menu in topbar */}
+               
               {!isMobile && isTopNav && !isPosPage && (
                 <Box sx={{ flex: 1, overflow: "hidden" }}>
                   <TopNavbar />
                 </Box>
               )}
 
-              {/* DEFAULT / COMPACT MODE: simple shortcut buttons in topbar */}
+           
               {!isMobile && !isTopNav && (
                 <Box display="flex" gap={1}>
                   {menuItems.map((item) => {
@@ -359,8 +359,7 @@ export default function AppLayout() {
             </Toolbar>
           </AppBar>
         )}
-
-        {/* ── POS AppBar ─────────────────────────────────────────────────── */}
+ 
         {isPosPage && (
           <>
             <AppBar
@@ -501,7 +500,7 @@ export default function AppLayout() {
           </>
         )}
 
-        {/* ── Page content ──────────────────────────────────────────────── */}
+         
         <Box
           sx={{
             flex: 1,
