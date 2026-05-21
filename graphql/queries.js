@@ -352,6 +352,8 @@ query GetSubProducts($parentProductId: ID!) {
     _id
     priceDes
     priceImg
+    batchNo
+    expiryDate
     productDes
     productImg
     qty
@@ -877,6 +879,16 @@ export const GET_SALES = gql`
             _id
             productImg
             productDes
+            unitId {
+              _id
+              nameEn
+              nameKh
+            }
+            parentProductId {
+              _id
+              nameEn
+              nameKh
+            }
           }
           name
           price
@@ -1801,6 +1813,7 @@ export const GET_FULL_DASHBOARD = gql`
       customerOverview   { firstTime return firstTimePercent returnPercent }
       topSellingProducts { productId productName sales revenue image }
       lowStockProducts   { productId productName subProductId stock minStock image }
+      productExpiryAlerts { productId productName batchNo expiryDate stock daysUntilExpiry }
       recentSales        { saleId productName category amount date }
       recentTransactions { date customer quantity price status total }
       topCustomers       { customerId name country orders totalSpent }

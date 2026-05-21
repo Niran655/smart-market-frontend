@@ -490,5 +490,7 @@
   "6_months": "6 Months",
   "all_time": "All Time",
   "export": "Export",
-  "transferred": "Transferred"
+  "transferred": "Transferred",
+  "partial_received": "Partial Received",
+  "approved": "Approved"
 }

@@ -784,7 +784,21 @@ const SaleHistory = ({ open, onClose, t, shopId, onViewDetails }) => {
     },
   });
 
- 
+  const getLocalizedName = (obj) =>
+    language === "kh"
+      ? obj?.nameKh || obj?.nameKhmer || obj?.nameEn || obj?.nameEnglish || ""
+      : obj?.nameEn || obj?.nameEnglish || obj?.nameKh || obj?.nameKhmer || "";
+
+  const getSaleItemName = (item) => {
+    const subProduct = item?.subProduct || item?.subProductId;
+    if (subProduct && typeof subProduct === "object") {
+      const productName = getLocalizedName(subProduct.parentProductId) || getLocalizedName(item.product) || item.name;
+      const unitName = getLocalizedName(subProduct.unitId);
+      return unitName ? `${productName} (${unitName})` : productName;
+    }
+    return item?.name || "";
+  };
+
 const handlePrintReceipt = (sale) => {
   if (!sale) return;
 
@@ -842,7 +856,7 @@ const handlePrintReceipt = (sale) => {
     .map(
       (item) => `
       <tr>
-        <td class="col-name">${item.name}</td>
+        <td class="col-name">${getSaleItemName(item)}</td>
         <td class="col-r">${toKHR(item.price)}</td>
         <td class="col-r">${item.quantity}</td>
         <td class="col-r">${toKHR(item.quantity * item.price)}</td>
@@ -1173,7 +1187,7 @@ const handlePrintReceipt = (sale) => {
                     >
                       <Box>
                         <Typography variant="body1" fontWeight="medium">
-                          {item.name}
+                          {getSaleItemName(item)}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           {item.quantity} × ${item.price?.toFixed(2)}

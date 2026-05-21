@@ -35,6 +35,7 @@ import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import Menu from "./menu/Menu";
 import { MenuMobile, MenuNavbar } from "../Menu";
+import TopNavbar from "./TopNavbar"; // ← new import
 import { useQuery } from "@apollo/client/react";
 import { GET_SHOP_BY_SHOP_ID } from "../../graphql/queries";
 
@@ -63,7 +64,12 @@ export default function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userObject, setUserObject] = useState(null);
 
-  const sidebarWidth = layoutMode === "compact" ? 70 : 250;
+  // "top" mode: no sidebar — nav lives in the topbar
+  const isTopNav = layoutMode === "top";
+  const isCompact = layoutMode === "compact";
+
+  // Sidebar width: compact = 200px (icon+label), default = 250px, top = 0
+  const sidebarWidth = isTopNav ? 0 : isCompact ? 200 : 250;
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -118,6 +124,7 @@ export default function AppLayout() {
     setSelectedLanguage(newLang === "kh" ? "ភាសាខ្មែរ" : "English");
   };
 
+  // These are used only in non-POS mode when NOT in top-nav layout
   const menuItems = [
     {
       icon: GridViewOutlinedIcon,
@@ -130,7 +137,6 @@ export default function AppLayout() {
       label: `${t("report")}`,
       path: "/report",
     },
-    
     {
       icon: SettingsOutlinedIcon,
       label: `${t("setting")}`,
@@ -150,14 +156,81 @@ export default function AppLayout() {
     { key: "table", label: t("table"), link: `/store/table/${id}` },
   ];
 
-  
   const sidebarBg = sidebarColor;
-  const isGlass = theme.palette.mode === "dark" && theme.components?.MuiDrawer?.styleOverrides?.paper?.backdropFilter;
+
+  // Right-side actions reused in both topbars
+  const RightActions = () => (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <IconButton
+        onClick={handleToggleFullscreen}
+        sx={{ color: theme.palette.getContrastText(topbarColor) }}
+      >
+        <Shrink size={20} />
+      </IconButton>
+      <Tooltip title={selectedLanguage}>
+        <IconButton
+          onClick={toggleLanguage}
+          sx={{ color: theme.palette.getContrastText(topbarColor) }}
+        >
+          <Avatar src={selectedFlag} sx={{ width: 30, height: 30 }} />
+        </IconButton>
+      </Tooltip>
+
+      <ButtonBase
+        onClick={handleMenuOpen}
+        sx={{ borderRadius: theme.shape.borderRadius }}
+      >
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Avatar
+            sx={{ width: 32, height: 32 }}
+            src={userObject?.image}
+            alt={userObject?.nameKh}
+          />
+          {!isExtraSmall && (
+            <Typography
+              sx={{ color: theme.palette.getContrastText(topbarColor) }}
+            >
+              {userObject?.nameKh}
+            </Typography>
+          )}
+        </Stack>
+      </ButtonBase>
+
+      <MuiMenu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        PaperProps={{ sx: { mt: 1.5, boxShadow: theme.shadows[4] } }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+      >
+        <MenuItem onClick={handleProfile}>
+          <ListItemIcon>
+            <PersonIcon fontSize="small" />
+          </ListItemIcon>
+          {t(`profile`)}
+        </MenuItem>
+        <MenuItem onClick={handleLogout}>
+          <ListItemIcon>
+            <LogoutIcon fontSize="small" />
+          </ListItemIcon>
+          {t(`logout`)}
+        </MenuItem>
+      </MuiMenu>
+    </Box>
+  );
 
   return (
-    <Box sx={{ minHeight: "100vh", width: "100vw", position: "relative", bgcolor: theme.palette.background.default }}>
-       
-      {!isPosPage && !isMobile && (
+    <Box
+      sx={{
+        minHeight: "100vh",
+        width: "100vw",
+        position: "relative",
+        bgcolor: theme.palette.background.default,
+      }}
+    >
+      {/* ── Sidebar (only when NOT top-nav, NOT POS, NOT mobile) ─────────── */}
+      {!isPosPage && !isMobile && !isTopNav && (
         <Box
           sx={{
             position: "fixed",
@@ -180,7 +253,7 @@ export default function AppLayout() {
         </Box>
       )}
 
- 
+      {/* ── Mobile drawer (not POS, not top-nav) ────────────────────────── */}
       {!isPosPage && isMobile && (
         <Drawer
           anchor="left"
@@ -203,10 +276,10 @@ export default function AppLayout() {
         </Drawer>
       )}
 
- 
+      {/* ── Main content area ─────────────────────────────────────────────── */}
       <Box
         sx={{
-          marginLeft: !isPosPage && !isMobile ? `${sidebarWidth}px` : 0,
+          marginLeft: !isPosPage && !isMobile && !isTopNav ? `${sidebarWidth}px` : 0,
           minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
@@ -216,7 +289,7 @@ export default function AppLayout() {
           }),
         }}
       >
-      
+        {/* ── Non-POS AppBar ─────────────────────────────────────────────── */}
         {!isPosPage && (
           <AppBar
             position="sticky"
@@ -227,18 +300,31 @@ export default function AppLayout() {
               boxShadow: theme.shadows[1],
             }}
           >
-            <Toolbar sx={{ justifyContent: "space-between" }}>
+            <Toolbar sx={{ justifyContent: "space-between", gap: 1 }}>
+              {/* Mobile: hamburger */}
               {isMobile && (
-                <IconButton onClick={handleDrawerToggle} edge="start" sx={{ color: theme.palette.getContrastText(topbarColor) }}>
+                <IconButton
+                  onClick={handleDrawerToggle}
+                  edge="start"
+                  sx={{ color: theme.palette.getContrastText(topbarColor) }}
+                >
                   <MenuIcon />
                 </IconButton>
               )}
 
-              {!isMobile && (
+              {/* TOP NAV MODE: full horizontal menu in topbar */}
+              {!isMobile && isTopNav && !isPosPage && (
+                <Box sx={{ flex: 1, overflow: "hidden" }}>
+                  <TopNavbar />
+                </Box>
+              )}
+
+              {/* DEFAULT / COMPACT MODE: simple shortcut buttons in topbar */}
+              {!isMobile && !isTopNav && (
                 <Box display="flex" gap={1}>
                   {menuItems.map((item) => {
                     const IconComponent = item.icon;
-                    const isActive = location.pathname.startsWith(item.path);
+                    const isActiveItem = location.pathname.startsWith(item.path);
                     return (
                       <Link
                         key={item.path}
@@ -248,10 +334,12 @@ export default function AppLayout() {
                         <Button
                           startIcon={<IconComponent />}
                           sx={{
-                            borderRadius:1,
+                            borderRadius: 1,
                             px: 2,
                             color: theme.palette.getContrastText(topbarColor),
-                            bgcolor: isActive ? theme.palette.action.selected : "transparent",
+                            bgcolor: isActiveItem
+                              ? theme.palette.action.selected
+                              : "transparent",
                             "&:hover": {
                               bgcolor: theme.palette.action.hover,
                             },
@@ -267,64 +355,12 @@ export default function AppLayout() {
 
               {isMobile && <Box flex={1} />}
 
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <IconButton onClick={handleToggleFullscreen} sx={{ color: theme.palette.getContrastText(topbarColor) }}>
-                  <Shrink size={20} />
-                </IconButton>
-                <Tooltip title={selectedLanguage}>
-                  <IconButton onClick={toggleLanguage} sx={{ color: theme.palette.getContrastText(topbarColor) }}>
-                    <Avatar src={selectedFlag} sx={{ width: 30, height: 30 }} />
-                  </IconButton>
-                </Tooltip>
-
-                <ButtonBase onClick={handleMenuOpen} sx={{ borderRadius: theme.shape.borderRadius }}>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <Avatar
-                      sx={{ width: 32, height: 32 }}
-                      src={userObject?.image}
-                      alt={userObject?.nameKh}
-                    />
-                    {!isExtraSmall && (
-                      <Typography sx={{ color: theme.palette.getContrastText(topbarColor) }}>
-                        {userObject?.nameKh}
-                      </Typography>
-                    )}
-                  </Stack>
-                </ButtonBase>
-
-                <MuiMenu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                  PaperProps={{
-                    sx: {
-                      mt: 1.5,
-                      
-                      boxShadow: theme.shadows[4],
-                    },
-                  }}
-                  transformOrigin={{ horizontal: "right", vertical: "top" }}
-                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-                >
-                  <MenuItem onClick={handleProfile}>
-                    <ListItemIcon>
-                      <PersonIcon fontSize="small" />
-                    </ListItemIcon>
-                    {t(`profile`)}
-                  </MenuItem>
-                  <MenuItem onClick={handleLogout}>
-                    <ListItemIcon>
-                      <LogoutIcon fontSize="small" />
-                    </ListItemIcon>
-                    {t(`logout`)}
-                  </MenuItem>
-                </MuiMenu>
-              </Box>
+              <RightActions />
             </Toolbar>
           </AppBar>
         )}
 
-         
+        {/* ── POS AppBar ─────────────────────────────────────────────────── */}
         {isPosPage && (
           <>
             <AppBar
@@ -344,16 +380,15 @@ export default function AppLayout() {
                   py: { xs: 0.5, sm: 0 },
                 }}
               >
- 
                 <Stack direction="row" alignItems="center" spacing={1}>
-                  <Link to={`/store/pos/${id}`} style={{ textDecoration: "none" }}>
-                    <Button >
+                  <Link
+                    to={`/store/pos/${id}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Button>
                       {!isExtraSmall && (
                         <Typography
-                          sx={{
-                            fontWeight: "bold",
-                            fontSize: "1.1rem",
-                          }}
+                          sx={{ fontWeight: "bold", fontSize: "1.1rem" }}
                         >
                           {t("pos_system")}
                         </Typography>
@@ -366,16 +401,13 @@ export default function AppLayout() {
                       borderRadius: 1,
                       color: theme.palette.getContrastText(topbarColor),
                       bgcolor: "rgba(255,255,255,0.1)",
-                      "&:hover": {
-                        bgcolor: "rgba(255,255,255,0.2)",
-                      },
+                      "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
                     }}
                   >
                     <GridViewOutlinedIcon fontSize="small" />
                   </IconButton>
                 </Stack>
 
- 
                 <Box
                   sx={{
                     flex: { xs: "1 1 100%", sm: "0 1 auto" },
@@ -400,7 +432,6 @@ export default function AppLayout() {
                         component={Link}
                         to={tab.link}
                         sx={{
-                         
                           fontWeight: "bold",
                           whiteSpace: "nowrap",
                           bgcolor:
@@ -424,7 +455,7 @@ export default function AppLayout() {
                     ))}
                   </Stack>
                 </Box>
- 
+
                 <Box
                   sx={{
                     display: "flex",
@@ -434,12 +465,18 @@ export default function AppLayout() {
                   }}
                 >
                   <Tooltip title={selectedLanguage}>
-                    <IconButton onClick={toggleLanguage} sx={{ color: theme.palette.getContrastText(topbarColor) }}>
+                    <IconButton
+                      onClick={toggleLanguage}
+                      sx={{ color: theme.palette.getContrastText(topbarColor) }}
+                    >
                       <Avatar src={selectedFlag} sx={{ width: 30, height: 30 }} />
                     </IconButton>
                   </Tooltip>
 
-                  <ButtonBase onClick={handleMenuOpen} sx={{ borderRadius: theme.shape.borderRadius }}>
+                  <ButtonBase
+                    onClick={handleMenuOpen}
+                    sx={{ borderRadius: theme.shape.borderRadius }}
+                  >
                     <Stack direction="row" spacing={1} alignItems="center">
                       <Avatar
                         sx={{ width: 32, height: 32 }}
@@ -447,7 +484,11 @@ export default function AppLayout() {
                         alt={userObject?.nameKh}
                       />
                       {!isExtraSmall && (
-                        <Typography sx={{ color: theme.palette.getContrastText(topbarColor) }}>
+                        <Typography
+                          sx={{
+                            color: theme.palette.getContrastText(topbarColor),
+                          }}
+                        >
                           {userObject?.nameKh}
                         </Typography>
                       )}
@@ -460,7 +501,7 @@ export default function AppLayout() {
           </>
         )}
 
- 
+        {/* ── Page content ──────────────────────────────────────────────── */}
         <Box
           sx={{
             flex: 1,

@@ -469,5 +469,7 @@
   "3_months": "៣ខែចុងក្រោយ",
   "6_months": "៦ខែចុងក្រោយ",
   "all_time": "គ្រប់ពេល",
-    "transferred": "បានផ្ទេរ"
+    "transferred": "បានផ្ទេរ",
+  "partial_received": "ទទួលបានខ្លះ",
+  "approved": "ព្រមទទួល"
 }

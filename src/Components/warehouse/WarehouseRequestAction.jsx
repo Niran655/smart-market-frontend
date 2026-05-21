@@ -147,7 +147,7 @@ export default function WarehouseRequestAction({ request, t, language, setRefetc
               })
             }
           >
-            {approving ? t("processing...") : t("accept")}
+            {approving ? t("processing...") : t("transfer_product")}
           </Button>
         </DialogActions>
       </Dialog>

@@ -352,6 +352,7 @@ export default function Dashboard() {
   const custOverview = dashboard?.customerOverview || { firstTime: 0, return: 0, firstTimePercent: 0, returnPercent: 0 };
   const topSelling = dashboard?.topSellingProducts || [];
   const lowStock = dashboard?.lowStockProducts || [];
+  const productExpiryAlerts = dashboard?.productExpiryAlerts || [];
   const recentSales = dashboard?.recentSales || [];
   const topCustomers = dashboard?.topCustomers || [];
 
@@ -507,6 +508,7 @@ export default function Dashboard() {
     const custRows = [["First Time", custOverview.firstTime, `${custOverview.firstTimePercent.toFixed(1)}%`], ["Return", custOverview.return, `${custOverview.returnPercent.toFixed(1)}%`]];
     const topProdRows = topSelling.map(p => [p.productName, p.sales, formatCurrency(p.revenue)]);
     const lowStockRows = lowStock.map(p => [p.productName, p.stock, p.minStock]);
+    const expiryRows = productExpiryAlerts.map(p => [p.productName, p.batchNo || "-", formatDateShort(p.expiryDate), p.stock, p.daysUntilExpiry]);
     const rSalesRows = recentSales.map(s => [s.productName, s.category, formatCurrency(s.amount), formatDateLong(s.date)]);
     const rTxRows = recentTx.map(tx => [formatDateLong(tx.date), tx.customer, tx.quantity, formatCurrency(tx.price), tx.status, formatCurrency(tx.total)]);
     const topCustRows = topCustomers.map(c => [c.name, c.country || "-", c.orders, formatCurrency(c.totalSpent)]);
@@ -517,11 +519,11 @@ export default function Dashboard() {
     return {
       companyName, phone, email, address, invoiceNumber,
       invoiceDate: formatDateLong(new Date()), periodText,
-      summaryRows, chartRows, infoRows, custRows, topProdRows, lowStockRows, rSalesRows, rTxRows, topCustRows, topCatRows, orderRows, catStatRows,
-      hasChart: chartRows.length > 0, hasTopProd: topProdRows.length > 0, hasLowStock: lowStockRows.length > 0,
+      summaryRows, chartRows, infoRows, custRows, topProdRows, lowStockRows, expiryRows, rSalesRows, rTxRows, topCustRows, topCatRows, orderRows, catStatRows,
+      hasChart: chartRows.length > 0, hasTopProd: topProdRows.length > 0, hasLowStock: lowStockRows.length > 0, hasExpiry: expiryRows.length > 0,
       hasRSales: rSalesRows.length > 0, hasRTx: rTxRows.length > 0, hasTopCust: topCustRows.length > 0, hasTopCat: topCatRows.length > 0,
     };
-  }, [dashboard, period, customStart, customEnd, user, savedStoreId, filterLabel, overview, spChart, overallInfo, custOverview, topSelling, lowStock, recentSales, recentTx, topCustomers, topCategories, orderStats, catStats]);
+  }, [dashboard, period, customStart, customEnd, user, savedStoreId, filterLabel, overview, spChart, overallInfo, custOverview, topSelling, lowStock, productExpiryAlerts, recentSales, recentTx, topCustomers, topCategories, orderStats, catStats]);
 
 
   const handleExportExcel = async () => {
@@ -544,6 +546,7 @@ export default function Dashboard() {
     addSheet("Customer Overview", "Customer Overview", ["Type", "Count", "Percentage"], printData.custRows);
     if (printData.hasTopProd) addSheet("Top Products", "Top Selling Products", ["Product", "Sales", "Revenue"], printData.topProdRows);
     if (printData.hasLowStock) addSheet("Low Stock", "Low Stock Products", ["Product", "Stock", "Min Stock"], printData.lowStockRows);
+    if (printData.hasExpiry) addSheet("Expiry Alerts", "Product Expiry Alerts", ["Product", "Batch", "Expiry Date", "Stock", "Days Left"], printData.expiryRows);
     if (printData.hasRSales) addSheet("Recent Sales", "Recent Sales", ["Product", "Category", "Amount", "Date"], printData.rSalesRows);
     if (printData.hasRTx) addSheet("Transactions", "Recent Transactions", ["Date", "Customer", "Qty", "Price", "Status", "Total"], printData.rTxRows);
     if (printData.hasTopCust) addSheet("Top Customers", "Top Customers", ["Name", "Country", "Orders", "Total Spent"], printData.topCustRows);
@@ -981,6 +984,65 @@ export default function Dashboard() {
                                 <TableCell align="right" sx={tdSx(theme)}>{item.minStock}</TableCell>
                               </TableRow>
                             ))
+                          }
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+
+
+            <Grid container spacing={1.5} sx={{ mb: 1.5 }}>
+              <Grid size={{ xs: 12 }}>
+                <Card sx={cardSx(theme)}>
+                  <CardContent sx={{ pb: "12px !important", p: "20px !important" }}>
+                    <SectionTitle action={<ViewAllBtn />}>{t("product_expiry") || "Product Expiry"}</SectionTitle>
+                    <TableContainer sx={{ minHeight: 220 }}>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={thSx(theme)}>{t("product") || "Product"}</TableCell>
+                            <TableCell sx={thSx(theme)}>{t("batch") || "Batch"}</TableCell>
+                            <TableCell sx={thSx(theme)}>{t("expiry_date") || "Expiry Date"}</TableCell>
+                            <TableCell align="right" sx={thSx(theme)}>{t("stock") || "Stock"}</TableCell>
+                            <TableCell align="right" sx={thSx(theme)}>{t("days_left") || "Days Left"}</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {productExpiryAlerts.length === 0
+                            ? <SkeletonRows count={5} cols={5} opacity={loading ? 0.4 : 0.2} />
+                            : productExpiryAlerts.map((item, idx) => {
+                              const isExpired = Number(item.daysUntilExpiry) < 0;
+                              const isUrgent = Number(item.daysUntilExpiry) <= 3;
+                              return (
+                                <TableRow key={idx} hover sx={{ "&:last-child td": { border: 0 }, "&:hover": { bgcolor: theme.palette.action.hover } }}>
+                                  <TableCell sx={tdSx(theme)}>
+                                    <Stack direction="row" alignItems="center" spacing={1.4}>
+                                      <Avatar sx={{ width: 30, height: 30, borderRadius: 2, bgcolor: theme.palette.warning.light + "30", color: theme.palette.warning.main, fontSize: "0.65rem" }}>
+                                        {(item.productName || "?")[0]}
+                                      </Avatar>
+                                      <Typography sx={{ fontSize: "0.79rem", color: theme.palette.text.primary }}>{item.productName}</Typography>
+                                    </Stack>
+                                  </TableCell>
+                                  <TableCell sx={tdSx(theme)}>{item.batchNo || "-"}</TableCell>
+                                  <TableCell sx={tdSx(theme)}>{formatDateShort(item.expiryDate)}</TableCell>
+                                  <TableCell align="right" sx={tdSx(theme)}>{item.stock ?? 0}</TableCell>
+                                  <TableCell align="right">
+                                    <Chip
+                                      label={isExpired ? `${Math.abs(item.daysUntilExpiry)} expired` : item.daysUntilExpiry}
+                                      size="small"
+                                      sx={{
+                                        fontWeight: 700, fontSize: "0.64rem", borderRadius: 6, height: 20,
+                                        bgcolor: (isExpired || isUrgent) ? theme.palette.error.light + "30" : theme.palette.warning.light + "30",
+                                        color: (isExpired || isUrgent) ? theme.palette.error.main : theme.palette.warning.main,
+                                      }}
+                                    />
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })
                           }
                         </TableBody>
                       </Table>

@@ -956,9 +956,21 @@ const POS = () => {
   };
   const handleClosePendingDialog = () => setOpenPendingDialog(false);
 
+  const getLocalizedName = (obj) =>
+    language === "kh"
+      ? obj?.nameKh || obj?.nameKhmer || obj?.nameEn || obj?.nameEnglish || ""
+      : obj?.nameEn || obj?.nameEnglish || obj?.nameKh || obj?.nameKhmer || "";
+
+  const getSubProductName = (item) => {
+    const productName = getLocalizedName(item?.parentProductId);
+    const unitName = getLocalizedName(item?.unitId);
+    return unitName ? `${productName} (${unitName})` : productName;
+  };
+
  
   const addToCart = (item) => {
     const uniqueId = item._id;
+    const itemName = getSubProductName(item);
     setCart((prev) => {
       const found = prev.find((p) => p.id === uniqueId);
       if (found) return prev.map((p) => p.id === uniqueId ? { ...p, qty: p.qty + 1 } : p);
@@ -968,13 +980,13 @@ const POS = () => {
           id: uniqueId,
           subProductId: item._id,
           productId: item.parentProductId._id,
-          name: language === "kh" ? item.parentProductId.nameKh : item.parentProductId.nameEn,
-          nameEn: item.parentProductId.nameEn,
-          nameKh: item.parentProductId.nameKh,
+          name: itemName,
+          nameEn: item.unitId?.nameEn ? `${item.parentProductId.nameEn} (${item.unitId.nameEn})` : item.parentProductId.nameEn,
+          nameKh: item.unitId?.nameKh ? `${item.parentProductId.nameKh} (${item.unitId.nameKh})` : item.parentProductId.nameKh,
           price: item.salePrice,
           qty: 1,
           img: item.productImg,
-          variant: "Original",
+          variant: getLocalizedName(item.unitId) || "Original",
         },
       ];
     });

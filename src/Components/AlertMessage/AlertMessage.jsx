@@ -5,22 +5,22 @@ import { useAuth } from "../../Context/AuthContext";
 const STATUS_CONFIG = {
   info: {
     color: "#4FC3F7",
-    bg: "rgba(79, 195, 247, 0.12)",
+    bg: "#102331",
     border: "#4FC3F7",
   },
   success: {
-    color: "#00C9A7",
-    bg: "rgba(0, 201, 167, 0.12)",
+    color: "#00E0B8",
+    bg: "#0E2A24",
     border: "#00C9A7",
   },
   warning: {
-    color: "#FFA500",
-    bg: "rgba(255, 165, 0, 0.12)",
+    color: "#FFB547",
+    bg: "#2B1F0A",
     border: "#FFA500",
   },
   error: {
-    color: "#FF6F91",
-    bg: "rgba(255, 111, 145, 0.12)",
+    color: "#FF8DA8",
+    bg: "#2A1218",
     border: "#FF6F91",
   },
 };
@@ -50,19 +50,21 @@ export default function AlertMessage() {
         style={{
           display: "flex",
           alignItems: "center",
-          minWidth: 220,
-          maxWidth: 360,
-          padding: "14px 20px",
-          borderRadius: 8,
-          backgroundColor: cfg.bg,
-          border: `1px solid ${cfg.border}33`,
-  
+          minWidth: 240,
+          maxWidth: 380,
+          padding: "14px 18px",
+          borderRadius: 12,
+
+          background: cfg.bg,
+          border: `1px solid ${cfg.border}`,
+
           color: cfg.color,
-          fontSize: "0.9rem",
+          fontSize: "0.92rem",
           fontWeight: 500,
           fontFamily: "'Segoe UI', sans-serif",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
-        
+
+          boxShadow: "0 8px 30px rgba(0,0,0,0.55)",
+
           gap: 12,
         }}
       >

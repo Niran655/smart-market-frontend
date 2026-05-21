@@ -11,12 +11,16 @@ import {
 import { FormikProvider, useFormik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
+import dayjs from "dayjs";
 import AddIcon from "@mui/icons-material/Add";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import DeleteIcon from "@mui/icons-material/Delete";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import UseAutocomplete from "../include/useAutoComplete";
 import { CREATE_SUB_PRODUCT, UPDATE_SUB_PRODUCT } from "../../../graphql/mutation";
 import { useAuth } from "../../Context/AuthContext";
@@ -34,6 +38,12 @@ const calcTotal = (price, tax, service) =>
   (Number(price) || 0) + (Number(tax) || 0) + (Number(service) || 0);
 
 const ADDITION_PRICES_CLIPBOARD_KEY = "subProductAdditionPricesClipboard";
+
+const formatDateInput = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+};
 
 const normalizeAdditionPrices = (items = []) =>
   items.map((item) => ({
@@ -147,6 +157,8 @@ export default function SubProductForm({
     taxRate: Yup.number().min(0).nullable(),
     costPrice: Yup.number().min(0).nullable(),
     totalPrice: Yup.number().min(0).nullable(),
+    batchNo: Yup.string().nullable(),
+    expiryDate: Yup.date().nullable(),
     parentProductId: Yup.string().nullable(),
   });
 
@@ -171,6 +183,8 @@ export default function SubProductForm({
       priceImg: subProductData?.priceImg || "",
       totalPrice: subProductData?.totalPrice ?? 0,
       priceDes: subProductData?.priceDes || "",
+      batchNo: subProductData?.batchNo || "",
+      expiryDate: formatDateInput(subProductData?.expiryDate),
       parentProductId: subProductData?.parentProductId?._id || parentProductId || "",
       additionPrices: (subProductData?.additionPrices || []).map(p => ({
         ...p,
@@ -224,6 +238,8 @@ export default function SubProductForm({
         priceImg: values.priceImg || "",
         totalPrice: Number(values.totalPrice || 0),
         priceDes: values.priceDes || "",
+        batchNo: values.batchNo || "",
+        expiryDate: values.expiryDate || null,
         parentProductId: values.parentProductId || parentProductId || null,
         additionPrices: processAdditionPrices(values.additionPrices),
       };
@@ -276,6 +292,8 @@ export default function SubProductForm({
           priceImg: subProductData?.priceImg || "",
           totalPrice: subProductData?.totalPrice ?? 0,
           priceDes: subProductData?.priceDes || "",
+          batchNo: subProductData?.batchNo || "",
+          expiryDate: formatDateInput(subProductData?.expiryDate),
           parentProductId: subProductData?.parentProductId?._id || parentProductId || "",
           additionPrices: (subProductData?.additionPrices || []).map(p => ({
             ...p,
@@ -776,6 +794,29 @@ export default function SubProductForm({
                   <Grid size={{ xs: 12, md: 6 }}>
                     <Typography variant="body2">Parent Product</Typography>
                     <TextField fullWidth size="small" value={values.parentProductId || ""} disabled />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Typography variant="body2">{t("batch") || "Batch"}</Typography>
+                    <TextField fullWidth size="small" {...getFieldProps("batchNo")} />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Typography variant="body2">{t("expiry_date") || "Expiry Date"}</Typography>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        value={values.expiryDate ? dayjs(values.expiryDate) : null}
+                        onChange={(date) => {
+                          setFieldValue("expiryDate", date?.isValid() ? date.format("YYYY-MM-DD") : "");
+                        }}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            size: "small",
+                            error: Boolean(touched.expiryDate && errors.expiryDate),
+                            helperText: touched.expiryDate && errors.expiryDate,
+                          },
+                        }}
+                      />
+                    </LocalizationProvider>
                   </Grid>
                 </Grid>
               </Box>

@@ -85,21 +85,28 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
   };
 
  
+  const getLocalizedName = (obj) =>
+    language === "kh"
+      ? obj?.nameKh || obj?.nameKhmer || obj?.nameEn || obj?.nameEnglish || ""
+      : obj?.nameEn || obj?.nameEnglish || obj?.nameKh || obj?.nameKhmer || "";
+
   const getItemDisplayName = (item) => {
-    const subProduct = item.subProductId;
+    const subProduct = item.subProduct || item.subProductId;
     const product = item.product;
     if (subProduct && typeof subProduct === 'object') {
-      return subProduct.productDes || (language === "kh" ? product?.nameKh : product?.nameEn) || item.name;
+      const productName = getLocalizedName(subProduct.parentProductId) || getLocalizedName(product) || item.name;
+      const unitName = getLocalizedName(subProduct.unitId);
+      return unitName ? `${productName} (${unitName})` : productName;
     }
     if (product && typeof product === 'object') {
-      return language === "kh" ? product.nameKh : product.nameEn;
+      return getLocalizedName(product);
     }
     return item.name;
   };
 
  
   const getItemImage = (item) => {
-    const subProduct = item.subProductId;
+    const subProduct = item.subProduct || item.subProductId;
     const product = item.product;
     if (subProduct && typeof subProduct === 'object' && subProduct.productImg) {
       return subProduct.productImg;
@@ -115,11 +122,11 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
   const handleLoadToCart = (sale) => {
     if (onLoadToCart) {
       const cartItems = sale.items.map(item => {
-        const subProduct = item.subProductId;  
+        const subProduct = item.subProduct || item.subProductId;  
         const product = item.product;
         const displayName = getItemDisplayName(item);
-        const displayNameEn = subProduct?.productDes || product?.nameEn || item.name;
-        const displayNameKh = subProduct?.productDes || product?.nameKh || item.name;
+        const displayNameEn = subProduct?.unitId?.nameEn ? `${subProduct?.parentProductId?.nameEn || product?.nameEn || item.name} (${subProduct.unitId.nameEn})` : product?.nameEn || item.name;
+        const displayNameKh = subProduct?.unitId?.nameKh ? `${subProduct?.parentProductId?.nameKh || product?.nameKh || item.name} (${subProduct.unitId.nameKh})` : product?.nameKh || item.name;
         const imageUrl = getItemImage(item);
 
         return {
@@ -132,7 +139,7 @@ const InvoicePending = ({ open, onClose, t, shopId, onLoadToCart }) => {
           price: item.price,
           qty: item.quantity,
           img: imageUrl,
-          variant: subProduct?.productDes || "Original",
+          variant: getLocalizedName(subProduct?.unitId) || subProduct?.productDes || "Original",
         };
       });
 

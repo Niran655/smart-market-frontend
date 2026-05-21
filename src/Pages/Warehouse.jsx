@@ -752,6 +752,14 @@ const Warehouse = () => {
               >
                 {t("purchase_order")}
               </Button>
+                  <Button
+                fullWidth
+                variant={activeTab === "4" ? "contained" : "text"}
+                onClick={() => setActiveTab("4")}
+                sx={{ justifyContent: "flex-start", textTransform: "none" }}
+              >
+                {t("shop_request")}
+              </Button>
               <Button
                 fullWidth
                 variant={activeTab === "3" ? "contained" : "text"}
@@ -760,14 +768,7 @@ const Warehouse = () => {
               >
                 {t("stock_movement")}
               </Button>
-              <Button
-                fullWidth
-                variant={activeTab === "4" ? "contained" : "text"}
-                onClick={() => setActiveTab("4")}
-                sx={{ justifyContent: "flex-start", textTransform: "none" }}
-              >
-                {t("shop_request")}
-              </Button>
+          
             </Stack>
           </Paper>
         </Grid>

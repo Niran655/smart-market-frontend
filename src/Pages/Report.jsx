@@ -396,7 +396,7 @@ const ReportPage = ({ shopId = null }) => {
       case "customer": return (d.customers || []).map(c => [c.customerName, c.customerPhone, c.totalOrders, formatCurrency(c.totalSpent)]);
       case "customerDue": return (d.customersWithDue || []).map(due => [due.customerName, due.customerPhone, formatCurrency(due.dueAmount)]);
       case "product": return (d.productList || []).map(p => [p.productName, p.category, p.status]);
-      case "productExpiry": return (d.expiredProducts || []).map(e => [e.productName, e.batchNo, formatDateShort(new Date(e.expiryDate)), e.stock, e.daysUntilExpiry]);
+      case "productExpiry": return [...(d.expiredProducts || []), ...(d.expiringSoon || [])].map(e => [e.productName, e.batchNo || "-", formatDateShort(new Date(e.expiryDate)), e.stock, e.daysUntilExpiry]);
       case "productAlert": return (d.lowStockProducts || []).map(l => [l.productName, l.currentStock, l.minStockLevel]);
       case "expense": return (d.expensesList || []).map(e => [e.category, formatCurrency(e.amount), formatDateShort(new Date(e.date)), e.description || ""]);
       case "income": return (d.incomesList || []).map(i => [i.source, formatCurrency(i.amount), formatDateShort(new Date(i.date)), i.description || ""]);
@@ -439,7 +439,7 @@ const ReportPage = ({ shopId = null }) => {
       case "customer": return reportData.paginator;
       case "customerDue": return reportData.paginator;
       case "product": return reportData.paginator;
-      case "productExpiry": return reportData.expiredPaginator;
+      case "productExpiry": return reportData.expiringPaginator || reportData.expiredPaginator;
       case "productAlert": return reportData.lowStockPaginator;
       case "expense": return reportData.paginator;
       case "income": return reportData.paginator;

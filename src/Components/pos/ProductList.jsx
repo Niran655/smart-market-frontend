@@ -26,6 +26,17 @@ const ProductList = ({
   onProductClick,
   loading
 }) => {
+  const getLocalizedName = (obj) =>
+    language === "kh"
+      ? obj?.nameKh || obj?.nameKhmer || obj?.nameEn || obj?.nameEnglish || ""
+      : obj?.nameEn || obj?.nameEnglish || obj?.nameKh || obj?.nameKhmer || "";
+
+  const getProductUnitName = (item) => {
+    const productName = getLocalizedName(item.parentProductId);
+    const unitName = getLocalizedName(item.unitId);
+    return unitName ? `${productName} (${unitName})` : productName;
+  };
+
   const [visibleCount, setVisibleCount] = useState(12);
 
   const getCategoryData = (category, language) => {
@@ -128,9 +139,7 @@ const ProductList = ({
                     />
                     <CardContent>
                       <Typography className="product-name">
-                        {language === "kh"
-                          ? item.parentProductId?.nameKh
-                          : item.parentProductId?.nameEn}
+                        {getProductUnitName(item)}
                       </Typography>
 
                       <Typography className="product-category">

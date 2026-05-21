@@ -157,7 +157,9 @@ const ProductDialog = ({ open, onClose, product, onAddToCart, language, t }) => 
   const getSugarLabel = (s) => s.sugarLevel || getName(s);
 
   const buildItemName = () => {
-    const parts = [getName(product.parentProductId)];
+    const productName = getName(product.parentProductId);
+    const unitName = getName(product.unitId);
+    const parts = [unitName ? `${productName} (${unitName})` : productName];
     if (selectedSize) parts.push(getName(selectedSize));
     if (selectedSugar) parts.push(`(${getSugarLabel(selectedSugar)})`);
     return parts.join(" — ");
@@ -181,7 +183,7 @@ const ProductDialog = ({ open, onClose, product, onAddToCart, language, t }) => 
       price: finalUnit,
       qty: quantity,
       img: product.productImg,
-      variant: product.saleType || "Original",
+      variant: getName(product.unitId) || product.saleType || "Original",
       selectedSize,
       selectedSugar,
     });
