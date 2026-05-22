@@ -514,7 +514,7 @@ const getStatusColor = (status) => {
 
 const Warehouse = () => {
   const [activeTab, setActiveTab] = useState("1");
-  const { language } = useAuth();
+  const { language, setAlert } = useAuth();
   const { t } = translateLauguage(language);
 
   const [productWarehousePage, setProductWarehousePage] = useState(1);
@@ -529,6 +529,7 @@ const Warehouse = () => {
   const [stockMovementPage, setStockMovementPage] = useState(1);
   const [stockMovementLimit, setStockMovementLimit] = useState(5);
   const [stockMovementKeyword, setStockMovementKeyword] = useState("");
+  const [stockMovementStatus, setStockMovementStatus] = useState("All");
 
   const [purchaseOrderPage, setPurchaseOrderPage] = useState(1);
   const [purchaseOrderLimit, setPurchaseOrderLimit] = useState(5);
@@ -584,6 +585,13 @@ const Warehouse = () => {
     limit: stockMovementLimit,
     pagination: true,
     keyword: stockMovementKeyword,
+    type: stockMovementStatus === "All" ? undefined : stockMovementStatus,
+    onError: (error) => {
+      setAlert(true, "error", {
+        messageEn: error.message,
+        messageKh: error.message,
+      });
+    },
   });
 
 
@@ -656,6 +664,16 @@ const Warehouse = () => {
   const handleWarehouseRequestSearchChange = (e) => {
     setWarehouseRequestKeyword(e.target.value);
     setWarehouseRequestPage(1);
+  };
+
+  const handleStockMovementSearchChange = (e) => {
+    setStockMovementKeyword(e.target.value);
+    setStockMovementPage(1);
+  };
+
+  const handleStockMovementStatusChange = (e) => {
+    setStockMovementStatus(e.target.value);
+    setStockMovementPage(1);
   };
 
   const handleLimit = (e) => {
@@ -732,6 +750,10 @@ const Warehouse = () => {
     padding: 2,
     bgcolor: "background.paper",
     borderTop: `1px solid ${theme.palette.divider}`,
+  };
+  const stockMovementTableScrollSx = {
+    ...tableScrollSx,
+    maxHeight: { xs: "58vh", md: "calc(100vh - 365px)" },
   };
 
   return (
@@ -1392,7 +1414,63 @@ const Warehouse = () => {
               </Box>
             }
             {activeTab === "3" && <Box>
-              <TableContainer className="table-container" sx={tableScrollSx}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: 2,
+                  mb: 2,
+                }}
+              >
+                <Grid
+                  container
+                  spacing={2}
+                  alignItems="center"
+                  textAlign={"start"}
+                  sx={{ flex: 1 }}
+                >
+                  <Grid size={{ xs: 12, sm: 4, md: 3 }}>
+                    <Typography variant="body2" fontWeight={500} mb={0.5}>
+                      {t("search")}
+                    </Typography>
+                    <TextField
+                      type="search"
+                      size="small"
+                      value={stockMovementKeyword}
+                      onChange={handleStockMovementSearchChange}
+                      placeholder={`${t("search")} ${t("product")}...`}
+                      fullWidth
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Search />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 4, md: 3 }}>
+                    <Typography className="search-head-title">{t("status")}</Typography>
+                    <TextField
+                      className="select-text-field"
+                      select
+                      fullWidth
+                      size="small"
+                      value={stockMovementStatus}
+                      onChange={handleStockMovementStatusChange}
+                    >
+                      <MenuItem value="All">{t("all")}</MenuItem>
+                      <MenuItem value="in">{t("in")}</MenuItem>
+                      <MenuItem value="out">{t("out")}</MenuItem>
+                      <MenuItem value="adjustment">{t("adjustment")}</MenuItem>
+                    </TextField>
+                  </Grid>
+                </Grid>
+              </Box>
+              <TableContainer className="table-container" sx={stockMovementTableScrollSx}>
                 <Table className="table" stickyHeader>
                   <TableHead>
                     <TableRow>
@@ -1436,7 +1514,7 @@ const Warehouse = () => {
 
                           <TableCell>
                             <Chip
-                              label={row?.type}
+                              label={language === "kh" ? t(row?.type) : row?.type}
                               size="small"
                               color={row?.type === "in"
                                 ? "success"
@@ -1453,25 +1531,15 @@ const Warehouse = () => {
                             />
                           </TableCell>
 
-
                           <TableCell>
                             {row?.quantity}{" "}
                             {language === "kh"
                               ? row?.subProduct?.unitId?.nameKh
                               : row?.subProduct?.unitId?.nameEn}
                           </TableCell>
-
-
                           <TableCell>{row?.previousStock}</TableCell>
-
-
                           <TableCell>{row?.newStock}</TableCell>
-
-
                           <TableCell>{row?.reason || "-"}</TableCell>
-
-
-
 
                         </TableRow>
                       ))}

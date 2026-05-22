@@ -91,6 +91,25 @@ query GetUsersWithPagination($page: Int, $limit: Int, $pagination: Boolean, $key
   }
 }
 `
+
+export const GET_ROLE_PERMISSIONS = gql`
+query GetRolePermissions {
+  getRolePermissions {
+    role
+    permissions {
+      module
+      actions {
+        view
+        add
+        edit
+        delete
+        export
+        approveVoid
+      }
+    }
+  }
+}
+`
 export const GET_CUSTOMERS_WITH_PAGINATION = gql`
 query GetCustomersWithPagination($shopIds: ID, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $active: Boolean) {
   getCustomersWithPagination(shopIds: $shopIds, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, active: $active) {
@@ -1701,8 +1720,8 @@ query GetOpenShift($shopId: ID!, $userId: ID) {
 `
 
 export const GET_STOCK_MOVMENT_WITH_PAGINATION = gql`
-query GetStockMovementWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $shopId: ID) {
-  getStockMovementWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, shopId: $shopId) {
+query GetStockMovementWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $shopId: ID, $type: StockMovementType) {
+  getStockMovementWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, shopId: $shopId, type: $type) {
     data {
       type
       quantity

@@ -56,6 +56,11 @@ export default function MenuNavbar() {
       routeTo: "/dashboard",
       pageIcon: <LayoutDashboard className="icon" />,
     },
+     {
+      pageTitle: t("report"),
+      routeTo: "/report",
+      pageIcon: <ChartNoAxesColumn className="icon" />,
+    },
     {
       pageTitle: t("warehouse"),
       routeTo: "/warehouse",
@@ -78,11 +83,7 @@ export default function MenuNavbar() {
       pageIcon: <Users className="icon" />,
       matchPaths: ["/customer", "/customer/customer-detail"],
     },
-    {
-      pageTitle: t("report"),
-      routeTo: "/report",
-      pageIcon: <ChartNoAxesColumn className="icon" />,
-    },
+   
     {
       pageTitle: "AI Chat",
       routeTo: "/chat",
@@ -194,7 +195,7 @@ export default function MenuNavbar() {
               opacity: 0.95,
             }}
           >
-            LIKA COMPANY
+            LIKA WEB APP SYSTEM
           </Typography>
         )}
       </Stack>

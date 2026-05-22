@@ -24,6 +24,7 @@ import TablePage from './Pages/Table';
 import ReportInShop from './Pages/ReportInShop';
 import DashboardInShop from './Pages/DashboardInShop';
 import ChatBot from './Pages/ChatBot';
+import Permission from './Pages/Permission';
  
 export default function Router() {
   const { isAuthenticated } = useAuth();
@@ -50,6 +51,7 @@ export default function Router() {
         { path: '/setting/supplier', element: <Supplier/>},
         { path: '/setting/customer', element: <Customer/>},
         { path: '/setting/table', element: <TablePage/>},
+        { path: '/setting/permission', element: <Permission/>},
         { path: '/store', element: <Store/>},
         { path: 'report', element: <Report/> },
         { path: '/store/pos/:id/report-in-shop', element: <ReportInShop/> },

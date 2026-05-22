@@ -55,7 +55,7 @@ const TOPBAR_COLORS = [
   { name: "Onyx",    value: "#1c2128" },
   { name: "Zinc",    value: "#27272a" },
   { name: "Ocean",   value: "#0969da" },
-  { name: "Indigo",  value: "#4f46e5" },
+  { name: "Marine",  value: "#1e3a5f" },
   { name: "Forest",  value: "#14532d" },
   { name: "Crimson", value: "#dc2626" },
   { name: "Sand",    value: "#f6f8fa" },

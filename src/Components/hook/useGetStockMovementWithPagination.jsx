@@ -10,14 +10,17 @@ const useGetStockMovementWithPagination = ({
     limit = 10,
     pagination = true,
     keyword,
+    type,
+    onError,
 })=>{
     const [stockMovement,setStockMovement] = useState([]);
     const [paginator, setPaginator] = useState(true);
     const { data, loading, error, refetch } = useQuery(
         GET_STOCK_MOVMENT_WITH_PAGINATION,
         {
-          variables: {shopId, page, limit, pagination, keyword },
+          variables: {shopId, page, limit, pagination, keyword, type },
           fetchPolicy: "cache-and-network",
+          onError,
         },
       );   
       

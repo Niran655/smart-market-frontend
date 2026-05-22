@@ -123,7 +123,7 @@
   "service": "សេវាកម្ម",
   "service_charge": "ថ្លៃសេវា",
   "service_price": "តម្លៃសេវាកម្ម",
-  "setting": "ការកំណត់",
+  "setting": "ការរៀបចំ",
   "shop": "ហាង",
   "shop_request": "ការស្នើរសុំពីហាង",
   "sibilings": "បងប្អូន",
@@ -471,5 +471,9 @@
   "all_time": "គ្រប់ពេល",
     "transferred": "បានផ្ទេរ",
   "partial_received": "ទទួលបានខ្លះ",
-  "approved": "ព្រមទទួល"
+  "approved": "ព្រមទទួល",
+  "in": "ចូល",
+  "out": "ចេញ",
+  "adjustment": "បម្រែបម្រួល",
+  "store_settings": "ការកំណត់ហាង"
 }

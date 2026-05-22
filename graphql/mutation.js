@@ -65,6 +65,18 @@ mutation DeleteUser($id: ID!) {
 }
 `
 
+export const SAVE_ROLE_PERMISSIONS = gql`
+mutation SaveRolePermissions($role: Role!, $permissions: [PermissionModuleInput!]!) {
+  saveRolePermissions(role: $role, permissions: $permissions) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
 export const CREATE_CUSTOMER = gql`
 mutation CreateCustomer($input: CustomerInput!) {
   createCustomer(input: $input) {

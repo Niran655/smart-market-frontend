@@ -8,6 +8,7 @@ import Unit from "../assets/Image/unit.png";
 import User from "../assets/Image/man.png";
 import Table from "../assets/Image/table.png";
 import Customer from "../assets/Image/customer.png";
+import PermissionImage from "../assets/Image/man.png";
 import { useAuth } from "../Context/AuthContext";
 import "../Styles/setting.scss";
 import { translateLauguage } from "../function/translate";
@@ -181,6 +182,7 @@ export default function Settings() {
             </Stack>
           </Paper>
         </Grid>
+        
       </Grid>
     </Box>
   );

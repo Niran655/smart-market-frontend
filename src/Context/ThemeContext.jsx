@@ -1403,15 +1403,14 @@ export const ThemeProvider = ({ children }) => {
             root: { fontSize: "0.75rem", color: t.textSubtle, marginTop: 4 },
           },
         },
-
-        // ── Select ───────────────────────────────────────────────────────────
+ 
         MuiSelect: {
           styleOverrides: {
             icon: { color: t.textMuted },
           },
         },
 
-        // ── Menu / MenuItem ──────────────────────────────────────────────────
+       
         MuiMenu: {
           styleOverrides: {
             paper: {

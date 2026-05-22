@@ -221,6 +221,94 @@ const SectionTitle = ({ children, action }) => {
   );
 };
 
+const DashboardActionButton = ({ icon, title, subtitle, onClick, primary }) => {
+  const theme = useTheme();
+  return (
+    <Button
+      onClick={onClick}
+      variant={primary ? "contained" : "outlined"}
+      startIcon={icon}
+      sx={{
+        minWidth: { xs: "100%", sm: 150 },
+        justifyContent: "flex-start",
+        px: 1.5,
+        py: 1,
+        borderRadius: 1,
+        textAlign: "left",
+        bgcolor: primary ? theme.palette.primary.main : theme.palette.background.paper,
+      }}
+    >
+      <Box>
+        <Typography sx={{ fontSize: "0.78rem", fontWeight: 800, lineHeight: 1.1 }}>
+          {title}
+        </Typography>
+        <Typography
+          sx={{
+            fontSize: "0.65rem",
+            lineHeight: 1.2,
+            color: primary ? "rgba(255,255,255,0.78)" : "text.secondary",
+          }}
+        >
+          {subtitle}
+        </Typography>
+      </Box>
+    </Button>
+  );
+};
+
+const PrintSection = ({ title, children }) => (
+  <Box sx={{ mt: 2.2, breakInside: "avoid" }}>
+    <Typography sx={{ fontSize: 13, fontWeight: 800, mb: 0.8, color: "#1f2937" }}>
+      {title}
+    </Typography>
+    {children}
+  </Box>
+);
+
+const PrintTable = ({ headers, rows }) => (
+  <Table size="small" sx={{ border: "1px solid #d0d7de", bgcolor: "#fff" }}>
+    <TableHead>
+      <TableRow>
+        {headers.map((header) => (
+          <TableCell
+            key={header}
+            sx={{
+              bgcolor: "#eef4ff",
+              color: "#1f2937",
+              fontSize: 11,
+              fontWeight: 800,
+              border: "1px solid #d0d7de",
+              py: 0.8,
+            }}
+          >
+            {header}
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {rows.length > 0 ? rows.map((row, index) => (
+        <TableRow key={`${row[0]}-${index}`}>
+          {row.map((cell, cellIndex) => (
+            <TableCell
+              key={`${cell}-${cellIndex}`}
+              sx={{ fontSize: 11, border: "1px solid #d0d7de", py: 0.7 }}
+            >
+              {cell}
+            </TableCell>
+          ))}
+        </TableRow>
+      )) : (
+        <TableRow>
+          <TableCell colSpan={headers.length} sx={{ fontSize: 11, py: 1, color: "#6b7280" }}>
+            No data
+          </TableCell>
+        </TableRow>
+      )}
+    </TableBody>
+  </Table>
+);
+
 const ViewAllBtn = () => {
   const theme = useTheme();
   const { language } = useAuth();
@@ -570,7 +658,7 @@ export default function Dashboard() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <style>{`@media print{@page{size:A4 portrait;margin:1.2cm 0.8cm;}body *{visibility:hidden;}#pdr,#pdr *{visibility:visible;}#pdr{position:fixed;left:0;top:0;width:100%;background:#f4f6fb;}thead{display:table-header-group;}}`}</style>
+      <style>{`@media print{@page{size:A4 portrait;margin:1.2cm 0.8cm;}body *{visibility:hidden;}#pdr,#pdr *{visibility:visible;}#pdr{position:fixed;left:0;top:0;width:100%;background:#f4f6fb;color:#111827;-webkit-print-color-adjust:exact;print-color-adjust:exact;}thead{display:table-header-group;}}`}</style>
 
       <Box sx={{ width: "100%", bgcolor: theme.palette.background.default, pb: 5 }}>
         <Box sx={{ "@media print": { display: "none" } }}>
@@ -595,33 +683,29 @@ export default function Dashboard() {
               </Box>
             </Stack>
 
-            <Stack direction="row" spacing={1}>
-              <Button
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1}
+              sx={{
+                p: 0.75,
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: 1,
+                bgcolor: theme.palette.background.paper,
+              }}
+            >
+              <DashboardActionButton
+                icon={<Download sx={{ fontSize: 18 }} />}
+                title={t("export_excel")}
+                subtitle={printData.periodText}
                 onClick={handleExportExcel}
-                size="small"
-                startIcon={<Download sx={{ fontSize: 15 }} />}
-                sx={{
-                  fontSize: "0.75rem", fontWeight: 600, textTransform: "none",
-                  color: theme.palette.primary.main, border: `1px solid ${theme.palette.divider}`, borderRadius: 0.5,
-                  bgcolor: theme.palette.background.paper, px: 1.5,
-                  "&:hover": { bgcolor: theme.palette.action.hover, borderColor: theme.palette.primary.main },
-                }}
-              >
-                {t("export_excel")}
-              </Button>
-              <Button
+              />
+              <DashboardActionButton
+                icon={<Print sx={{ fontSize: 18 }} />}
+                title={t("print")}
+                subtitle={t("dashboard") || "Dashboard"}
                 onClick={handlePrint}
-                size="small"
-                startIcon={<Print sx={{ fontSize: 15 }} />}
-                sx={{
-                  fontSize: "0.75rem", fontWeight: 600, textTransform: "none",
-                  color: theme.palette.common.white, borderRadius: 0.5, bgcolor: theme.palette.primary.main, px: 1.5,
-                  boxShadow: `0 2px 8px ${theme.palette.primary.main}70`,
-                  "&:hover": { bgcolor: theme.palette.primary.dark },
-                }}
-              >
-                {t("print")}
-              </Button>
+                primary
+              />
             </Stack>
           </Stack>
 
@@ -1308,7 +1392,7 @@ export default function Dashboard() {
 
         <Box id="pdr" sx={{ position: "fixed", left: "-10000px", top: 0, width: "100%", visibility: "hidden", "@media print": { position: "relative", left: 0, top: 0, visibility: "visible" } }}>
           <Box sx={{ bgcolor: theme.palette.background.default, p: 2 }}>
-            <Box sx={{ background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%)`, color: "#fff", p: 2.5, borderRadius: "12px 12px 0 0" }}>
+            <Box sx={{ background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`, color: "#fff", p: 2.5, borderRadius: "12px 12px 0 0" }}>
               <Stack direction="row" justifyContent="space-between">
                 <Box>
                   <Typography variant="h6" fontWeight={800}>{printData.companyName}</Typography>
@@ -1323,6 +1407,96 @@ export default function Dashboard() {
                   </Typography>
                 </Box>
               </Stack>
+            </Box>
+
+            <Box sx={{ bgcolor: "#fff", border: "1px solid #d0d7de", borderTop: 0, p: 2.5 }}>
+              <Grid container spacing={1.2}>
+                {printData.summaryRows.slice(0, 8).map(([label, value, change]) => (
+                  <Grid key={label} size={{ xs: 6, md: 3 }}>
+                    <Box sx={{ border: "1px solid #d0d7de", borderRadius: 1, p: 1.2, bgcolor: "#f8fafc" }}>
+                      <Typography sx={{ fontSize: 10, color: "#6b7280", textTransform: "uppercase", fontWeight: 800 }}>
+                        {label}
+                      </Typography>
+                      <Typography sx={{ fontSize: 16, color: "#111827", fontWeight: 900, mt: 0.3 }}>
+                        {value}
+                      </Typography>
+                      <Typography sx={{ fontSize: 10, color: "#2563eb", fontWeight: 700 }}>
+                        {change}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <PrintSection title="Overall Information">
+                    <PrintTable headers={["Metric", "Count"]} rows={printData.infoRows} />
+                  </PrintSection>
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <PrintSection title="Customer Overview">
+                    <PrintTable headers={["Type", "Count", "Percentage"]} rows={printData.custRows} />
+                  </PrintSection>
+                </Grid>
+              </Grid>
+
+              {printData.hasChart && (
+                <PrintSection title="Sales vs Purchase">
+                  <PrintTable headers={["Period", "Sales", "Purchases"]} rows={printData.chartRows} />
+                </PrintSection>
+              )}
+
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <PrintSection title="Top Selling Products">
+                    <PrintTable headers={["Product", "Sales", "Revenue"]} rows={printData.topProdRows} />
+                  </PrintSection>
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <PrintSection title="Low Stock Products">
+                    <PrintTable headers={["Product", "Stock", "Min Stock"]} rows={printData.lowStockRows} />
+                  </PrintSection>
+                </Grid>
+              </Grid>
+
+              <PrintSection title="Product Expiry Alerts">
+                <PrintTable headers={["Product", "Batch", "Expiry Date", "Stock", "Days Left"]} rows={printData.expiryRows} />
+              </PrintSection>
+
+              <PrintSection title="Recent Sales">
+                <PrintTable headers={["Product", "Category", "Amount", "Date"]} rows={printData.rSalesRows} />
+              </PrintSection>
+
+              <PrintSection title="Recent Transactions">
+                <PrintTable headers={["Date", "Customer", "Qty", "Price", "Status", "Total"]} rows={printData.rTxRows} />
+              </PrintSection>
+
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <PrintSection title="Top Customers">
+                    <PrintTable headers={["Name", "Country", "Orders", "Total Spent"]} rows={printData.topCustRows} />
+                  </PrintSection>
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <PrintSection title="Top Categories">
+                    <PrintTable headers={["Category", "Sales Amount"]} rows={printData.topCatRows} />
+                  </PrintSection>
+                </Grid>
+              </Grid>
+
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <PrintSection title="Order Statistics">
+                    <PrintTable headers={["Label", "Orders"]} rows={printData.orderRows} />
+                  </PrintSection>
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <PrintSection title="Category Statistics">
+                    <PrintTable headers={["Metric", "Count"]} rows={printData.catStatRows} />
+                  </PrintSection>
+                </Grid>
+              </Grid>
             </Box>
           </Box>
         </Box>

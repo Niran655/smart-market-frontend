@@ -492,5 +492,9 @@
   "export": "Export",
   "transferred": "Transferred",
   "partial_received": "Partial Received",
-  "approved": "Approved"
+  "approved": "Approved",
+  "in": "In",
+  "out": "Out",
+  "adjustment": "Adjustment",
+  "store_settings": "Store Settings"
 }
