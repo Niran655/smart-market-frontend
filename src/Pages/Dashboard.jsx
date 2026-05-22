@@ -256,59 +256,6 @@ const DashboardActionButton = ({ icon, title, subtitle, onClick, primary }) => {
   );
 };
 
-const PrintSection = ({ title, children }) => (
-  <Box sx={{ mt: 2.2, breakInside: "avoid" }}>
-    <Typography sx={{ fontSize: 13, fontWeight: 800, mb: 0.8, color: "#1f2937" }}>
-      {title}
-    </Typography>
-    {children}
-  </Box>
-);
-
-const PrintTable = ({ headers, rows }) => (
-  <Table size="small" sx={{ border: "1px solid #d0d7de", bgcolor: "#fff" }}>
-    <TableHead>
-      <TableRow>
-        {headers.map((header) => (
-          <TableCell
-            key={header}
-            sx={{
-              bgcolor: "#eef4ff",
-              color: "#1f2937",
-              fontSize: 11,
-              fontWeight: 800,
-              border: "1px solid #d0d7de",
-              py: 0.8,
-            }}
-          >
-            {header}
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-    <TableBody>
-      {rows.length > 0 ? rows.map((row, index) => (
-        <TableRow key={`${row[0]}-${index}`}>
-          {row.map((cell, cellIndex) => (
-            <TableCell
-              key={`${cell}-${cellIndex}`}
-              sx={{ fontSize: 11, border: "1px solid #d0d7de", py: 0.7 }}
-            >
-              {cell}
-            </TableCell>
-          ))}
-        </TableRow>
-      )) : (
-        <TableRow>
-          <TableCell colSpan={headers.length} sx={{ fontSize: 11, py: 1, color: "#6b7280" }}>
-            No data
-          </TableCell>
-        </TableRow>
-      )}
-    </TableBody>
-  </Table>
-);
-
 const ViewAllBtn = () => {
   const theme = useTheme();
   const { language } = useAuth();
@@ -595,6 +542,21 @@ export default function Dashboard() {
     const infoRows = [["Suppliers", overallInfo.suppliers], ["Customers", overallInfo.customers], ["Orders", overallInfo.orders]];
     const custRows = [["First Time", custOverview.firstTime, `${custOverview.firstTimePercent.toFixed(1)}%`], ["Return", custOverview.return, `${custOverview.returnPercent.toFixed(1)}%`]];
     const topProdRows = topSelling.map(p => [p.productName, p.sales, formatCurrency(p.revenue)]);
+    const topSellingTotalOrders = topSelling.reduce((sum, item) => sum + Number(item.sales || item.orders || 0), 0);
+    const topSellingSubtotal = topSelling.reduce((sum, item) => sum + Number(item.revenue || item.amount || 0), 0);
+    const topSellingTax = topSellingSubtotal * 0.07;
+    const topItemRows = topSelling.map((p, index) => {
+      const orders = Number(p.sales || p.orders || 0);
+      const share = topSellingTotalOrders > 0 ? `${((orders / topSellingTotalOrders) * 100).toFixed(1)}%` : "0.0%";
+      return [p.productName || "-", index + 1, orders, share];
+    });
+    const paymentRows = [
+      ["Payment Method", "Dashboard Summary"],
+      ["Bank Name", user?.bankName || `${companyName} Bank`],
+      ["Account Name", user?.accountName || `${companyName} Services`],
+      ["Account Number", user?.accountNumber || "9876 5432 1234 5678"],
+      ["Routing Number", user?.routingNumber || "123456789"],
+    ];
     const lowStockRows = lowStock.map(p => [p.productName, p.stock, p.minStock]);
     const expiryRows = productExpiryAlerts.map(p => [p.productName, p.batchNo || "-", formatDateShort(p.expiryDate), p.stock, p.daysUntilExpiry]);
     const rSalesRows = recentSales.map(s => [s.productName, s.category, formatCurrency(s.amount), formatDateLong(s.date)]);
@@ -603,10 +565,32 @@ export default function Dashboard() {
     const topCatRows = topCategories.map(c => [c.name, formatCurrency(c.salesAmount)]);
     const orderRows = orderStats.labels.map((l, i) => [l, orderStats.values[i]]);
     const catStatRows = [["Total Categories", catStats.totalCategories], ["Total Products", catStats.totalProducts]];
+    const dashboardSections = [
+      { title: "Dashboard Summary", headers: ["Metric", "Value", "Change"], rows: summaryRows },
+      { title: "Sales vs Purchase", headers: ["Period", "Sales", "Purchases"], rows: chartRows },
+      { title: "Overall Information", headers: ["Metric", "Count"], rows: infoRows },
+      { title: "Customer Overview", headers: ["Type", "Count", "Percentage"], rows: custRows },
+      { title: "Top Selling Products", headers: ["Product", "Sales", "Revenue"], rows: topProdRows },
+      { title: "Low Stock Products", headers: ["Product", "Stock", "Min Stock"], rows: lowStockRows },
+      { title: "Product Expiry Alerts", headers: ["Product", "Batch", "Expiry Date", "Stock", "Days Left"], rows: expiryRows },
+      { title: "Recent Sales", headers: ["Product", "Category", "Amount", "Date"], rows: rSalesRows },
+      { title: "Recent Transactions", headers: ["Date", "Customer", "Qty", "Price", "Status", "Total"], rows: rTxRows },
+      { title: "Top Customers", headers: ["Name", "Country", "Orders", "Total Spent"], rows: topCustRows },
+      { title: "Top Categories", headers: ["Category", "Sales Amount"], rows: topCatRows },
+      { title: "Order Statistics", headers: ["Label", "Orders"], rows: orderRows },
+      { title: "Category Statistics", headers: ["Metric", "Count"], rows: catStatRows },
+    ];
 
     return {
       companyName, phone, email, address, invoiceNumber,
       invoiceDate: formatDateLong(new Date()), periodText,
+      dueDate: formatDateLong(dayjs().add(7, "day")),
+      subtotal: topSellingSubtotal,
+      tax: topSellingTax,
+      total: topSellingSubtotal + topSellingTax,
+      topItemRows,
+      paymentRows,
+      dashboardSections,
       summaryRows, chartRows, infoRows, custRows, topProdRows, lowStockRows, expiryRows, rSalesRows, rTxRows, topCustRows, topCatRows, orderRows, catStatRows,
       hasChart: chartRows.length > 0, hasTopProd: topProdRows.length > 0, hasLowStock: lowStockRows.length > 0, hasExpiry: expiryRows.length > 0,
       hasRSales: rSalesRows.length > 0, hasRTx: rTxRows.length > 0, hasTopCust: topCustRows.length > 0, hasTopCat: topCatRows.length > 0,
@@ -616,9 +600,214 @@ export default function Dashboard() {
 
   const handleExportExcel = async () => {
     const wb = new ExcelJS.Workbook();
-    const C = { blue: theme.palette.primary.main.replace("#", ""), dark: "FF0D2B52", white: "FFFFFFFF", bdr: theme.palette.divider.replace("#", "") };
-    const tb = { top: { style: "thin", color: { argb: C.bdr } }, left: { style: "thin", color: { argb: C.bdr } }, bottom: { style: "thin", color: { argb: C.bdr } }, right: { style: "thin", color: { argb: C.bdr } } };
-    const hs = { font: { name: "Calibri", size: 11, bold: true, color: { argb: C.white } }, fill: { type: "pattern", pattern: "solid", fgColor: { argb: C.blue } }, alignment: { horizontal: "center", vertical: "middle" }, border: tb };
+    wb.creator = "Smart Market";
+    wb.created = new Date();
+
+    const C = {
+      blue: "FF4472C4",
+      yellow: "FFFFD93D",
+      darkBlue: "FF2F5597",
+      white: "FFFFFFFF",
+      sheet: "FFF4F4F4",
+      grid: "FFD9E2F3",
+      dark: "FF1F2937",
+    };
+    const thinBlue = { style: "thin", color: { argb: C.blue } };
+    const thinGrid = { style: "thin", color: { argb: C.grid } };
+    const tb = { top: thinGrid, left: thinGrid, bottom: thinGrid, right: thinGrid };
+    const headerBorder = { top: thinBlue, left: thinBlue, bottom: thinBlue, right: thinBlue };
+    const fill = (argb) => ({ type: "pattern", pattern: "solid", fgColor: { argb } });
+    const applyMergeStyle = (ws, range, style) => {
+      ws.getCell(range.split(":")[0]).style = { ...ws.getCell(range.split(":")[0]).style, ...style };
+    };
+    const money = (value) => `$${Number(value || 0).toFixed(2)}`;
+    const paintSheetRow = (ws, row) => {
+      for (let col = 1; col <= 12; col += 1) {
+        ws.getCell(row, col).fill = fill(C.sheet);
+      }
+    };
+    const getSpans = (count) => {
+      const base = Math.floor(12 / count);
+      const extra = 12 % count;
+      let start = 1;
+      return Array.from({ length: count }).map((_, index) => {
+        const size = base + (index < extra ? 1 : 0);
+        const span = [start, start + size - 1];
+        start += size;
+        return span;
+      });
+    };
+    const mergeCell = (ws, row, startCol, endCol, value, style = {}) => {
+      const start = ws.getCell(row, startCol).address;
+      const end = ws.getCell(row, endCol).address;
+      if (startCol !== endCol) ws.mergeCells(`${start}:${end}`);
+      const cell = ws.getCell(row, startCol);
+      cell.value = value;
+      cell.style = { ...cell.style, ...style };
+      return cell;
+    };
+
+    const invoiceSheet = wb.addWorksheet("Dashboard Invoice", {
+      pageSetup: { paperSize: 9, orientation: "portrait", fitToPage: true, fitToWidth: 1, fitToHeight: 0 },
+      views: [{ showGridLines: true }],
+    });
+    invoiceSheet.properties.defaultRowHeight = 18;
+    invoiceSheet.columns = [
+      { width: 4 }, { width: 18 }, { width: 10 }, { width: 10 },
+      { width: 10 }, { width: 10 }, { width: 10 }, { width: 10 },
+      { width: 10 }, { width: 10 }, { width: 10 }, { width: 10 },
+    ];
+
+    for (let row = 1; row <= 32; row += 1) paintSheetRow(invoiceSheet, row);
+
+    invoiceSheet.mergeCells("A2:F6");
+    invoiceSheet.mergeCells("G2:L6");
+    invoiceSheet.getCell("A2").value = {
+      richText: [
+        { text: `${printData.companyName}\n`, font: { name: "Calibri", size: 16, bold: true, color: { argb: C.white } } },
+        { text: `dashboard analytics\n${printData.address}\n${printData.phone}\n${printData.email}`, font: { name: "Calibri", size: 10, color: { argb: C.white } } },
+      ],
+    };
+    invoiceSheet.getCell("A2").alignment = { vertical: "middle", horizontal: "left", wrapText: true };
+    invoiceSheet.getCell("G2").value = {
+      richText: [
+        { text: "INVOICE\n", font: { name: "Calibri", size: 34, bold: true, color: { argb: C.yellow } } },
+        { text: `Invoice Number: ${printData.invoiceNumber}\nInvoice Date: ${printData.invoiceDate}\nDue Date: ${printData.dueDate}`, font: { name: "Calibri", size: 10, bold: true, color: { argb: C.white } } },
+      ],
+    };
+    invoiceSheet.getCell("G2").alignment = { vertical: "middle", horizontal: "right", wrapText: true };
+    ["A2:F6", "G2:L6"].forEach((range) => applyMergeStyle(invoiceSheet, range, { fill: fill(C.blue) }));
+    invoiceSheet.mergeCells("A7:L7");
+    invoiceSheet.getCell("A7").fill = fill(C.yellow);
+
+    invoiceSheet.mergeCells("B9:E10");
+    invoiceSheet.getCell("B9").value = "Invoice To";
+    invoiceSheet.getCell("B9").font = { name: "Calibri", size: 14, bold: true, color: { argb: C.darkBlue } };
+    invoiceSheet.getCell("B9").alignment = { horizontal: "center", vertical: "middle" };
+    invoiceSheet.mergeCells("H9:L11");
+    invoiceSheet.getCell("H9").value = {
+      richText: [
+        { text: `${printData.companyName}\n`, font: { name: "Calibri", size: 13, bold: true, color: { argb: C.darkBlue } } },
+        { text: `${printData.address}\nPeriod: ${printData.periodText}`, font: { name: "Calibri", size: 10, color: { argb: C.dark } } },
+      ],
+    };
+    invoiceSheet.getCell("H9").alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+
+    invoiceSheet.mergeCells("A13:L13");
+    invoiceSheet.getCell("A13").value = "Top Selling Items";
+    invoiceSheet.getCell("A13").font = { name: "Calibri", size: 12, bold: true, color: { argb: C.darkBlue } };
+    invoiceSheet.getCell("A13").border = { bottom: { style: "thin", color: { argb: C.blue } } };
+    [
+      ["A14:E14", "Item"],
+      ["F14:H14", "Rank"],
+      ["I14:J14", "Orders"],
+      ["K14:L14", "Share"],
+    ].forEach(([range, label]) => {
+      invoiceSheet.mergeCells(range);
+      const cell = invoiceSheet.getCell(range.split(":")[0]);
+      cell.value = label;
+      cell.font = { name: "Calibri", size: 11, bold: true, color: { argb: C.white } };
+      cell.fill = fill(C.blue);
+      cell.alignment = { horizontal: label === "Item" ? "left" : "center", vertical: "middle" };
+      cell.border = headerBorder;
+    });
+
+    const itemRows = printData.topItemRows.length > 0 ? printData.topItemRows : [["No data", "-", "-", "-"]];
+    itemRows.forEach((row, index) => {
+      const excelRow = 15 + index;
+      [
+        [`A${excelRow}:E${excelRow}`, row[0], "left"],
+        [`F${excelRow}:H${excelRow}`, row[1], "center"],
+        [`I${excelRow}:J${excelRow}`, row[2], "center"],
+        [`K${excelRow}:L${excelRow}`, row[3], "right"],
+      ].forEach(([range, value, align]) => {
+        invoiceSheet.mergeCells(range);
+        const cell = invoiceSheet.getCell(range.split(":")[0]);
+        cell.value = value;
+        cell.font = { name: "Calibri", size: 10, color: { argb: C.dark } };
+        cell.border = tb;
+        cell.alignment = { horizontal: align, vertical: "middle" };
+      });
+    });
+
+    const totalsStart = Math.max(20, 15 + itemRows.length + 1);
+    [
+      ["Sub Total", money(printData.subtotal), false],
+      ["Tax (7%)", money(printData.tax), false],
+      ["TOTAL", money(printData.total), true],
+    ].forEach(([label, value, strong], index) => {
+      const row = totalsStart + index;
+      invoiceSheet.mergeCells(`H${row}:J${row}`);
+      invoiceSheet.mergeCells(`K${row}:L${row}`);
+      invoiceSheet.getCell(`H${row}`).value = label;
+      invoiceSheet.getCell(`K${row}`).value = value;
+      [invoiceSheet.getCell(`H${row}`), invoiceSheet.getCell(`K${row}`)].forEach((cell) => {
+        cell.font = { name: "Calibri", size: strong ? 14 : 10, bold: true, color: { argb: strong ? C.darkBlue : C.dark } };
+        cell.alignment = { horizontal: cell.address.startsWith("K") ? "right" : "left", vertical: "middle" };
+        cell.border = { top: thinBlue, bottom: strong ? thinBlue : thinGrid };
+      });
+    });
+
+    const paymentStart = totalsStart + 5;
+    invoiceSheet.mergeCells(`A${paymentStart}:L${paymentStart}`);
+    invoiceSheet.getCell(`A${paymentStart}`).value = "Payment Information";
+    invoiceSheet.getCell(`A${paymentStart}`).font = { name: "Calibri", size: 16, bold: true, color: { argb: C.darkBlue } };
+    invoiceSheet.getCell(`A${paymentStart}`).alignment = { horizontal: "center", vertical: "middle" };
+    invoiceSheet.getCell(`A${paymentStart}`).border = { top: thinBlue };
+    printData.paymentRows.forEach(([label, value], index) => {
+      const row = paymentStart + index + 1;
+      invoiceSheet.mergeCells(`D${row}:F${row}`);
+      invoiceSheet.mergeCells(`H${row}:L${row}`);
+      invoiceSheet.getCell(`D${row}`).value = `${label}:`;
+      invoiceSheet.getCell(`H${row}`).value = value;
+      invoiceSheet.getCell(`D${row}`).font = { name: "Calibri", size: 10, bold: true, color: { argb: C.dark } };
+      invoiceSheet.getCell(`H${row}`).font = { name: "Calibri", size: 10, color: { argb: C.dark } };
+      invoiceSheet.getCell(`D${row}`).alignment = { horizontal: "right" };
+      invoiceSheet.getCell(`H${row}`).alignment = { horizontal: "center" };
+    });
+
+    const addInvoiceSection = (startRow, title, headers, rows) => {
+      const safeRows = rows.length > 0 ? rows : [headers.map((_, index) => (index === 0 ? "No data" : "-"))];
+      const spans = getSpans(headers.length);
+      for (let row = startRow; row <= startRow + safeRows.length + 2; row += 1) paintSheetRow(invoiceSheet, row);
+
+      invoiceSheet.mergeCells(`A${startRow}:L${startRow}`);
+      invoiceSheet.getCell(`A${startRow}`).value = title;
+      invoiceSheet.getCell(`A${startRow}`).font = { name: "Calibri", size: 12, bold: true, color: { argb: C.darkBlue } };
+      invoiceSheet.getCell(`A${startRow}`).alignment = { horizontal: "left", vertical: "middle" };
+      invoiceSheet.getCell(`A${startRow}`).border = { bottom: thinBlue };
+
+      headers.forEach((header, index) => {
+        const [startCol, endCol] = spans[index];
+        mergeCell(invoiceSheet, startRow + 1, startCol, endCol, header, {
+          font: { name: "Calibri", size: 10, bold: true, color: { argb: C.white } },
+          fill: fill(C.blue),
+          alignment: { horizontal: index === 0 ? "left" : "center", vertical: "middle", wrapText: true },
+          border: headerBorder,
+        });
+      });
+
+      safeRows.forEach((rowData, rowIndex) => {
+        const excelRow = startRow + 2 + rowIndex;
+        rowData.forEach((value, colIndex) => {
+          const [startCol, endCol] = spans[colIndex];
+          mergeCell(invoiceSheet, excelRow, startCol, endCol, value ?? "-", {
+            font: { name: "Calibri", size: 10, color: { argb: C.dark } },
+            alignment: { horizontal: colIndex === 0 ? "left" : "right", vertical: "middle", wrapText: true },
+            border: tb,
+          });
+        });
+      });
+
+      return startRow + safeRows.length + 4;
+    };
+
+    let sectionStart = paymentStart + printData.paymentRows.length + 4;
+    printData.dashboardSections.forEach((section) => {
+      sectionStart = addInvoiceSection(sectionStart, section.title, section.headers, section.rows);
+    });
+
+    const hs = { font: { name: "Calibri", size: 11, bold: true, color: { argb: C.white } }, fill: fill(C.blue), alignment: { horizontal: "center", vertical: "middle" }, border: tb };
     const addSheet = (name, title, headers, rows) => {
       const ws = wb.addWorksheet(name);
       ws.addRow([title]).font = { size: 14, bold: true, color: { argb: C.dark } };
@@ -690,19 +879,19 @@ export default function Dashboard() {
                 p: 0.75,
                 border: `1px solid ${theme.palette.divider}`,
                 borderRadius: 1,
-                bgcolor: theme.palette.background.paper,
+               
               }}
             >
               <DashboardActionButton
                 icon={<Download sx={{ fontSize: 18 }} />}
                 title={t("export_excel")}
-                subtitle={printData.periodText}
+                 
                 onClick={handleExportExcel}
               />
               <DashboardActionButton
                 icon={<Print sx={{ fontSize: 18 }} />}
                 title={t("print")}
-                subtitle={t("dashboard") || "Dashboard"}
+ 
                 onClick={handlePrint}
                 primary
               />
@@ -1391,112 +1580,153 @@ export default function Dashboard() {
 
 
         <Box id="pdr" sx={{ position: "fixed", left: "-10000px", top: 0, width: "100%", visibility: "hidden", "@media print": { position: "relative", left: 0, top: 0, visibility: "visible" } }}>
-          <Box sx={{ bgcolor: theme.palette.background.default, p: 2 }}>
-            <Box sx={{ background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`, color: "#fff", p: 2.5, borderRadius: "12px 12px 0 0" }}>
-              <Stack direction="row" justifyContent="space-between">
-                <Box>
-                  <Typography variant="h6" fontWeight={800}>{printData.companyName}</Typography>
-                  <Typography variant="caption">{printData.address}<br />{printData.phone}<br />{printData.email}</Typography>
+          <Box sx={{ bgcolor: "#f4f4f4", minHeight: "100vh", p: 0.5 }}>
+            <Box sx={{ width: "100%", maxWidth: 920, mx: "auto", bgcolor: "#f4f4f4", color: "#1f2937", fontFamily: "Calibri, Arial, sans-serif" }}>
+              <Stack direction="row" sx={{ bgcolor: "#4472c4", color: "#fff", minHeight: 150 }}>
+                <Box sx={{ width: "52%", p: 2.2 }}>
+                  <Typography sx={{ fontSize: 24, fontWeight: 800, lineHeight: 1.1 }}>
+                    {printData.companyName}
+                  </Typography>
+                  <Typography sx={{ fontSize: 13, lineHeight: 1.9, mt: 0.5 }}>
+                    dashboard analytics<br />
+                    {printData.address}<br />
+                    {printData.phone}<br />
+                    {printData.email}
+                  </Typography>
                 </Box>
-                <Box sx={{ textAlign: "right" }}>
-                  <Typography variant="h5" fontWeight={800}>{t("dashboard")}</Typography>
-                  <Typography variant="caption">
-                    <b>Report #:</b> {printData.invoiceNumber}<br />
-                    <b>Date:</b> {printData.invoiceDate}<br />
-                    <b>Period:</b> {printData.periodText}
+                <Box sx={{ flex: 1, p: 2.2, textAlign: "right" }}>
+                  <Typography sx={{ fontSize: 54, lineHeight: 1, fontWeight: 900, color: "#ffd93d", letterSpacing: 0 }}>
+                    INVOICE
+                  </Typography>
+                  <Typography sx={{ fontSize: 13, lineHeight: 1.9, fontWeight: 700, mt: 0.7 }}>
+                    Invoice Number: {printData.invoiceNumber}<br />
+                    Invoice Date: {printData.invoiceDate}<br />
+                    Due Date: {printData.dueDate}
                   </Typography>
                 </Box>
               </Stack>
-            </Box>
 
-            <Box sx={{ bgcolor: "#fff", border: "1px solid #d0d7de", borderTop: 0, p: 2.5 }}>
-              <Grid container spacing={1.2}>
-                {printData.summaryRows.slice(0, 8).map(([label, value, change]) => (
-                  <Grid key={label} size={{ xs: 6, md: 3 }}>
-                    <Box sx={{ border: "1px solid #d0d7de", borderRadius: 1, p: 1.2, bgcolor: "#f8fafc" }}>
-                      <Typography sx={{ fontSize: 10, color: "#6b7280", textTransform: "uppercase", fontWeight: 800 }}>
-                        {label}
+              <Box sx={{ height: 26, bgcolor: "#ffd93d" }} />
+
+              <Grid container sx={{ minHeight: 126, alignItems: "center" }}>
+                <Grid size={{ xs: 6 }}>
+                  <Typography sx={{ textAlign: "center", fontSize: 21, fontWeight: 800, color: "#2f5597" }}>
+                    Invoice To
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 6 }}>
+                  <Typography sx={{ textAlign: "center", fontSize: 21, fontWeight: 800, color: "#2f5597" }}>
+                    {printData.companyName}
+                  </Typography>
+                  <Typography sx={{ textAlign: "center", fontSize: 13, lineHeight: 1.8 }}>
+                    {printData.address}<br />
+                    Period: {printData.periodText}
+                  </Typography>
+                </Grid>
+              </Grid>
+
+              <Box sx={{ borderTop: "1.5px solid #4472c4", mb: 0.8 }}>
+                <Typography sx={{ fontSize: 18, lineHeight: 1.5, fontWeight: 800, color: "#2f5597", px: 0.5 }}>
+                  Top Selling Items
+                </Typography>
+              </Box>
+
+              <Table size="small" sx={{ tableLayout: "fixed", width: "100%", "& td, & th": { fontFamily: "Calibri, Arial, sans-serif" } }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ width: "43%", bgcolor: "#4472c4", color: "#fff", fontSize: 16, fontWeight: 800, py: 0.6, borderRight: "1px solid #d9e2f3" }}>Item</TableCell>
+                    <TableCell align="center" sx={{ width: "24%", bgcolor: "#4472c4", color: "#fff", fontSize: 16, fontWeight: 800, py: 0.6, borderRight: "1px solid #d9e2f3" }}>Rank</TableCell>
+                    <TableCell align="center" sx={{ width: "17%", bgcolor: "#4472c4", color: "#fff", fontSize: 16, fontWeight: 800, py: 0.6, borderRight: "1px solid #d9e2f3" }}>Orders</TableCell>
+                    <TableCell align="right" sx={{ width: "16%", bgcolor: "#4472c4", color: "#fff", fontSize: 16, fontWeight: 800, py: 0.6 }}>Share</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {(printData.topItemRows.length > 0 ? printData.topItemRows : [["No data", "-", "-", "-"]]).map((row, index) => (
+                    <TableRow key={`${row[0]}-${index}`}>
+                      <TableCell sx={{ fontSize: 13, py: 0.55, borderBottom: "1px solid #d9e2f3" }}>{row[0]}</TableCell>
+                      <TableCell align="center" sx={{ fontSize: 13, py: 0.55, borderBottom: "1px solid #d9e2f3" }}>{row[1]}</TableCell>
+                      <TableCell align="center" sx={{ fontSize: 13, py: 0.55, borderBottom: "1px solid #d9e2f3" }}>{row[2]}</TableCell>
+                      <TableCell align="right" sx={{ fontSize: 13, py: 0.55, borderBottom: "1px solid #d9e2f3" }}>{row[3]}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              <Grid container sx={{ mt: 2.8, borderBottom: "1.5px solid #4472c4", pb: 1.2 }}>
+                <Grid size={{ xs: 7 }} />
+                <Grid size={{ xs: 5 }}>
+                  {[
+                    ["Sub Total", formatCurrency(printData.subtotal), false],
+                    ["Tax (7%)", formatCurrency(printData.tax), false],
+                    ["TOTAL", formatCurrency(printData.total), true],
+                  ].map(([label, value, strong]) => (
+                    <Stack key={label} direction="row" justifyContent="space-between" sx={{ borderTop: "1.5px solid #4472c4", py: 0.45 }}>
+                      <Typography sx={{ fontSize: strong ? 19 : 13, fontWeight: 800, color: strong ? "#2f5597" : "#1f2937" }}>{label}</Typography>
+                      <Typography sx={{ fontSize: strong ? 20 : 13, fontWeight: 800, color: strong ? "#2f5597" : "#1f2937" }}>{value}</Typography>
+                    </Stack>
+                  ))}
+                </Grid>
+              </Grid>
+
+              <Box sx={{ pt: 0.8 }}>
+                <Typography sx={{ textAlign: "center", fontSize: 24, fontWeight: 800, color: "#2f5597", lineHeight: 1.3 }}>
+                  Payment Information
+                </Typography>
+                <Box sx={{ width: "62%", mx: "auto", mt: 0.6 }}>
+                  {printData.paymentRows.map(([label, value]) => (
+                    <Stack key={label} direction="row" sx={{ py: 0.25 }}>
+                      <Typography sx={{ width: "45%", textAlign: "right", pr: 2, fontSize: 14, fontWeight: 800 }}>
+                        {label}:
                       </Typography>
-                      <Typography sx={{ fontSize: 16, color: "#111827", fontWeight: 900, mt: 0.3 }}>
+                      <Typography sx={{ flex: 1, textAlign: "center", fontSize: 14 }}>
                         {value}
                       </Typography>
-                      <Typography sx={{ fontSize: 10, color: "#2563eb", fontWeight: 700 }}>
-                        {change}
+                    </Stack>
+                  ))}
+                </Box>
+              </Box>
+
+              <Box sx={{ mt: 3 }}>
+                {printData.dashboardSections.map((section) => (
+                  <Box key={section.title} sx={{ mt: 2.2, breakInside: "avoid" }}>
+                    <Box sx={{ borderTop: "1.5px solid #4472c4", mb: 0.6 }}>
+                      <Typography sx={{ fontSize: 16, lineHeight: 1.5, fontWeight: 800, color: "#2f5597", px: 0.5 }}>
+                        {section.title}
                       </Typography>
                     </Box>
-                  </Grid>
+                    <Table size="small" sx={{ tableLayout: "fixed", width: "100%", "& td, & th": { fontFamily: "Calibri, Arial, sans-serif" } }}>
+                      <TableHead>
+                        <TableRow>
+                          {section.headers.map((header, index) => (
+                            <TableCell
+                              key={header}
+                              align={index === 0 ? "left" : "right"}
+                              sx={{ bgcolor: "#4472c4", color: "#fff", fontSize: 12, fontWeight: 800, py: 0.45, borderRight: "1px solid #d9e2f3" }}
+                            >
+                              {header}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {(section.rows.length > 0 ? section.rows : [section.headers.map((_, index) => (index === 0 ? "No data" : "-"))]).map((row, rowIndex) => (
+                          <TableRow key={`${section.title}-${rowIndex}`}>
+                            {row.map((cell, cellIndex) => (
+                              <TableCell
+                                key={`${section.title}-${rowIndex}-${cellIndex}`}
+                                align={cellIndex === 0 ? "left" : "right"}
+                                sx={{ fontSize: 11, py: 0.4, borderBottom: "1px solid #d9e2f3", overflowWrap: "anywhere" }}
+                              >
+                                {cell}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Box>
                 ))}
-              </Grid>
-
-              <Grid container spacing={2} sx={{ mt: 1 }}>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <PrintSection title="Overall Information">
-                    <PrintTable headers={["Metric", "Count"]} rows={printData.infoRows} />
-                  </PrintSection>
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <PrintSection title="Customer Overview">
-                    <PrintTable headers={["Type", "Count", "Percentage"]} rows={printData.custRows} />
-                  </PrintSection>
-                </Grid>
-              </Grid>
-
-              {printData.hasChart && (
-                <PrintSection title="Sales vs Purchase">
-                  <PrintTable headers={["Period", "Sales", "Purchases"]} rows={printData.chartRows} />
-                </PrintSection>
-              )}
-
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <PrintSection title="Top Selling Products">
-                    <PrintTable headers={["Product", "Sales", "Revenue"]} rows={printData.topProdRows} />
-                  </PrintSection>
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <PrintSection title="Low Stock Products">
-                    <PrintTable headers={["Product", "Stock", "Min Stock"]} rows={printData.lowStockRows} />
-                  </PrintSection>
-                </Grid>
-              </Grid>
-
-              <PrintSection title="Product Expiry Alerts">
-                <PrintTable headers={["Product", "Batch", "Expiry Date", "Stock", "Days Left"]} rows={printData.expiryRows} />
-              </PrintSection>
-
-              <PrintSection title="Recent Sales">
-                <PrintTable headers={["Product", "Category", "Amount", "Date"]} rows={printData.rSalesRows} />
-              </PrintSection>
-
-              <PrintSection title="Recent Transactions">
-                <PrintTable headers={["Date", "Customer", "Qty", "Price", "Status", "Total"]} rows={printData.rTxRows} />
-              </PrintSection>
-
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <PrintSection title="Top Customers">
-                    <PrintTable headers={["Name", "Country", "Orders", "Total Spent"]} rows={printData.topCustRows} />
-                  </PrintSection>
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <PrintSection title="Top Categories">
-                    <PrintTable headers={["Category", "Sales Amount"]} rows={printData.topCatRows} />
-                  </PrintSection>
-                </Grid>
-              </Grid>
-
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <PrintSection title="Order Statistics">
-                    <PrintTable headers={["Label", "Orders"]} rows={printData.orderRows} />
-                  </PrintSection>
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <PrintSection title="Category Statistics">
-                    <PrintTable headers={["Metric", "Count"]} rows={printData.catStatRows} />
-                  </PrintSection>
-                </Grid>
-              </Grid>
+              </Box>
             </Box>
           </Box>
         </Box>

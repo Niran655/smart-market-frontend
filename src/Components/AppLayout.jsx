@@ -376,7 +376,7 @@ export default function AppLayout() {
           {shopLoading ? (
             <Box sx={{ px: 2, py: 2 }}>
               <Typography sx={{ fontSize: "0.82rem", color: "text.secondary" }}>
-                {t("loading") || "Loading..."}
+                {t("loading")}
               </Typography>
             </Box>
           ) : filteredStores.length === 0 ? (

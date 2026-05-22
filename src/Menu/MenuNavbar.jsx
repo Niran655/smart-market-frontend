@@ -112,7 +112,7 @@ export default function MenuNavbar() {
     setLayoutMode(isCompact ? "default" : "compact");
   };
 
-  // ── Shared styles ──────────────────────────────────────────────────────────
+ 
   const itemSx = (active) => ({
     backgroundColor: active ? "rgba(255,255,255,0.1)" : "transparent",
     borderRadius: "6px",
