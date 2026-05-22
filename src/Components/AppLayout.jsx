@@ -1,11 +1,15 @@
-import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Shrink } from "lucide-react";
+import {
+  ChartColumnIncreasing,
+  LayoutDashboard,
+  Settings2,
+  Shrink,
+  Store,
+} from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   AppBar,
@@ -25,7 +29,6 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { Store } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import CambodiaFlag from "../assets/Image/cambodiaflag.png";
@@ -138,21 +141,21 @@ export default function AppLayout() {
   
   const menuItems = [
     {
-      icon: GridViewOutlinedIcon,
+      icon: LayoutDashboard,
       label: `${t("dashboard")}`,
       path: "/dashboard",
     },
     { icon: Store, label: `${t("store")}`, path: "/store" },
     {
-      icon: ReceiptLongOutlinedIcon,
+      icon: ChartColumnIncreasing,
       label: `${t("report")}`,
       path: "/report",
     },
-    {
-      icon: SettingsOutlinedIcon,
-      label: `${t("setting")}`,
-      path: "/setting",
-    },
+    // {
+    //   icon: Settings2,
+    //   label: `${t("setting")}`,
+    //   path: "/setting",
+    // },
   ];
 
   const tabs = [
@@ -354,19 +357,46 @@ export default function AppLayout() {
                         style={{ textDecoration: "none" }}
                       >
                         <Button
-                          startIcon={<IconComponent />}
                           sx={{
+                            position: "relative",
+                            minHeight: 35,
                             borderRadius: 1,
-                            px: 2,
+                            px: 1.5,
+                            gap: 1,
+                            textTransform: "none",
+                            fontWeight: isActiveItem ? 700 : 500,
                             color: theme.palette.getContrastText(topbarColor),
                             bgcolor: isActiveItem
-                              ? theme.palette.action.selected
+                              ? "rgba(255,255,255,0.16)"
                               : "transparent",
+                            border: "1px solid",
+                            borderColor: isActiveItem
+                              ? "rgba(255,255,255,0.28)"
+                              : "transparent",
+                            boxShadow: isActiveItem
+                              ? "0 6px 18px rgba(0,0,0,0.12)"
+                              : "none",
                             "&:hover": {
-                              bgcolor: theme.palette.action.hover,
+                              bgcolor: "rgba(255,255,255,0.12)",
+                              borderColor: "rgba(255,255,255,0.18)",
                             },
+                          
                           }}
                         >
+                          <Box
+                            component="span"
+                            sx={{
+                              width: 28,
+                              height: 28,
+                              borderRadius: 1.5,
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                               
+                            }}
+                          >
+                            <IconComponent size={18} strokeWidth={2.2} />
+                          </Box>
                           {item.label}
                         </Button>
                       </Link>
