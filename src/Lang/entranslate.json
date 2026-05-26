@@ -496,5 +496,20 @@
   "in": "In",
   "out": "Out",
   "adjustment": "Adjustment",
-  "store_settings": "Store Settings"
+  "store_settings": "Store Settings",
+  "salaries": "Salaries",
+  "rent": "Rent",
+  "utilities": "Utilities",
+  "marketing": "Marketing",
+  "supplies": "Supplies",
+  "order_tax": "Order Tax",
+  "shipping": "Shipping",
+  "net_unit_price": "Net Unit Price",
+  "add_return": "Add Return",
+  "reference": "Reference",
+  "main": "Main",
+  "finance": "Finance",
+  "people": "People",
+  "restaurant": "Restaurant",
+  "add_sales_return": "Add Sales Return"
 }

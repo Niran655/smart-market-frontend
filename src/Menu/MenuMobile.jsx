@@ -16,11 +16,9 @@ import {
   Bag2,
   Category,
   DocumentText1,
-  HomeHashtag,
   Messages2,
   Shop,          // for Store page
   Tag,
-  UserOctagon,
 } from "iconsax-react";
 import { useState } from "react";
 
@@ -32,10 +30,37 @@ export default function MenuMobile({ onNavigate, showLabels }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { sidebarColor, layoutMode } = useThemeContext();
+  const [settingsOpen, setSettingsOpen] = useState(
+    location.pathname.startsWith("/setting")
+  );
 
  
   const labelsVisible =
     typeof showLabels === "boolean" ? showLabels : layoutMode !== "compact";
+
+  const settingGroups = [
+    {
+      title: "Inventory",
+      items: [
+        { pageTitle: "Products", routeTo: "/setting/product" },
+        { pageTitle: "Category", routeTo: "/setting/category" },
+        { pageTitle: "Units", routeTo: "/setting/unit" },
+      ],
+    },
+    {
+      title: "People",
+      items: [
+        { pageTitle: "Users", routeTo: "/setting/user" },
+        { pageTitle: "Suppliers", routeTo: "/setting/supplier" },
+        { pageTitle: "Customers", routeTo: "/setting/customer" },
+        { pageTitle: "Permission", routeTo: "/setting/permission" },
+      ],
+    },
+    {
+      title: "Restaurant",
+      items: [{ pageTitle: "Tables", routeTo: "/setting/table" }],
+    },
+  ];
 
  
   const menuData = [
@@ -48,11 +73,6 @@ export default function MenuMobile({ onNavigate, showLabels }) {
       pageTitle: "Store",
       routeTo: "/store",
       pageIcon: <Shop className="icon" />,
-    },
-    {
-      pageTitle: "Warehouse",
-      routeTo: "/warehouse",
-      pageIcon: <HomeHashtag className="icon" />,
     },
     {
       pageTitle: "Order",
@@ -69,12 +89,6 @@ export default function MenuMobile({ onNavigate, showLabels }) {
       pageTitle: "On Sale",
       routeTo: "/on-sale",
       pageIcon: <Bag2 className="icon" />,
-    },
-    {
-      pageTitle: "Customer",
-      routeTo: "/customer",
-      pageIcon: <UserOctagon className="icon" />,
-      matchPaths: ["/customer", "/customer/customer-detail"],
     },
     {
       pageTitle: "Reports",
@@ -177,18 +191,22 @@ export default function MenuMobile({ onNavigate, showLabels }) {
           <ListItem
             disablePadding
             onClick={() => {
-              navigate("/setting");
-              if (typeof onNavigate === "function") onNavigate();
+              if (labelsVisible) {
+                setSettingsOpen((prev) => !prev);
+              } else {
+                navigate("/setting");
+                if (typeof onNavigate === "function") onNavigate();
+              }
             }}
             sx={{
               backgroundColor:
-                location.pathname === "/setting"
+                location.pathname.startsWith("/setting")
                   ? "rgba(255, 255, 255, 0.15)"
                   : "transparent",
               transition: "background-color 0.3s ease",
               "&:hover": {
                 backgroundColor:
-                  location.pathname === "/setting"
+                  location.pathname.startsWith("/setting")
                     ? "rgba(255, 255, 255, 0.15)"
                     : "rgba(255, 255, 255, 0.1)",
               },
@@ -214,12 +232,84 @@ export default function MenuMobile({ onNavigate, showLabels }) {
                 <IoSettingsOutline size={25} className="icon" />
               </ListItemIcon>
               {labelsVisible && (
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                  Setting
-                </Typography>
+                <>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 500, flexGrow: 1 }}
+                  >
+                    Setting
+                  </Typography>
+                  {settingsOpen ? <ExpandLess /> : <ExpandMore />}
+                </>
               )}
             </ListItemButton>
           </ListItem>
+          {labelsVisible && (
+            <Collapse in={settingsOpen} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {settingGroups.map((group) => (
+                  <Box key={group.title} sx={{ mb: 0.75 }}>
+                    <Typography
+                      sx={{
+                        color: "rgba(255,255,255,0.65)",
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        px: 2,
+                        py: 0.75,
+                      }}
+                    >
+                      {group.title}
+                    </Typography>
+                    {group.items.map((child) => {
+                      const active = location.pathname === child.routeTo;
+
+                      return (
+                        <ListItem
+                          key={child.routeTo}
+                          disablePadding
+                          onClick={() => {
+                            navigate(child.routeTo);
+                            if (typeof onNavigate === "function") onNavigate();
+                          }}
+                          sx={{
+                            backgroundColor: active
+                              ? "rgba(255, 255, 255, 0.15)"
+                              : "transparent",
+                            "&:hover": {
+                              backgroundColor: active
+                                ? "rgba(255, 255, 255, 0.15)"
+                                : "rgba(255, 255, 255, 0.1)",
+                            },
+                          }}
+                        >
+                          <ListItemButton sx={{ color: "white", pl: 3, py: 0.75 }}>
+                            <Box
+                              sx={{
+                                width: 4,
+                                height: 4,
+                                borderRadius: "50%",
+                                bgcolor: active
+                                  ? "white"
+                                  : "rgba(255,255,255,0.45)",
+                                mr: 1.5,
+                                flexShrink: 0,
+                              }}
+                            />
+                            <Typography
+                              variant="body2"
+                              sx={{ fontWeight: active ? 700 : 400 }}
+                            >
+                              {child.pageTitle}
+                            </Typography>
+                          </ListItemButton>
+                        </ListItem>
+                      );
+                    })}
+                  </Box>
+                ))}
+              </List>
+            </Collapse>
+          )}
         </List>
       </Stack>
     </Box>

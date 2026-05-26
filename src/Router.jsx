@@ -25,6 +25,10 @@ import ReportInShop from './Pages/ReportInShop';
 import DashboardInShop from './Pages/DashboardInShop';
 import ChatBot from './Pages/ChatBot';
 import Permission from './Pages/Permission';
+import Expense from './Pages/Expense';
+import Income from './Pages/Income';
+import Invoice from './Pages/Invoice';
+import SaleReturn from './Pages/SaleReturn';
  
 export default function Router() {
   const { isAuthenticated } = useAuth();
@@ -54,6 +58,10 @@ export default function Router() {
         { path: '/setting/permission', element: <Permission/>},
         { path: '/store', element: <Store/>},
         { path: 'report', element: <Report/> },
+        { path: 'expense', element: <Expense/> },
+        { path: 'income', element: <Income/> },
+        { path: 'invoice', element: <Invoice/> },
+        { path: 'sale-return', element: <SaleReturn/> },
         { path: '/store/pos/:id/report-in-shop', element: <ReportInShop/> },
         { path: '/store/pos/:id/dashboard-in-shop', element: <DashboardInShop/> },
         { path: 'profile', element:<Profile/>},

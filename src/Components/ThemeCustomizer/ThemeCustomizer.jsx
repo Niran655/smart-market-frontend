@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import SettingsIcon from "@mui/icons-material/Settings";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import CloseIcon from "@mui/icons-material/Close";
@@ -17,7 +18,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useThemeContext } from "../../Context/ThemeContext";
 
  
@@ -427,10 +428,14 @@ export default function ThemeCustomizer() {
                 onChange={(e) => setLayoutMode(e.target.value)}
                 row
               >
-                {["Default", "Boxed", "Compact"].map((l) => (
+                {[
+                  { label: "Default", value: "default" },
+                  { label: "Horizontal", value: "top" },
+                  { label: "Compact", value: "compact" },
+                ].map((l) => (
                   <FormControlLabel
-                    key={l}
-                    value={l.toLowerCase()}
+                    key={l.value}
+                    value={l.value}
                     control={
                       <Radio
                         size="small"
@@ -442,8 +447,8 @@ export default function ThemeCustomizer() {
                       />
                     }
                     label={
-                      <Typography sx={{ fontSize: "0.8125rem", color: layoutMode === l.toLowerCase() ? drawerText : drawerMuted }}>
-                        {l}
+                      <Typography sx={{ fontSize: "0.8125rem", color: layoutMode === l.value ? drawerText : drawerMuted }}>
+                        {l.label}
                       </Typography>
                     }
                     sx={{ mr: 1.5 }}

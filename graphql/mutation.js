@@ -455,6 +455,30 @@ export const UPDATE_SALE_STATUS = gql`
   }
 `;
 
+export const UPDATE_SALE = gql`
+mutation UpdateSale($id: ID!, $input: SaleInput) {
+  updateSale(_id: $id, input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`;
+
+export const DELETE_SALE = gql`
+mutation DeleteSale($id: ID!) {
+  deleteSale(_id: $id) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`;
+
 
 export const CREATE_SUPPLIER = gql`
 mutation CreateSupplier($input: SupplierInput) {
@@ -658,6 +682,78 @@ mutation UpdateTable($id: ID!, $input: TableInput) {
 export const DELETE_TABLE = gql`
 mutation DeleteTable($id: ID!) {
   deleteTable(_id: $id) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const CREATE_EXPENSE = gql`
+mutation CreateExpense($input: ExpenseInput!) {
+  createExpense(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const UPDATE_EXPENSE = gql`
+mutation UpdateExpense($id: ID!, $input: ExpenseInput) {
+  updateExpense(_id: $id, input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const DELETE_EXPENSE = gql`
+mutation DeleteExpense($id: ID!) {
+  deleteExpense(_id: $id) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const CREATE_INCOME = gql`
+mutation CreateIncome($input: IncomeInput!) {
+  createIncome(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const UPDATE_INCOME = gql`
+mutation UpdateIncome($id: ID!, $input: IncomeInput) {
+  updateIncome(_id: $id, input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const DELETE_INCOME = gql`
+mutation DeleteIncome($id: ID!) {
+  deleteIncome(_id: $id) {
     isSuccess
     message {
       messageEn

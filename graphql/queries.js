@@ -863,6 +863,7 @@ export const GET_SALES = gql`
     $pagination: Boolean
     $startDate: Date
     $endDate: Date
+    $keyword: String
   ) {
     getSales(
       shopId: $shopId
@@ -872,6 +873,7 @@ export const GET_SALES = gql`
       pagination: $pagination
       startDate: $startDate
       endDate: $endDate
+      keyword: $keyword
     ) {
       data {
         _id
@@ -1471,6 +1473,119 @@ export const GET_INCOME_REPORT = gql`
         totalDocs
         hasNextPage
         hasPrevPage
+      }
+    }
+  }
+`;
+
+export const GET_EXPENSES_WITH_PAGINATION = gql`
+  query GetExpensesWithPagination(
+    $shopId: ID
+    $category: String
+    $startDate: Date
+    $endDate: Date
+    $page: Int
+    $limit: Int
+    $pagination: Boolean
+    $keyword: String
+  ) {
+    getExpensesWithPagination(
+      shopId: $shopId
+      category: $category
+      startDate: $startDate
+      endDate: $endDate
+      page: $page
+      limit: $limit
+      pagination: $pagination
+      keyword: $keyword
+    ) {
+      data {
+        _id
+        category
+        amount
+        description
+        date
+        shopId {
+          _id
+          nameEn
+          nameKh
+        }
+        createdBy {
+          _id
+          nameEn
+          nameKh
+        }
+        createdAt
+        updatedAt
+      }
+      paginator {
+        slNo
+        prev
+        next
+        perPage
+        totalPosts
+        totalPages
+        currentPage
+        hasPrevPage
+        hasNextPage
+        totalDocs
+      }
+    }
+  }
+`;
+
+export const GET_INCOMES_WITH_PAGINATION = gql`
+  query GetIncomesWithPagination(
+    $shopId: ID
+    $type: String
+    $startDate: Date
+    $endDate: Date
+    $page: Int
+    $limit: Int
+    $pagination: Boolean
+    $keyword: String
+  ) {
+    getIncomesWithPagination(
+      shopId: $shopId
+      type: $type
+      startDate: $startDate
+      endDate: $endDate
+      page: $page
+      limit: $limit
+      pagination: $pagination
+      keyword: $keyword
+    ) {
+      data {
+        _id
+        type
+        source
+        amount
+        description
+        date
+        shopId {
+          _id
+          nameEn
+          nameKh
+        }
+        createdBy {
+          _id
+          nameEn
+          nameKh
+        }
+        createdAt
+        updatedAt
+      }
+      paginator {
+        slNo
+        prev
+        next
+        perPage
+        totalPosts
+        totalPages
+        currentPage
+        hasPrevPage
+        hasNextPage
+        totalDocs
       }
     }
   }

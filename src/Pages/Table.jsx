@@ -141,9 +141,10 @@ const TablePage = () => {
               value={activeFilter}
               onChange={(e) => setActiveFilter(e.target.value)}
             >
+              <MenuItem value="all">{t("all")}</MenuItem>
               <MenuItem value="active">{t("active")}</MenuItem>
               <MenuItem value="inactive">{t("inactive")}</MenuItem>
-              <MenuItem value="all">{t("all")}</MenuItem>
+              
             </TextField>
           </Grid>
         </Grid>

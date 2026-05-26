@@ -1,9 +1,17 @@
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import {
+  CategoryOutlined,
+  GroupOutlined,
+  Inventory2Outlined,
+  LocalShippingOutlined,
+  PeopleAltOutlined,
+  RestaurantOutlined,
+  SecurityOutlined,
+  StraightenOutlined,
+} from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Avatar,
   Box,
-  Collapse,
   List,
   ListItem,
   ListItemButton,
@@ -16,13 +24,14 @@ import {
   BadgePercent,
   BotMessageSquare,
   ChartNoAxesColumn,
+  FileText,
   LayoutDashboard,
-  Settings,
+  RotateCcw,
   ShoppingCart,
-  Users,
+  TrendingDown,
+  TrendingUp,
   Warehouse,
 } from "lucide-react";
-import { useState } from "react";
 
 import logo from "../assets/Image/small-logo.png";
 import { useThemeContext } from "../Context/ThemeContext";
@@ -45,27 +54,28 @@ export default function MenuNavbar() {
   const { language } = useAuth();
   const { t } = translateLauguage(language);
   const { sidebarColor, layoutMode, setLayoutMode } = useThemeContext();
-  const [openDropdown, setOpenDropdown] = useState(null);
 
-   
+
   const isCompact = layoutMode === "compact";
 
   const menuData = [
+    { type: "section", pageTitle: t("main") },
     {
       pageTitle: t("dashboard"),
       routeTo: "/dashboard",
       pageIcon: <LayoutDashboard className="icon" />,
     },
-     {
+    {
       pageTitle: t("report"),
       routeTo: "/report",
       pageIcon: <ChartNoAxesColumn className="icon" />,
     },
     {
-      pageTitle: t("warehouse"),
-      routeTo: "/warehouse",
-      pageIcon: <Warehouse className="icon" />,
+      pageTitle: "AI Chat",
+      routeTo: "/chat",
+      pageIcon: <BotMessageSquare className="icon" />,
     },
+    { type: "section", pageTitle: t("sales") },
     {
       pageTitle: t("orders"),
       routeTo: "/order",
@@ -78,16 +88,73 @@ export default function MenuNavbar() {
       pageIcon: <BadgePercent className="icon" />,
     },
     {
-      pageTitle: t("customer"),
-      routeTo: "/customer",
-      pageIcon: <Users className="icon" />,
-      matchPaths: ["/customer", "/customer/customer-detail"],
+      pageTitle: t("period_invoice") || "Invoice",
+      routeTo: "/invoice",
+      pageIcon: <FileText className="icon" />,
     },
-   
     {
-      pageTitle: "AI Chat",
-      routeTo: "/chat",
-      pageIcon: <BotMessageSquare className="icon" />,
+      pageTitle: t("total_sale_return") || "Sales Return",
+      routeTo: "/sale-return",
+      pageIcon: <RotateCcw className="icon" />,
+    },
+    { type: "section", pageTitle: t("finance") || "Finance" },
+    {
+      pageTitle: t("income_report") || "Income",
+      routeTo: "/income",
+      pageIcon: <TrendingUp className="icon" />,
+    },
+    {
+      pageTitle: t("period_expense") || "Expense",
+      routeTo: "/expense",
+      pageIcon: <TrendingDown className="icon" />,
+    },
+    { type: "section", pageTitle: t("inventory") },
+    {
+      pageTitle: t("warehouse"),
+      routeTo: "/warehouse",
+      pageIcon: <Warehouse className="icon" />,
+    },
+    {
+      pageTitle: t("products"),
+      routeTo: "/setting/product",
+      pageIcon: <Inventory2Outlined className="icon" />,
+    },
+    {
+      pageTitle: t("category"),
+      routeTo: "/setting/category",
+      pageIcon: <CategoryOutlined className="icon" />,
+    },
+    {
+      pageTitle: t("unit"),
+      routeTo: "/setting/unit",
+      pageIcon: <StraightenOutlined className="icon" />,
+    },
+    { type: "section", pageTitle: t("people") },
+    {
+      pageTitle: t("user"),
+      routeTo: "/setting/user",
+      pageIcon: <GroupOutlined className="icon" />,
+    },
+    {
+      pageTitle: t("suppliers"),
+      routeTo: "/setting/supplier",
+      pageIcon: <LocalShippingOutlined className="icon" />,
+    },
+    {
+      pageTitle: t("customer"),
+      routeTo: "/setting/customer",
+      pageIcon: <PeopleAltOutlined className="icon" />,
+    },
+    {
+      pageTitle: t("permission"),
+      routeTo: "/setting/permission",
+      pageIcon: <SecurityOutlined className="icon" />,
+    },
+    { type: "section", pageTitle: t("restaurant") },
+    {
+      pageTitle: t("table"),
+      routeTo: "/setting/table",
+      pageIcon: <RestaurantOutlined className="icon" />,
     },
   ];
 
@@ -99,11 +166,7 @@ export default function MenuNavbar() {
   };
 
   const handleItemClick = (menu) => {
-    if (menu.children) {
-      setOpenDropdown((prev) =>
-        prev === menu.pageTitle ? null : menu.pageTitle
-      );
-    } else {
+    if (menu.routeTo) {
       navigate(menu.routeTo);
     }
   };
@@ -112,7 +175,7 @@ export default function MenuNavbar() {
     setLayoutMode(isCompact ? "default" : "compact");
   };
 
- 
+
   const itemSx = (active) => ({
     backgroundColor: active ? "rgba(255,255,255,0.1)" : "transparent",
     borderRadius: "6px",
@@ -157,7 +220,7 @@ export default function MenuNavbar() {
         },
       }}
     >
-      
+
       <Stack
         direction="row"
         alignItems="center"
@@ -203,14 +266,40 @@ export default function MenuNavbar() {
       {/* ── Menu items ──────────────────────────────────────────────────── */}
       <Box sx={{ flex: 1, overflowY: "auto", overflowX: "hidden" }}>
         <List sx={{ px: 1, pt: 1.5, pb: 0 }}>
-          {menuData.map((menu) => {
+          {menuData.map((menu, index) => {
+            const menuKey = `${menu.type || "item"}-${menu.routeTo || menu.pageTitle}-${index}`;
+
+            if (menu.type === "section") {
+              if (isCompact) return null;
+
+              const isFirstSection = index === 0;
+
+              return (
+                <Typography
+                  key={menuKey}
+                  sx={{
+                    color: `${textColor}99`,
+                    fontSize: "0.76rem",
+                    fontWeight: 700,
+                    textAlign: "left",
+                    px: 1.25,
+                    pt: 2.25,
+                    pb: 0.75,
+                    textTransform: "capitalize",
+                    borderTop: isFirstSection ? "none" : "1px solid rgba(255,255,255,0.08)",
+                    mt: isFirstSection ? 0 : 1.25,
+                  }}
+                >
+                  {menu.pageTitle}
+                </Typography>
+              );
+            }
+
             const active = isActive(menu);
-            const hasChildren = !!menu.children;
-            const isOpen = openDropdown === menu.pageTitle;
 
             const row = (
               <ListItem
-                key={menu.pageTitle}
+                key={menuKey}
                 disablePadding
                 sx={itemSx(active)}
                 onClick={() => handleItemClick(menu)}
@@ -249,18 +338,6 @@ export default function MenuNavbar() {
                       >
                         {menu.pageTitle}
                       </Typography>
-
-                      {/* Chevron */}
-                      {hasChildren &&
-                        (isOpen ? (
-                          <ExpandLess
-                            sx={{ fontSize: 15, color: `${textColor}88`, flexShrink: 0 }}
-                          />
-                        ) : (
-                          <ExpandMore
-                            sx={{ fontSize: 15, color: `${textColor}88`, flexShrink: 0 }}
-                          />
-                        ))}
                     </>
                   )}
                 </ListItemButton>
@@ -268,7 +345,7 @@ export default function MenuNavbar() {
             );
 
             return (
-              <Box key={menu.pageTitle}>
+              <Box key={menuKey}>
                 {/* Wrap icon-only in Tooltip */}
                 {isCompact ? (
                   <Tooltip title={menu.pageTitle} placement="right" arrow>
@@ -277,134 +354,12 @@ export default function MenuNavbar() {
                 ) : (
                   row
                 )}
-
-                {/* Dropdown children */}
-                {hasChildren && (
-                  <Collapse in={isOpen} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding sx={{ pl: isCompact ? 0.5 : 1 }}>
-                      {menu.children.map((child) => {
-                        const childActive = location.pathname === child.routeTo;
-                        return (
-                          <ListItem
-                            key={child.pageTitle}
-                            disablePadding
-                            sx={itemSx(childActive)}
-                            onClick={() => navigate(child.routeTo)}
-                          >
-                            <ListItemButton
-                              sx={{ ...btnSx, px: isCompact ? 0 : 1.25, py: 0.625 }}
-                            >
-                              {/* Dot for non-compact child */}
-                              {!isCompact && (
-                                <Box
-                                  sx={{
-                                    width: 4,
-                                    height: 4,
-                                    borderRadius: "50%",
-                                    bgcolor: childActive ? textColor : `${textColor}55`,
-                                    mr: 1.75,
-                                    ml: 0.5,
-                                    flexShrink: 0,
-                                  }}
-                                />
-                              )}
-                              <Typography
-                                sx={{
-                                  fontSize: "0.8rem",
-                                  fontWeight: childActive ? 600 : 400,
-                                  color: childActive ? textColor : `${textColor}aa`,
-                                  whiteSpace: "nowrap",
-                                }}
-                              >
-                                {child.pageTitle}
-                              </Typography>
-                            </ListItemButton>
-                          </ListItem>
-                        );
-                      })}
-                    </List>
-                  </Collapse>
-                )}
               </Box>
             );
           })}
         </List>
       </Box>
-
-      {/* ── Settings pinned at bottom ────────────────────────────────────── */}
-      <Box
-        sx={{
-          flexShrink: 0,
-          borderTop: `1px solid rgba(255,255,255,0.07)`,
-          px: 1,
-          py: 1,
-        }}
-      >
-        {isCompact ? (
-          <Tooltip title={t("setting")} placement="right" arrow>
-            <ListItem
-              disablePadding
-              sx={itemSx(location.pathname === "/setting")}
-              onClick={() => navigate("/setting")}
-            >
-              <ListItemButton
-                sx={{ ...btnSx, justifyContent: "center" }}
-              >
-                <ListItemIcon
-                  sx={{
-                    color:
-                      location.pathname === "/setting"
-                        ? textColor
-                        : `${textColor}99`,
-                    minWidth: 0,
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Settings size={18} />
-                </ListItemIcon>
-              </ListItemButton>
-            </ListItem>
-          </Tooltip>
-        ) : (
-          <ListItem
-            disablePadding
-            sx={itemSx(location.pathname === "/setting")}
-            onClick={() => navigate("/setting")}
-          >
-            <ListItemButton sx={btnSx}>
-              <ListItemIcon
-                sx={{
-                  color:
-                    location.pathname === "/setting"
-                      ? textColor
-                      : `${textColor}99`,
-                  minWidth: 0,
-                  mr: 1.25,
-                  flexShrink: 0,
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Settings size={18} />
-              </ListItemIcon>
-              <Typography
-                sx={{
-                  fontSize: "0.8375rem",
-                  fontWeight: location.pathname === "/setting" ? 600 : 400,
-                  color:
-                    location.pathname === "/setting"
-                      ? textColor
-                      : `${textColor}cc`,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {t("setting")}
-              </Typography>
-            </ListItemButton>
-          </ListItem>
-        )}
-      </Box>
+ 
     </Box>
   );
 }

@@ -1,17 +1,34 @@
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
-  ChartColumnIncreasing,
-  ChevronDown,
+  CategoryOutlined,
+  GroupOutlined,
+  Inventory2Outlined,
+  LocalShippingOutlined,
+  PeopleAltOutlined,
+  RestaurantOutlined,
+  SecurityOutlined,
+  StraightenOutlined,
+} from "@mui/icons-material";
+import {
   ExternalLink,
   LayoutDashboard,
-  Settings2,
   Shrink,
   Store,
-  ChevronsUpDown 
+  ChevronsUpDown,
+  BadgePercent,
+  BotMessageSquare,
+  ChartNoAxesColumn,
+  FileText,
+  RotateCcw,
+  ShoppingCart,
+  TrendingDown,
+  TrendingUp,
+  Warehouse,
+  Search,
+  X,
 } from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -38,16 +55,15 @@ import { useEffect, useState } from "react";
 
 import CambodiaFlag from "../assets/Image/cambodiaflag.png";
 import EnglishFlag from "../assets/Image/englishflag.png";
+import logo from "../assets/Image/small-logo.png";
 import { useThemeContext } from "../Context/ThemeContext";
 import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import Menu from "./menu/Menu";
 import { MenuMobile, MenuNavbar } from "../Menu";
-import TopNavbar from "../Menu/TopNavbar";
 import { useLazyQuery, useQuery } from "@apollo/client/react";
 import { GET_ALL_SHOP, GET_OPEN_SHIFT } from "../../graphql/queries";
-// import search icon
-import { Search, X } from "lucide-react";
+
 export default function AppLayout() {
   const {
     sidebarColor,
@@ -72,6 +88,8 @@ export default function AppLayout() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuPosition, setMenuPosition] = useState(null);
   const [storeMenuAnchor, setStoreMenuAnchor] = useState(null);
+  const [horizontalMenuPosition, setHorizontalMenuPosition] = useState(null);
+  const [activeHorizontalSection, setActiveHorizontalSection] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userObject, setUserObject] = useState(null);
 
@@ -114,8 +132,6 @@ export default function AppLayout() {
   const [checkOpenShift] = useLazyQuery(GET_OPEN_SHIFT);
 
   const stores = shopData?.getAllShops || [];
-  const activeShop = stores.find((shop) => shop?._id === id);
-
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
   const handleMenuOpen = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -174,6 +190,69 @@ export default function AppLayout() {
     // },
   ];
 
+  const horizontalSections = [
+    {
+      key: "main",
+      label: t("main"),
+      icon: LayoutDashboard,
+      items: [
+        { label: t("dashboard"), path: "/dashboard", icon: LayoutDashboard },
+        { label: t("report"), path: "/report", icon: ChartNoAxesColumn },
+        { label: "AI Chat", path: "/chat", icon: BotMessageSquare },
+      ],
+    },
+    {
+      key: "sales",
+      label: t("sales"),
+      icon: ShoppingCart,
+      items: [
+        { label: t("orders"), path: "/order", icon: ShoppingCart },
+        { label: t("sale"), path: "/on-sale", icon: BadgePercent },
+        { label: t("period_invoice") || "Invoice", path: "/invoice", icon: FileText },
+        { label: t("total_sale_return") || "Sales Return", path: "/sale-return", icon: RotateCcw },
+      ],
+    },
+    {
+      key: "finance",
+      label: t("finance") || "Finance",
+      icon: TrendingUp,
+      items: [
+        { label: t("income_report") || "Income", path: "/income", icon: TrendingUp },
+        { label: t("period_expense") || "Expense", path: "/expense", icon: TrendingDown },
+      ],
+    },
+    {
+      key: "inventory",
+      label: t("inventory"),
+      icon: Inventory2Outlined,
+      items: [
+        { label: t("warehouse"), path: "/warehouse", icon: Warehouse },
+        { label: t("products"), path: "/setting/product", icon: Inventory2Outlined },
+        { label: t("category"), path: "/setting/category", icon: CategoryOutlined },
+        { label: t("unit"), path: "/setting/unit", icon: StraightenOutlined },
+      ],
+    },
+    {
+      key: "people",
+      label: t("people"),
+      icon: PeopleAltOutlined,
+      items: [
+        { label: t("user"), path: "/setting/user", icon: GroupOutlined },
+        { label: t("suppliers"), path: "/setting/supplier", icon: LocalShippingOutlined },
+        { label: t("customer"), path: "/setting/customer", icon: PeopleAltOutlined },
+        { label: t("permission"), path: "/setting/permission", icon: SecurityOutlined },
+      ],
+    },
+    {
+      key: "restaurant",
+      label: t("restaurant"),
+      icon: RestaurantOutlined,
+      items: [
+        { label: t("table"), path: "/setting/table", icon: RestaurantOutlined },
+      ],
+    },
+  ];
+
   const tabs = [
     { key: "pos", label: t("pos"), link: `/store/pos/${id}` },
     { key: "orders", label: t("orders"), link: `/store/orders/${id}` },
@@ -202,6 +281,25 @@ export default function AppLayout() {
 
   const handleStoreMenuClose = () => {
     setStoreMenuAnchor(null);
+  };
+
+  const handleHorizontalMenuOpen = (event, section) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setHorizontalMenuPosition({
+      top: rect.bottom,
+      left: rect.left,
+    });
+    setActiveHorizontalSection(section);
+  };
+
+  const handleHorizontalMenuClose = () => {
+    setHorizontalMenuPosition(null);
+    setActiveHorizontalSection(null);
+  };
+
+  const handleHorizontalNavigate = (path) => {
+    handleHorizontalMenuClose();
+    navigate(path);
   };
 
   const handleGoToShop = async (shopId) => {
@@ -534,6 +632,134 @@ export default function AppLayout() {
     </MuiMenu>
   );
 
+  const HorizontalMenuBar = () => (
+    <>
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={0.75}
+        sx={{
+          width: "100%",
+          overflowX: "auto",
+          scrollbarWidth: "none",
+          "&::-webkit-scrollbar": { display: "none" },
+        }}
+      >
+        {horizontalSections.map((section) => {
+          const SectionIcon = section.icon;
+          const isActiveSection = section.items.some((item) =>
+            location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)
+          );
+
+          return (
+            <Button
+              key={section.key}
+              onClick={(event) => handleHorizontalMenuOpen(event, section)}
+              startIcon={<SectionIcon size={17} />}
+              endIcon={<ChevronsUpDown size={14} />}
+              sx={{
+                flexShrink: 0,
+                minHeight: 36,
+                px: 1.5,
+                borderRadius: 1,
+                textTransform: "none",
+                fontWeight: isActiveSection ? 700 : 500,
+                color: theme.palette.getContrastText(topbarColor),
+                bgcolor: isActiveSection ? "rgba(255,255,255,0.16)" : "transparent",
+                border: "1px solid",
+                borderColor: isActiveSection ? "rgba(255,255,255,0.28)" : "transparent",
+                "&:hover": {
+                  bgcolor: "rgba(255,255,255,0.12)",
+                  borderColor: "rgba(255,255,255,0.18)",
+                },
+              }}
+            >
+              {section.label}
+            </Button>
+          );
+        })}
+      </Stack>
+
+      <MuiMenu
+        open={Boolean(horizontalMenuPosition)}
+        onClose={handleHorizontalMenuClose}
+        anchorReference="anchorPosition"
+        anchorPosition={horizontalMenuPosition || undefined}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        slotProps={{
+          paper: {
+            sx: {
+              mt: 0.75,
+              minWidth: 220,
+              borderRadius: 1.5,
+              boxShadow: theme.shadows[6],
+            },
+          },
+          backdrop: {
+            sx: {
+              backdropFilter: "none",
+              backgroundColor: "transparent",
+            },
+          },
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1,
+            px: 1.25,
+            py: 0.75,
+          }}
+        >
+          <Typography sx={{ fontSize: "0.85rem", fontWeight: 700 }} noWrap>
+            {activeHorizontalSection?.label}
+          </Typography>
+          <Tooltip title={t("close")}>
+            <IconButton
+              size="small"
+              aria-label={t("close")}
+              onClick={handleHorizontalMenuClose}
+              sx={{
+                width: 28,
+                height: 28,
+                borderRadius: 1,
+                color: "text.secondary",
+                "&:hover": {
+                  color: "error.main",
+                  bgcolor: "action.hover",
+                },
+              }}
+            >
+              <X size={15} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        <Divider />
+
+        {(activeHorizontalSection?.items || []).map((item) => {
+          const ItemIcon = item.icon;
+          const active = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+
+          return (
+            <MenuItem
+              key={item.path}
+              selected={active}
+              onClick={() => handleHorizontalNavigate(item.path)}
+              sx={{ gap: 1.25, py: 1 }}
+            >
+              <ListItemIcon sx={{ minWidth: 28 }}>
+                <ItemIcon size={17} />
+              </ListItemIcon>
+              {item.label}
+            </MenuItem>
+          );
+        })}
+      </MuiMenu>
+    </>
+  );
+
 
   const RightActions = () => (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -664,10 +890,45 @@ export default function AppLayout() {
               )}
 
 
-              {!isMobile && isTopNav && !isPosPage && (
-                <Box sx={{ flex: 1, overflow: "hidden" }}>
-                  <TopNavbar />
-                </Box>
+              {!isMobile && isTopNav && (
+                <Stack direction="row" alignItems="center" spacing={1.5}>
+                  <ButtonBase
+                    onClick={() => navigate("/dashboard")}
+                    sx={{ borderRadius: 1, p: 0.5 }}
+                  >
+                    <Avatar
+                      alt="logo"
+                      src={logo}
+                      sx={{ width: 30, height: 30, borderRadius: 0 }}
+                    />
+                  </ButtonBase>
+                  <Button
+                    onClick={handleStoreMenuOpen}
+                    startIcon={<Store size={18} />}
+                    endIcon={<ChevronsUpDown size={15} />}
+                    sx={{
+                      minHeight: 35,
+                      borderRadius: 1,
+                      px: 1.5,
+                      textTransform: "none",
+                      fontWeight: 600,
+                      color: theme.palette.getContrastText(topbarColor),
+                      bgcolor: location.pathname.startsWith("/store")
+                        ? "rgba(255,255,255,0.16)"
+                        : "transparent",
+                      border: "1px solid",
+                      borderColor: location.pathname.startsWith("/store")
+                        ? "rgba(255,255,255,0.28)"
+                        : "transparent",
+                      "&:hover": {
+                        bgcolor: "rgba(255,255,255,0.12)",
+                        borderColor: "rgba(255,255,255,0.18)",
+                      },
+                    }}
+                  >
+                    {t("store")}
+                  </Button>
+                </Stack>
               )}
 
 
@@ -746,9 +1007,24 @@ export default function AppLayout() {
               )}
 
               {isMobile && <Box flex={1} />}
+              {!isMobile && isTopNav && <Box flex={1} />}
 
               <RightActions />
             </Toolbar>
+
+            {!isMobile && isTopNav && (
+              <Toolbar
+                variant="dense"
+                sx={{
+                  minHeight: "44px !important",
+                  borderTop: "1px solid rgba(255,255,255,0.08)",
+                  borderBottom: "1px solid rgba(255,255,255,0.08)",
+                  px: 2,
+                }}
+              >
+                <HorizontalMenuBar />
+              </Toolbar>
+            )}
           </AppBar>
         )}
 

@@ -475,5 +475,21 @@
   "in": "ចូល",
   "out": "ចេញ",
   "adjustment": "បម្រែបម្រួល",
-  "store_settings": "ការកំណត់ហាង"
+  "store_settings": "ការកំណត់ហាង",
+  "salaries": "លុយខែ",
+  "rent": "ជួល",
+  "utilities": "សេវាកម្ម",
+  "marketing": "ផ្សព្វផ្សាយ",
+  "supplies": "គ្រឿងបរិក្ខារ",
+  "order_tax": "ពន្ធលើការបញ្ជាទិញ",
+  "shipping": "ការដឹកជញ្ជូន",
+  "net_unit_price": "តម្លៃសុទ្ធក្នុងឯកតា",
+  "add_return": "បន្ថែមការត្រឡប់មកវិញ",
+  "reference": "លេខយោង",
+  "main":"សំខាន់",
+  "finance":"ហិរញ្ញវត្ថុ",
+  "people":"មនុស្ស",
+  "restaurant":"ភោជនីយដ្ឋាន",
+  "add_sales_return":"បន្ថែមការត្រឡប់មកវិញពីការលក់"
+
 }
