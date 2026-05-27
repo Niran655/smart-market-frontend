@@ -939,3 +939,41 @@ mutation ClockOutAttendance($employeeId: ID!) {
   }
 }
 `
+
+export const CREATE_LEAVE_REQUEST = gql`
+mutation CreateLeaveRequest($input: LeaveRequestInput!) {
+  createLeaveRequest(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+    data {
+      _id
+      date
+      reason
+      status
+      adminRemark
+      createdAt
+    }
+  }
+}
+`
+
+export const UPDATE_LEAVE_REQUEST_STATUS = gql`
+mutation UpdateLeaveRequestStatus($id: ID!, $status: LeaveRequestStatus!, $adminRemark: String) {
+  updateLeaveRequestStatus(id: $id, status: $status, adminRemark: $adminRemark) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+    data {
+      _id
+      status
+      adminRemark
+      reviewedAt
+    }
+  }
+}
+`

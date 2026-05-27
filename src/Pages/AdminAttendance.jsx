@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -6,6 +6,7 @@ import {
   Avatar,
   Box,
   Breadcrumbs,
+  Button,
   Chip,
   Grid,
   InputAdornment,
@@ -25,7 +26,8 @@ import { Search } from "lucide-react";
 import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
-import { GET_ATTENDANCES_WITH_PAGINATION } from "../../graphql/queries";
+import { UPDATE_LEAVE_REQUEST_STATUS } from "../../graphql/mutation";
+import { GET_ATTENDANCES_WITH_PAGINATION, GET_LEAVE_REQUESTS_WITH_PAGINATION } from "../../graphql/queries";
 import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 import EmptyData from "../include/EmptyData";
@@ -50,7 +52,7 @@ const statusColor = (status) => {
 };
 
 export default function AdminAttendance() {
-  const { language } = useAuth();
+  const { language, setAlert } = useAuth();
   const { t } = translateLauguage(language);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -74,6 +76,22 @@ export default function AdminAttendance() {
   const attendances = data?.getAttendancesWithPagination?.data || [];
   const paginator = data?.getAttendancesWithPagination?.paginator || {};
 
+  const { data: leaveData, refetch: refetchLeaveRequests } = useQuery(GET_LEAVE_REQUESTS_WITH_PAGINATION, {
+    variables: { page: 1, limit: 20, pagination: true, status: "pending" },
+    fetchPolicy: "cache-and-network",
+  });
+  const leaveRequests = leaveData?.getLeaveRequestsWithPagination?.data || [];
+
+  const [updateLeaveStatus, { loading: updatingLeave }] = useMutation(UPDATE_LEAVE_REQUEST_STATUS, {
+    onCompleted: ({ updateLeaveRequestStatus }) => {
+      setAlert(true, updateLeaveRequestStatus?.isSuccess ? "success" : "error", updateLeaveRequestStatus?.message);
+      refetchLeaveRequests();
+    },
+    onError: (error) => {
+      setAlert(true, "error", { messageEn: error.message, messageKh: error.message });
+    },
+  });
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box>
@@ -86,6 +104,50 @@ export default function AdminAttendance() {
 
         <Typography variant="h5" fontWeight={700} mt={4}>Attendance</Typography>
         <Typography color="text.secondary" mb={3}>Manage your Attendance</Typography>
+
+        <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 2, mb: 3 }}>
+          <Typography variant="h6" fontWeight={700} mb={2}>Pending Leave Requests</Typography>
+          {leaveRequests.length === 0 ? (
+            <Typography color="text.secondary">No pending leave requests.</Typography>
+          ) : (
+            <Grid container spacing={2}>
+              {leaveRequests.map((request) => (
+                <Grid size={{ xs: 12, md: 6 }} key={request._id}>
+                  <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 2 }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="start" spacing={2}>
+                      <Box>
+                        <Typography fontWeight={700}>{request.employee?.nameEn || request.employee?.nameKh || "-"}</Typography>
+                        <Typography color="text.secondary" fontSize={13}>{dayjs(request.date).format("DD MMM YYYY")}</Typography>
+                      </Box>
+                      <Chip size="small" color="warning" label={request.status} />
+                    </Stack>
+                    <Typography sx={{ my: 1.5 }}>{request.reason}</Typography>
+                    <Stack direction="row" spacing={1}>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="success"
+                        disabled={updatingLeave}
+                        onClick={() => updateLeaveStatus({ variables: { id: request._id, status: "approved" } })}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="error"
+                        disabled={updatingLeave}
+                        onClick={() => updateLeaveStatus({ variables: { id: request._id, status: "rejected" } })}
+                      >
+                        Reject
+                      </Button>
+                    </Stack>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </Box>
 
         <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1 }}>
           <Grid container spacing={2} alignItems="center" sx={{ p: 2 }}>

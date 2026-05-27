@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Chip,
+  Grid,
   IconButton,
   InputAdornment,
   Stack,
@@ -18,8 +19,17 @@ import { useSearchParams } from "react-router-dom";
 import * as Yup from "yup";
 import { EmailOutlined, LockOutlined, Visibility, VisibilityOff } from "@mui/icons-material";
 
-import { CLOCK_IN_ATTENDANCE, LOGIN_EMPLOYEE } from "../../graphql/mutation";
-import { GET_TODAY_ATTENDANCE } from "../../graphql/queries";
+import {
+  CLOCK_IN_ATTENDANCE,
+  CLOCK_OUT_ATTENDANCE,
+  CREATE_LEAVE_REQUEST,
+  LOGIN_EMPLOYEE,
+} from "../../graphql/mutation";
+import {
+  GET_ATTENDANCES_WITH_PAGINATION,
+  GET_LEAVE_REQUESTS_WITH_PAGINATION,
+  GET_TODAY_ATTENDANCE,
+} from "../../graphql/queries";
 import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 
@@ -75,10 +85,52 @@ export default function AttendanceQrScan() {
   });
   const todayAttendance = todayData?.getTodayAttendance;
 
+  const employeeAuthContext = {
+    headers: {
+      authorization: employeeToken ? `Bearer ${employeeToken}` : "",
+    },
+  };
+
+  const { data: historyData, refetch: refetchHistory } = useQuery(GET_ATTENDANCES_WITH_PAGINATION, {
+    variables: { page: 1, limit: 7, pagination: true, employeeId },
+    skip: !employeeId || !employeeToken,
+    fetchPolicy: "cache-and-network",
+    context: employeeAuthContext,
+  });
+  const attendanceHistory = historyData?.getAttendancesWithPagination?.data || [];
+
+  const { data: leaveData, refetch: refetchLeaveRequests } = useQuery(GET_LEAVE_REQUESTS_WITH_PAGINATION, {
+    variables: { page: 1, limit: 5, pagination: true, employeeId },
+    skip: !employeeId || !employeeToken,
+    fetchPolicy: "cache-and-network",
+    context: employeeAuthContext,
+  });
+  const leaveRequests = leaveData?.getLeaveRequestsWithPagination?.data || [];
+
   const [clockIn, { loading }] = useMutation(CLOCK_IN_ATTENDANCE, {
     onCompleted: ({ clockInAttendance }) => {
       setAlert(true, clockInAttendance?.isSuccess ? "success" : "error", clockInAttendance?.message);
       if (employeeId) refetch();
+      refetchHistory();
+    },
+    onError: (error) => {
+      setAlert(true, "error", { messageEn: error.message, messageKh: error.message });
+    },
+  });
+  const [clockOut, { loading: clockingOut }] = useMutation(CLOCK_OUT_ATTENDANCE, {
+    onCompleted: ({ clockOutAttendance }) => {
+      setAlert(true, clockOutAttendance?.isSuccess ? "success" : "error", clockOutAttendance?.message);
+      refetch();
+      refetchHistory();
+    },
+    onError: (error) => {
+      setAlert(true, "error", { messageEn: error.message, messageKh: error.message });
+    },
+  });
+  const [createLeaveRequest, { loading: creatingLeave }] = useMutation(CREATE_LEAVE_REQUEST, {
+    onCompleted: ({ createLeaveRequest }) => {
+      setAlert(true, createLeaveRequest?.isSuccess ? "success" : "error", createLeaveRequest?.message);
+      refetchLeaveRequests();
     },
     onError: (error) => {
       setAlert(true, "error", { messageEn: error.message, messageKh: error.message });
@@ -286,6 +338,109 @@ export default function AttendanceQrScan() {
               >
                 {todayAttendance?.clockIn ? "Checked In" : loading ? "Checking In..." : "Check In"}
               </Button>
+              <Button
+                size="large"
+                variant="outlined"
+                color="warning"
+                disabled={!employeeId || !todayAttendance?.clockIn || Boolean(todayAttendance?.clockOut) || clockingOut}
+                onClick={() =>
+                  clockOut({
+                    variables: { employeeId },
+                    context: { headers: { authorization: `Bearer ${employeeToken}` } },
+                  })
+                }
+              >
+                {todayAttendance?.clockOut ? `Checked Out ${dayjs(todayAttendance.clockOut).format("hh:mm A")}` : clockingOut ? "Checking Out..." : "Check Out"}
+              </Button>
+
+              <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 2 }}>
+                <Typography fontWeight={700} mb={1}>Ask Leave</Typography>
+                <Formik
+                  initialValues={{ date: dayjs().format("YYYY-MM-DD"), reason: "" }}
+                  validationSchema={Yup.object({
+                    date: Yup.string().required("Date is required"),
+                    reason: Yup.string().required("Reason is required"),
+                  })}
+                  onSubmit={(values, helpers) => {
+                    createLeaveRequest({
+                      variables: { input: { employeeId, date: values.date, reason: values.reason } },
+                      context: { headers: { authorization: `Bearer ${employeeToken}` } },
+                    });
+                    helpers.resetForm({ values: { date: dayjs().format("YYYY-MM-DD"), reason: "" } });
+                  }}
+                >
+                  {({ errors, touched, handleChange, values }) => (
+                    <Form>
+                      <Stack spacing={1.5}>
+                        <TextField
+                          name="date"
+                          type="date"
+                          size="small"
+                          value={values.date}
+                          onChange={handleChange}
+                          error={touched.date && Boolean(errors.date)}
+                          helperText={touched.date && errors.date}
+                          fullWidth
+                        />
+                        <TextField
+                          name="reason"
+                          size="small"
+                          value={values.reason}
+                          onChange={handleChange}
+                          error={touched.reason && Boolean(errors.reason)}
+                          helperText={touched.reason && errors.reason}
+                          fullWidth
+                          multiline
+                          rows={2}
+                          placeholder="Reason"
+                        />
+                        <Button type="submit" variant="contained" disabled={creatingLeave}>
+                          {creatingLeave ? "Sending..." : "Send Request"}
+                        </Button>
+                      </Stack>
+                    </Form>
+                  )}
+                </Formik>
+              </Box>
+
+              <Box>
+                <Typography fontWeight={700} mb={1}>My Attendance</Typography>
+                <Grid container spacing={1}>
+                  {attendanceHistory.map((row) => (
+                    <Grid size={{ xs: 12 }} key={row._id}>
+                      <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 1.5 }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                          <Typography fontWeight={700}>{dayjs(row.date).format("DD MMM YYYY")}</Typography>
+                          <Chip size="small" label={row.status || "-"} />
+                        </Stack>
+                        <Typography color="text.secondary" fontSize={13}>
+                          In: {row.clockIn ? dayjs(row.clockIn).format("hh:mm A") : "-"} · Out: {row.clockOut ? dayjs(row.clockOut).format("hh:mm A") : "-"}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+
+              <Box>
+                <Typography fontWeight={700} mb={1}>My Leave Requests</Typography>
+                <Stack spacing={1}>
+                  {leaveRequests.map((row) => (
+                    <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 1.5 }} key={row._id}>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Typography fontWeight={700}>{dayjs(row.date).format("DD MMM YYYY")}</Typography>
+                        <Chip
+                          size="small"
+                          color={row.status === "approved" ? "success" : row.status === "rejected" ? "error" : "warning"}
+                          label={row.status}
+                        />
+                      </Stack>
+                      <Typography color="text.secondary" fontSize={13}>{row.reason}</Typography>
+                      {row.adminRemark && <Typography color="text.secondary" fontSize={12}>Admin: {row.adminRemark}</Typography>}
+                    </Box>
+                  ))}
+                </Stack>
+              </Box>
               <Button variant="text" color="inherit" onClick={handleLogout}>
                 Logout
               </Button>

@@ -1870,6 +1870,32 @@ query GetAttendanceOverview($employeeId: ID, $month: Int, $year: Int) {
   }
 }`
 
+export const GET_LEAVE_REQUESTS_WITH_PAGINATION = gql`
+query GetLeaveRequestsWithPagination($page: Int, $limit: Int, $pagination: Boolean, $employeeId: ID, $status: LeaveRequestStatus) {
+  getLeaveRequestsWithPagination(page: $page, limit: $limit, pagination: $pagination, employeeId: $employeeId, status: $status) {
+    data {
+      _id
+      date
+      reason
+      status
+      adminRemark
+      reviewedAt
+      createdAt
+      employee {
+        _id
+        nameKh
+        nameEn
+        position
+      }
+    }
+    paginator {
+      totalDocs
+      totalPages
+      currentPage
+    }
+  }
+}`
+
 export const GET_PURCHASE_ORDER_WITH_PAGINATION = gql`
 query GetPurchaseOrdersWithPagination($supplierId: ID, $shopId: ID, $status: PurchaseOrderStatus, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
   getPurchaseOrdersWithPagination(supplierId: $supplierId, shopId: $shopId, status: $status, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {
