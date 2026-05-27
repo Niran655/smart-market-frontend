@@ -1,7 +1,7 @@
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import { useQuery } from "@apollo/client/react";
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Breadcrumbs, Button, Grid, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Breadcrumbs, Button, Grid, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -91,6 +91,7 @@ export default function Employee() {
           <TableHead>
             <TableRow>
               <TableCell>{t("no")}</TableCell>
+              <TableCell>{t("image")}</TableCell>
               <TableCell>{t("khmer_name")}</TableCell>
               <TableCell>{t("english_name")}</TableCell>
               <TableCell>{t("phone")}</TableCell>
@@ -108,6 +109,11 @@ export default function Employee() {
               {employees.map((employee, index) => (
                 <TableRow key={employee._id} className="table-row">
                   <TableCell>{(paginator.slNo || 1) + index}</TableCell>
+                  <TableCell>
+                    <Avatar src={employee.image || ""} sx={{ width: 40, height: 40 }}>
+                      {(employee.nameEn || employee.nameKh || "?").charAt(0)}
+                    </Avatar>
+                  </TableCell>
                   <TableCell>{employee.nameKh}</TableCell>
                   <TableCell>{employee.nameEn}</TableCell>
                   <TableCell>{employee.phone}</TableCell>

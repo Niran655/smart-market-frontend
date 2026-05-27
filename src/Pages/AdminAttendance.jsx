@@ -116,8 +116,15 @@ export default function AdminAttendance() {
                   <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 2 }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="start" spacing={2}>
                       <Box>
-                        <Typography fontWeight={700}>{request.employee?.nameEn || request.employee?.nameKh || "-"}</Typography>
-                        <Typography color="text.secondary" fontSize={13}>{dayjs(request.date).format("DD MMM YYYY")}</Typography>
+                        <Stack direction="row" spacing={1.5} alignItems="center">
+                          <Avatar src={request.employee?.image || ""} sx={{ width: 40, height: 40 }}>
+                            {(request.employee?.nameEn || request.employee?.nameKh || "?").charAt(0)}
+                          </Avatar>
+                          <Box>
+                            <Typography fontWeight={700}>{request.employee?.nameEn || request.employee?.nameKh || "-"}</Typography>
+                            <Typography color="text.secondary" fontSize={13}>{dayjs(request.date).format("DD MMM YYYY")}</Typography>
+                          </Box>
+                        </Stack>
                       </Box>
                       <Chip size="small" color="warning" label={request.status} />
                     </Stack>
@@ -232,7 +239,7 @@ export default function AdminAttendance() {
                     <TableRow key={row._id} className="table-row">
                       <TableCell>
                         <Stack direction="row" spacing={1.5} alignItems="center">
-                          <Avatar sx={{ width: 40, height: 40 }}>
+                          <Avatar src={row.employee?.image || ""} sx={{ width: 40, height: 40 }}>
                             {(row.employee?.nameEn || row.employee?.nameKh || "?").charAt(0)}
                           </Avatar>
                           <Box>

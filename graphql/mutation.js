@@ -27,6 +27,7 @@ mutation LoginEmployee($email: String!, $password: String!) {
       _id
       nameKh
       nameEn
+      image
       email
       phone
       position

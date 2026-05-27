@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client/react";
 import {
+  Avatar,
   Box,
   Button,
   Chip,
@@ -298,8 +299,15 @@ export default function AttendanceQrScan() {
 
               {selectedEmployee ? (
                 <Box sx={{ bgcolor: "action.hover", borderRadius: 1, p: 2 }}>
-                  <Typography fontWeight={700}>{selectedEmployee.nameEn || selectedEmployee.nameKh}</Typography>
-                  <Typography color="text.secondary">{selectedEmployee.position || "-"}</Typography>
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <Avatar src={selectedEmployee.image || ""} sx={{ width: 54, height: 54 }}>
+                      {(selectedEmployee.nameEn || selectedEmployee.nameKh || "?").charAt(0)}
+                    </Avatar>
+                    <Box>
+                      <Typography fontWeight={700}>{selectedEmployee.nameEn || selectedEmployee.nameKh}</Typography>
+                      <Typography color="text.secondary">{selectedEmployee.position || "-"}</Typography>
+                    </Box>
+                  </Stack>
                   <Stack direction="row" spacing={1} mt={1} alignItems="center">
                     <Chip
                       size="small"

@@ -8,6 +8,7 @@ import { useAuth } from "../../Context/AuthContext";
 import ReusableForm from "../include/useForm";
 
 const initialValues = {
+  image: "",
   nameKh: "",
   nameEn: "",
   gender: "",
@@ -80,6 +81,7 @@ export default function EmployeeForm({ open, onClose, t, employeeData, dialogTit
   const handleSubmit = (values) => {
     setLoading(true);
     const input = {
+      image: values.image,
       nameKh: values.nameKh,
       nameEn: values.nameEn,
       gender: values.gender,
@@ -120,6 +122,7 @@ export default function EmployeeForm({ open, onClose, t, employeeData, dialogTit
       tabs={[
         {
           fields: [
+            { name: "image", label: t("image"), type: "image", grid: { xs: 12 } },
             { name: "nameKh", label: t("khmer_name"), grid: { xs: 12, md: 6 } },
             { name: "nameEn", label: t("english_name"), grid: { xs: 12, md: 6 } },
             {

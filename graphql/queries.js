@@ -1729,6 +1729,7 @@ query GetEmployeesWithPagination($page: Int, $limit: Int, $pagination: Boolean, 
       _id
       nameKh
       nameEn
+      image
       gender
       phone
       email
@@ -1774,6 +1775,7 @@ query GetEmployeeSalariesWithPagination($page: Int, $limit: Int, $pagination: Bo
       active
       employee {
         _id
+        image
         nameKh
         nameEn
         phone
@@ -1817,6 +1819,7 @@ query GetAttendancesWithPagination($page: Int, $limit: Int, $pagination: Boolean
       totalMinutes
       employee {
         _id
+        image
         nameKh
         nameEn
         position
