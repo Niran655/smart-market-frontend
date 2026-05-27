@@ -1732,10 +1732,6 @@ query GetEmployeesWithPagination($page: Int, $limit: Int, $pagination: Boolean, 
       gender
       phone
       email
-      user {
-        _id
-        email
-      }
       position
       hireDate
       address

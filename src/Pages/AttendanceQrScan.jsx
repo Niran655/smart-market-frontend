@@ -18,8 +18,8 @@ import { useSearchParams } from "react-router-dom";
 import * as Yup from "yup";
 import { EmailOutlined, LockOutlined, Visibility, VisibilityOff } from "@mui/icons-material";
 
-import { CLOCK_IN_ATTENDANCE, LOGIN } from "../../graphql/mutation";
-import { GET_EMPLOYEES_WITH_PAGINATION, GET_TODAY_ATTENDANCE } from "../../graphql/queries";
+import { CLOCK_IN_ATTENDANCE, LOGIN_EMPLOYEE } from "../../graphql/mutation";
+import { GET_TODAY_ATTENDANCE } from "../../graphql/queries";
 import { useAuth } from "../Context/AuthContext";
 import { translateLauguage } from "../function/translate";
 
@@ -29,38 +29,49 @@ const loginValidationSchema = Yup.object({
 });
 
 export default function AttendanceQrScan() {
-  const { language, login, setAlert, user } = useAuth();
+  const { language, setAlert } = useAuth();
   const { t } = translateLauguage(language);
   const [searchParams] = useSearchParams();
   const [scannerActive, setScannerActive] = useState(false);
   const [qrScanned, setQrScanned] = useState(searchParams.get("scan") === "1");
   const [showPassword, setShowPassword] = useState(false);
+  const [employeeToken, setEmployeeToken] = useState(() => localStorage.getItem("attendance_employee_token") || "");
+  const [employeeAccount, setEmployeeAccount] = useState(() => {
+    try {
+      const saved = localStorage.getItem("attendance_employee");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      localStorage.removeItem("attendance_employee");
+      return null;
+    }
+  });
   const autoClockInRef = useRef("");
 
-  const [loginMutation, { loading: loggingIn }] = useMutation(LOGIN, {
-    onCompleted: ({ login: loginResult }) => {
-      if (loginResult) login(loginResult.token, loginResult.user);
+  const [loginMutation, { loading: loggingIn }] = useMutation(LOGIN_EMPLOYEE, {
+    onCompleted: ({ loginEmployee }) => {
+      if (!loginEmployee) return;
+      setEmployeeToken(loginEmployee.token);
+      setEmployeeAccount(loginEmployee.employee);
+      localStorage.setItem("attendance_employee_token", loginEmployee.token);
+      localStorage.setItem("attendance_employee", JSON.stringify(loginEmployee.employee));
     },
     onError: (error) => {
       setAlert(true, "error", { messageEn: error.message, messageKh: error.message });
     },
   });
 
-  const { data: employeeData } = useQuery(GET_EMPLOYEES_WITH_PAGINATION, {
-    variables: { page: 1, limit: 100, pagination: false, keyword: user?.email || "", active: true },
-    skip: !user?.email,
-  });
-  const employees = employeeData?.getEmployeesWithPagination?.data || [];
-  const selectedEmployee = useMemo(
-    () => employees.find((employee) => employee.email?.toLowerCase() === user?.email?.toLowerCase()) || null,
-    [employees, user?.email]
-  );
+  const selectedEmployee = useMemo(() => employeeAccount, [employeeAccount]);
   const employeeId = selectedEmployee?._id || "";
 
   const { data: todayData, loading: todayLoading, refetch } = useQuery(GET_TODAY_ATTENDANCE, {
     variables: { employeeId },
-    skip: !employeeId,
+    skip: !employeeId || !employeeToken,
     fetchPolicy: "cache-and-network",
+    context: {
+      headers: {
+        authorization: employeeToken ? `Bearer ${employeeToken}` : "",
+      },
+    },
   });
   const todayAttendance = todayData?.getTodayAttendance;
 
@@ -79,8 +90,11 @@ export default function AttendanceQrScan() {
     const autoClockInKey = `${employeeId}:${dayjs().format("YYYY-MM-DD")}`;
     if (autoClockInRef.current === autoClockInKey) return;
     autoClockInRef.current = autoClockInKey;
-    clockIn({ variables: { employeeId } });
-  }, [clockIn, employeeId, loading, qrScanned, todayAttendance?.clockIn, todayLoading]);
+    clockIn({
+      variables: { employeeId },
+      context: { headers: { authorization: `Bearer ${employeeToken}` } },
+    });
+  }, [clockIn, employeeId, employeeToken, loading, qrScanned, todayAttendance?.clockIn, todayLoading]);
 
   useEffect(() => {
     if (!scannerActive) return undefined;
@@ -126,6 +140,13 @@ export default function AttendanceQrScan() {
     loginMutation({ variables: values });
   };
 
+  const handleLogout = () => {
+    setEmployeeToken("");
+    setEmployeeAccount(null);
+    localStorage.removeItem("attendance_employee_token");
+    localStorage.removeItem("attendance_employee");
+  };
+
   return (
     <Box
       sx={{
@@ -143,11 +164,11 @@ export default function AttendanceQrScan() {
             <ScanLine size={42} color="#1D4592" />
             <Typography variant="h5" fontWeight={800}>Attendance Check In</Typography>
             <Typography color="text.secondary" textAlign="center">
-              {user ? "Your attendance account is ready for QR check in." : "Login with your staff account to continue."}
+              {selectedEmployee ? "Your attendance account is ready for QR check in." : "Login with your staff account to continue."}
             </Typography>
           </Stack>
 
-          {!user ? (
+          {!selectedEmployee ? (
             <Formik
               initialValues={{ email: "", password: "" }}
               validationSchema={loginValidationSchema}
@@ -246,7 +267,7 @@ export default function AttendanceQrScan() {
                 <Box sx={{ bgcolor: "action.hover", borderRadius: 1, p: 2 }}>
                   <Typography fontWeight={700}>No staff profile found</Typography>
                   <Typography color="text.secondary">
-                    Create an employee with the login email {user?.email || "-"}.
+                    Login with an employee account created from Employee setup.
                   </Typography>
                 </Box>
               )}
@@ -256,9 +277,17 @@ export default function AttendanceQrScan() {
                 variant="contained"
                 startIcon={todayAttendance?.clockIn ? <CheckCircle2 size={18} /> : <LogIn size={18} />}
                 disabled={!employeeId || !qrScanned || loading || Boolean(todayAttendance?.clockIn)}
-                onClick={() => clockIn({ variables: { employeeId } })}
+                onClick={() =>
+                  clockIn({
+                    variables: { employeeId },
+                    context: { headers: { authorization: `Bearer ${employeeToken}` } },
+                  })
+                }
               >
                 {todayAttendance?.clockIn ? "Checked In" : loading ? "Checking In..." : "Check In"}
+              </Button>
+              <Button variant="text" color="inherit" onClick={handleLogout}>
+                Logout
               </Button>
             </>
           )}

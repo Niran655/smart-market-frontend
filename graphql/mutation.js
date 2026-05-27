@@ -19,6 +19,23 @@ mutation Login($email: String!, $password: String!) {
 }
 `
 
+export const LOGIN_EMPLOYEE = gql`
+mutation LoginEmployee($email: String!, $password: String!) {
+  loginEmployee(email: $email, password: $password) {
+    token
+    employee {
+      _id
+      nameKh
+      nameEn
+      email
+      phone
+      position
+      active
+    }
+  }
+}
+`
+
 export const CREATE_USER = gql`
 mutation CreateUser($input: RegisterInput) {
   createUser(input: $input) {
