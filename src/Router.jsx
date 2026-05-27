@@ -40,7 +40,9 @@ import AttendanceQrScan from './Pages/AttendanceQrScan';
 export default function Router() {
   const { isAuthenticated } = useAuth();
 
- 
+  const AttendanceCheckInPage = useRoutes([
+    { path: '/setting/attendance-qr-scan', element: <AttendanceQrScan /> },
+  ]);
 
 
   const LoginPage = useRoutes([
@@ -69,7 +71,6 @@ export default function Router() {
         { path: '/setting/employee-attendance', element: <EmployeeAttendance/>},
         { path: '/setting/admin-attendance', element: <AdminAttendance/>},
         { path: '/setting/attendance-qr', element: <AttendanceQr/>},
-        { path: '/setting/attendance-qr-scan', element: <AttendanceQrScan/>},
         { path: '/store', element: <Store/>},
         { path: 'report', element: <Report/> },
         { path: 'expense', element: <Expense/> },
@@ -94,6 +95,6 @@ export default function Router() {
     },
   ]);
   
-  return isAuthenticated ? Content : LoginPage;
+  return AttendanceCheckInPage || (isAuthenticated ? Content : LoginPage);
 
 }
