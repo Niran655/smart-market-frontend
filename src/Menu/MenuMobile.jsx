@@ -60,6 +60,18 @@ export default function MenuMobile({ onNavigate, showLabels }) {
       title: "Restaurant",
       items: [{ pageTitle: "Tables", routeTo: "/setting/table" }],
     },
+    {
+      title: "HMR",
+      items: [
+        { pageTitle: "Employees", routeTo: "/setting/employee" },
+        { pageTitle: "Departments", routeTo: "/setting/department" },
+        { pageTitle: "Employee Salary", routeTo: "/setting/employee-salary" },
+        { pageTitle: "Employee Attendance", routeTo: "/setting/employee-attendance" },
+        { pageTitle: "Admin Attendance", routeTo: "/setting/admin-attendance" },
+        { pageTitle: "Attendance QR", routeTo: "/setting/attendance-qr" },
+        { pageTitle: "QR Check In", routeTo: "/setting/attendance-qr-scan" },
+      ],
+    },
   ];
 
  

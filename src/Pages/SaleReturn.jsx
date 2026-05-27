@@ -1,5 +1,8 @@
 import { useQuery } from "@apollo/client/react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import {
   Box,
   Breadcrumbs,
@@ -7,6 +10,7 @@ import {
   Chip,
   Grid,
   InputAdornment,
+  MenuItem,
   Stack,
   Table,
   TableBody,
@@ -34,6 +38,16 @@ import "../Styles/TableStyle.scss";
 
 const formatMoney = (value) => `$${Number(value || 0).toFixed(2)}`;
 const formatDate = (value) => (value ? dayjs(value).format("DD MMM YYYY") : "-");
+const getPaymentStatus = (row) => {
+  const total = Number(row?.total || 0);
+  const paid = Number(row?.amountPaid || 0);
+  const due = Math.max(total - paid, 0);
+
+  if (due <= 0 && total > 0) return { label: "Paid", color: "success" };
+  if (paid > 0) return { label: "Partial", color: "warning" };
+  return { label: "Unpaid", color: "error" };
+};
+const paymentStatusValue = (row) => getPaymentStatus(row).label.toLowerCase();
 
 export default function SaleReturn() {
   const { language } = useAuth();
@@ -41,11 +55,24 @@ export default function SaleReturn() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [keyword, setKeyword] = useState("");
+  const [customerFilter, setCustomerFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("refunded");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [dialogMode, setDialogMode] = useState(null);
   const [selectedSale, setSelectedSale] = useState(null);
 
   const { data, loading, refetch } = useQuery(GET_SALES, {
-    variables: { status: "refunded", page, limit, pagination: true, keyword },
+    variables: {
+      status: statusFilter === "all" ? null : statusFilter,
+      page,
+      limit,
+      pagination: true,
+      keyword,
+      startDate: startDate ? dayjs(startDate).startOf("day").toISOString() : null,
+      endDate: endDate ? dayjs(endDate).endOf("day").toISOString() : null,
+    },
     fetchPolicy: "cache-and-network",
   });
 
@@ -54,7 +81,15 @@ export default function SaleReturn() {
     fetchPolicy: "cache-and-network",
   });
 
-  const returns = data?.getSales?.data || [];
+  const returns = (data?.getSales?.data || []).filter((row) => {
+    const matchesCustomer = (row.customerName || "")
+      .toLowerCase()
+      .includes(customerFilter.trim().toLowerCase());
+    const matchesPaymentStatus =
+      paymentStatusFilter === "all" || paymentStatusValue(row) === paymentStatusFilter;
+
+    return matchesCustomer && matchesPaymentStatus;
+  });
   const invoices = invoiceData?.getSales?.data || [];
   const paginator = data?.getSales?.paginator || {};
 
@@ -70,7 +105,8 @@ export default function SaleReturn() {
   };
 
   return (
-    <Box>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Box>
       <Breadcrumbs separator="/">
         <Typography
           component={RouterLink}
@@ -92,7 +128,7 @@ export default function SaleReturn() {
         mt={5}
       >
         <Grid container spacing={2} alignItems="center" sx={{ flex: 1 }}>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <Typography textAlign={'left'} variant="body2" fontWeight={500} mb={0.5}>
               {t("search")}
             </Typography>
@@ -115,9 +151,103 @@ export default function SaleReturn() {
               }}
             />
           </Grid>
+          <Grid size={{ xs: 12, md: 2 }}>
+            <Typography textAlign="left" variant="body2" fontWeight={500} mb={0.5}>
+              {t("customer")}
+            </Typography>
+            <TextField
+              fullWidth
+              size="small"
+              value={customerFilter}
+              placeholder={t("customer")}
+              onChange={(event) => {
+                setCustomerFilter(event.target.value);
+                setPage(1);
+              }}
+              inputProps={{ style: { textAlign: "left" } }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 2 }}>
+            <Typography textAlign="left" variant="body2" fontWeight={500} mb={0.5}>
+              {t("status")}
+            </Typography>
+            <TextField
+              select
+              fullWidth
+              size="small"
+              value={statusFilter}
+              onChange={(event) => {
+                setStatusFilter(event.target.value);
+                setPage(1);
+              }}
+              sx={{ "& .MuiSelect-select": { textAlign: "left" } }}
+            >
+              <MenuItem value="refunded">{t("refunded") || "Refunded"}</MenuItem>
+              <MenuItem value="completed">{t("completed") || "Completed"}</MenuItem>
+              <MenuItem value="pending">{t("pending") || "Pending"}</MenuItem>
+              <MenuItem value="all">{t("all") || "All"}</MenuItem>
+            </TextField>
+          </Grid>
+          <Grid size={{ xs: 12, md: 2 }}>
+            <Typography textAlign="left" variant="body2" fontWeight={500} mb={0.5}>
+              Payment Status
+            </Typography>
+            <TextField
+              select
+              fullWidth
+              size="small"
+              value={paymentStatusFilter}
+              onChange={(event) => {
+                setPaymentStatusFilter(event.target.value);
+                setPage(1);
+              }}
+              sx={{ "& .MuiSelect-select": { textAlign: "left" } }}
+            >
+              <MenuItem value="all">{t("all") || "All"}</MenuItem>
+              <MenuItem value="paid">{t("paid") || "Paid"}</MenuItem>
+              <MenuItem value="partial">Partial</MenuItem>
+              <MenuItem value="unpaid">Unpaid</MenuItem>
+            </TextField>
+          </Grid>
+          <Grid size={{ xs: 12, md: 3 }}>
+            <Typography textAlign="left" variant="body2" fontWeight={500} mb={0.5}>
+              {t("date") || "Date"}
+            </Typography>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+              <DatePicker
+                value={startDate}
+                onChange={(newValue) => {
+                  setStartDate(newValue);
+                  setPage(1);
+                }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    size: "small",
+                    placeholder: t("start_date") || "Start date",
+                  },
+                }}
+              />
+              
+              <DatePicker
+                value={endDate}
+                onChange={(newValue) => {
+                  setEndDate(newValue);
+                  setPage(1);
+                }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    size: "small",
+                    placeholder: t("end_date") || "End date",
+                  },
+                }}
+              />
+            </Stack>
+          </Grid>
         </Grid>
-        <Button variant="contained" startIcon={<AddCircleOutlineIcon />} onClick={() => setDialogMode("create")}>
-          {t("add_return")}
+        <Button sx={{mt:3}} variant="contained" startIcon={<AddCircleOutlineIcon />} onClick={() => setDialogMode("create")}>
+          {t("create")}
         </Button>
       </Box>
 
@@ -125,12 +255,14 @@ export default function SaleReturn() {
         <Table className="table">
           <TableHead>
             <TableRow>
-              <TableCell>{t("no")}</TableCell>
-              <TableCell>{t("reference")}</TableCell>
-              <TableCell>{t("customer")}</TableCell>
+              <TableCell>{t("invoice_num") || "Invoice Number"}</TableCell>
               <TableCell>{t("date")}</TableCell>
-              <TableCell>{t("grand_total")}</TableCell>
+              <TableCell>{t("customer")}</TableCell>
               <TableCell>{t("status")}</TableCell>
+              <TableCell>{t("total") || "Total"}</TableCell>
+              <TableCell>{t("paid") || "Paid"}</TableCell>
+              <TableCell>{t("due") || "Due"}</TableCell>
+              <TableCell>Payment Status</TableCell>
               <TableCell align="center">{t("action")}</TableCell>
             </TableRow>
           </TableHead>
@@ -140,32 +272,41 @@ export default function SaleReturn() {
             <EmptyData />
           ) : (
             <TableBody>
-              {returns.map((row, index) => (
-                <TableRow key={row._id} className="table-row">
-                  <TableCell>{(paginator.slNo || 1) + index}</TableCell>
-                  <TableCell>{row.saleNumber}</TableCell>
-                  <TableCell>{row.customerName || "-"}</TableCell>
-                  <TableCell>{formatDate(row.createdAt)}</TableCell>
-                  <TableCell>{formatMoney(row.total)}</TableCell>
-                  <TableCell>
-                    <Chip size="small" label={row.status} color="error" variant="outlined" />
-                  </TableCell>
-                  <TableCell align="center">
-                    <SaleReturnAction
-                      row={row}
-                      onView={(sale) => {
-                        setSelectedSale(sale);
-                        setDialogMode("view");
-                      }}
-                      onEdit={(sale) => {
-                        setSelectedSale(sale);
-                        setDialogMode("edit");
-                      }}
-                      onDeleted={refresh}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
+              {returns.map((row) => {
+                const due = Math.max(Number(row.total || 0) - Number(row.amountPaid || 0), 0);
+                const paymentStatus = getPaymentStatus(row);
+
+                return (
+                  <TableRow key={row._id} className="table-row">
+                    <TableCell>{row.saleNumber || "-"}</TableCell>
+                    <TableCell>{formatDate(row.createdAt)}</TableCell>
+                    <TableCell>{row.customerName || "-"}</TableCell>
+                    <TableCell>
+                      <Chip size="small" label={row.status} color="error" variant="outlined" />
+                    </TableCell>
+                    <TableCell>{formatMoney(row.total)}</TableCell>
+                    <TableCell>{formatMoney(row.amountPaid)}</TableCell>
+                    <TableCell>{formatMoney(due)}</TableCell>
+                    <TableCell>
+                      <Chip size="small" label={paymentStatus.label} color={paymentStatus.color} variant="outlined" />
+                    </TableCell>
+                    <TableCell align="center">
+                      <SaleReturnAction
+                        row={row}
+                        onView={(sale) => {
+                          setSelectedSale(sale);
+                          setDialogMode("view");
+                        }}
+                        onEdit={(sale) => {
+                          setSelectedSale(sale);
+                          setDialogMode("edit");
+                        }}
+                        onDeleted={refresh}
+                      />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           )}
         </Table>
@@ -195,6 +336,7 @@ export default function SaleReturn() {
         t={t}
         language={language}
       />
-    </Box>
+      </Box>
+    </LocalizationProvider>
   );
 }

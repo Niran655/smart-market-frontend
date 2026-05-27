@@ -179,6 +179,7 @@ export default function ReusableForm({
           <TextField
             fullWidth
             size="small"
+            type={field.type || "text"}
             rows={field.rows || null}
             multiline={Boolean(field.rows)}
             placeholder={placeholder}

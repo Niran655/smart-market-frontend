@@ -515,6 +515,114 @@ mutation DeleteSupplier($id: ID!) {
 }
 `
 
+export const CREATE_DEPARTMENT = gql`
+mutation CreateDepartment($input: DepartmentInput) {
+  createDepartment(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const UPDATE_DEPARTMENT = gql`
+mutation UpdateDepartment($id: ID!, $input: DepartmentInput) {
+  updateDepartment(_id: $id, input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const DELETE_DEPARTMENT = gql`
+mutation DeleteDepartment($id: ID!) {
+  deleteDepartment(_id: $id) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const CREATE_EMPLOYEE = gql`
+mutation CreateEmployee($input: EmployeeInput) {
+  createEmployee(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const UPDATE_EMPLOYEE = gql`
+mutation UpdateEmployee($id: ID!, $input: EmployeeInput) {
+  updateEmployee(_id: $id, input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const DELETE_EMPLOYEE = gql`
+mutation DeleteEmployee($id: ID!) {
+  deleteEmployee(_id: $id) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const CREATE_EMPLOYEE_SALARY = gql`
+mutation CreateEmployeeSalary($input: EmployeeSalaryInput) {
+  createEmployeeSalary(input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const UPDATE_EMPLOYEE_SALARY = gql`
+mutation UpdateEmployeeSalary($id: ID!, $input: EmployeeSalaryInput) {
+  updateEmployeeSalary(_id: $id, input: $input) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
+export const DELETE_EMPLOYEE_SALARY = gql`
+mutation DeleteEmployeeSalary($id: ID!) {
+  deleteEmployeeSalary(_id: $id) {
+    isSuccess
+    message {
+      messageEn
+      messageKh
+    }
+  }
+}
+`
+
 
 export const CREATE_PURCHASE_ORDER = gql`
 mutation CreatePurchaseOrder($input: CreatePurchaseOrderInput) {
@@ -759,6 +867,58 @@ mutation DeleteIncome($id: ID!) {
       messageEn
       messageKh
     }
+  }
+}
+`
+
+const attendanceMutationFields = `
+  isSuccess
+  message {
+    messageEn
+    messageKh
+  }
+  data {
+    _id
+    date
+    status
+    clockIn
+    clockOut
+    breakStart
+    breakMinutes
+    productionMinutes
+    overtimeMinutes
+    totalMinutes
+  }
+`;
+
+export const CLOCK_IN_ATTENDANCE = gql`
+mutation ClockInAttendance($employeeId: ID!) {
+  clockInAttendance(employeeId: $employeeId) {
+    ${attendanceMutationFields}
+  }
+}
+`
+
+export const START_ATTENDANCE_BREAK = gql`
+mutation StartAttendanceBreak($employeeId: ID!) {
+  startAttendanceBreak(employeeId: $employeeId) {
+    ${attendanceMutationFields}
+  }
+}
+`
+
+export const END_ATTENDANCE_BREAK = gql`
+mutation EndAttendanceBreak($employeeId: ID!) {
+  endAttendanceBreak(employeeId: $employeeId) {
+    ${attendanceMutationFields}
+  }
+}
+`
+
+export const CLOCK_OUT_ATTENDANCE = gql`
+mutation ClockOutAttendance($employeeId: ID!) {
+  clockOutAttendance(employeeId: $employeeId) {
+    ${attendanceMutationFields}
   }
 }
 `

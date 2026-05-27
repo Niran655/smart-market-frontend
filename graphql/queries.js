@@ -1694,6 +1694,186 @@ query GetSuppliersWithPagination($page: Int, $limit: Int, $pagination: Boolean, 
   }
 }`
 
+export const GET_DEPARTMENTS_WITH_PAGINATION = gql`
+query GetDepartmentsWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $active: Boolean) {
+  getDepartmentsWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, active: $active) {
+    data {
+      _id
+      nameKh
+      nameEn
+      code
+      remark
+      active
+      createdAt
+      updatedAt
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
+  }
+}`
+
+export const GET_EMPLOYEES_WITH_PAGINATION = gql`
+query GetEmployeesWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $active: Boolean, $departmentId: ID) {
+  getEmployeesWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, active: $active, departmentId: $departmentId) {
+    data {
+      _id
+      nameKh
+      nameEn
+      gender
+      phone
+      email
+      user {
+        _id
+        email
+      }
+      position
+      hireDate
+      address
+      remark
+      active
+      department {
+        _id
+        nameKh
+        nameEn
+      }
+      createdAt
+      updatedAt
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
+  }
+}`
+
+export const GET_EMPLOYEE_SALARIES_WITH_PAGINATION = gql`
+query GetEmployeeSalariesWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $active: Boolean, $employeeId: ID) {
+  getEmployeeSalariesWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, active: $active, employeeId: $employeeId) {
+    data {
+      _id
+      baseSalary
+      allowance
+      deduction
+      currency
+      effectiveDate
+      remark
+      active
+      employee {
+        _id
+        nameKh
+        nameEn
+        phone
+        department {
+          _id
+          nameKh
+          nameEn
+        }
+      }
+      createdAt
+      updatedAt
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
+  }
+}`
+
+export const GET_ATTENDANCES_WITH_PAGINATION = gql`
+query GetAttendancesWithPagination($page: Int, $limit: Int, $pagination: Boolean, $keyword: String, $employeeId: ID, $status: AttendanceStatus, $startDate: Date, $endDate: Date) {
+  getAttendancesWithPagination(page: $page, limit: $limit, pagination: $pagination, keyword: $keyword, employeeId: $employeeId, status: $status, startDate: $startDate, endDate: $endDate) {
+    data {
+      _id
+      date
+      status
+      clockIn
+      clockOut
+      breakStart
+      breakMinutes
+      productionMinutes
+      overtimeMinutes
+      totalMinutes
+      employee {
+        _id
+        nameKh
+        nameEn
+        position
+        department {
+          _id
+          nameKh
+          nameEn
+        }
+      }
+    }
+    paginator {
+      slNo
+      prev
+      next
+      perPage
+      totalPosts
+      totalPages
+      currentPage
+      hasPrevPage
+      hasNextPage
+      totalDocs
+    }
+  }
+}`
+
+export const GET_TODAY_ATTENDANCE = gql`
+query GetTodayAttendance($employeeId: ID!) {
+  getTodayAttendance(employeeId: $employeeId) {
+    _id
+    date
+    status
+    clockIn
+    clockOut
+    breakStart
+    breakMinutes
+    productionMinutes
+    overtimeMinutes
+    totalMinutes
+  }
+}`
+
+export const GET_ATTENDANCE_OVERVIEW = gql`
+query GetAttendanceOverview($employeeId: ID, $month: Int, $year: Int) {
+  getAttendanceOverview(employeeId: $employeeId, month: $month, year: $year) {
+    totalWorkingDays
+    absentDays
+    presentDays
+    halfDays
+    lateDays
+    holidayDays
+  }
+}`
+
 export const GET_PURCHASE_ORDER_WITH_PAGINATION = gql`
 query GetPurchaseOrdersWithPagination($supplierId: ID, $shopId: ID, $status: PurchaseOrderStatus, $page: Int, $limit: Int, $pagination: Boolean, $keyword: String) {
   getPurchaseOrdersWithPagination(supplierId: $supplierId, shopId: $shopId, status: $status, page: $page, limit: $limit, pagination: $pagination, keyword: $keyword) {

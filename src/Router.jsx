@@ -29,6 +29,13 @@ import Expense from './Pages/Expense';
 import Income from './Pages/Income';
 import Invoice from './Pages/Invoice';
 import SaleReturn from './Pages/SaleReturn';
+import Employee from './Pages/Employee';
+import Department from './Pages/Department';
+import EmployeeSalary from './Pages/EmployeeSalary';
+import EmployeeAttendance from './Pages/EmployeeAttendance';
+import AdminAttendance from './Pages/AdminAttendance';
+import AttendanceQr from './Pages/AttendanceQr';
+import AttendanceQrScan from './Pages/AttendanceQrScan';
  
 export default function Router() {
   const { isAuthenticated } = useAuth();
@@ -56,6 +63,13 @@ export default function Router() {
         { path: '/setting/customer', element: <Customer/>},
         { path: '/setting/table', element: <TablePage/>},
         { path: '/setting/permission', element: <Permission/>},
+        { path: '/setting/employee', element: <Employee/>},
+        { path: '/setting/department', element: <Department/>},
+        { path: '/setting/employee-salary', element: <EmployeeSalary/>},
+        { path: '/setting/employee-attendance', element: <EmployeeAttendance/>},
+        { path: '/setting/admin-attendance', element: <AdminAttendance/>},
+        { path: '/setting/attendance-qr', element: <AttendanceQr/>},
+        { path: '/setting/attendance-qr-scan', element: <AttendanceQrScan/>},
         { path: '/store', element: <Store/>},
         { path: 'report', element: <Report/> },
         { path: 'expense', element: <Expense/> },
